@@ -137,7 +137,7 @@ export function ContactsPicker(props: {
 
 function Message({ title, body, cta, onCta, onClose }: { title: string; body: string; cta: string; onCta: () => void; onClose?: () => void }) {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 14, padding: 28, paddingTop: 44 }}>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 14, padding: 28, paddingTop: 42 }}>
       <View style={{ width: 72, height: 72, borderRadius: 22, backgroundColor: C.wa, alignItems: 'center', justifyContent: 'center' }}>
         <T w={800} size={30} color={C.white} lh={1.6}>+</T>
       </View>
