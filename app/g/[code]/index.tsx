@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { backend } from '@/backend';
 import { C } from '@/theme/tokens';
 import { Btn, Screen, T, toast } from '@/ui';
@@ -23,8 +23,9 @@ export default function GameRoute() {
   const joining = useRef(false);
 
   // Signed out (or still picking a username): remember the link so sign-in comes back here, even after a reload.
-  // Once the person is in, the link has done its job.
-  useEffect(() => { setPendingCode(user && !needsUsername(user) ? null : code); }, [code, user]);
+  // Once the person is in, the link has done its job. Only while this screen is in front — a guest saving their
+  // account from Results goes through /sign-in on top of it, and must still come back here afterwards.
+  useFocusEffect(useCallback(() => { setPendingCode(user && !needsUsername(user) ? null : code); }, [code, user]));
 
   const member = !!game && !!user && (game.hostUid === user.uid || game.players.some((p) => p.uid === user.uid));
   useEffect(() => {

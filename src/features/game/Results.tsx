@@ -5,6 +5,7 @@ import { backend } from '@/backend';
 import type { User } from '@/backend/types';
 import { AdSlot } from '@/lib/ads';
 import { say } from '@/lib/speech';
+import { setPendingCode } from '@/state/session';
 import { C, R } from '@/theme/tokens';
 import { Avatar, BackBtn, Btn, Eyebrow, LinkBtn, Screen, T, first, toast } from '@/ui';
 import { formatINR, roundResults } from '@core/stats.ts';
@@ -112,7 +113,7 @@ export function Results({ game, user }: { game: GameView; user: User }) {
         )}
 
         {user.isGuest && (
-          <Pressable onPress={() => router.push('/sign-in')} accessibilityRole="button" accessibilityLabel="Save your account to keep your wins"
+          <Pressable onPress={() => { setPendingCode(code); router.push('/sign-in'); }} accessibilityRole="button" accessibilityLabel="Save your account to keep your wins"
             style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: R.card, backgroundColor: C.surf, borderWidth: 1.5, borderColor: C.line }}>
             <View style={{ flex: 1, minWidth: 0 }}>
               <T w={800} size={17}>Save your account to keep your wins</T>

@@ -129,6 +129,13 @@ export function createLocalBackend(): Backend {
     channel?.postMessage({ code });
   };
 
+  // Two tabs acting in the same instant would both read the old game and the second write would undo the first
+  // (two players racing for a prize would both be told they won). Where the browser has Web Locks, actions on
+  // one game run strictly one after another across tabs. Native and tests have a single writer already.
+  const locks: LockManager | null = isWeb && typeof navigator !== 'undefined' && navigator.locks ? navigator.locks : null;
+  const exclusive = <T,>(code: string, fn: () => T): Promise<T> =>
+    locks ? (locks.request(KV_PREFIX + K.game(code), fn) as Promise<T>) : Promise.resolve(fn());
+
   const signedOut: ActionResult = { ok: false, error: 'Please sign in first' };
   const liveOnly = (provider: string): ActionResult =>
     ({ ok: false, error: `${provider} sign-in needs the live backend — use your phone number in demo mode` });
@@ -323,13 +330,15 @@ export function createLocalBackend(): Backend {
       const user = me();
       if (!user) return signedOut;
       const id = norm(code);
-      const doc = readDoc(id);
-      if (!doc) return { ok: false, error: 'Game not found' };
-      const r = applyAction(doc, readTickets(id), action, asActor(user), ctx());
-      if (r.docChanged) kvSet(K.game(id), r.doc);
-      if (r.touched.length) kvSet(K.tickets(id), r.tickets);
-      if (r.docChanged || r.touched.length) changed(id);
-      return r.ok ? { ok: true } : { ok: false, error: r.error ?? 'Something went wrong' };
+      return exclusive(id, (): ActionResult => {
+        const doc = readDoc(id);
+        if (!doc) return { ok: false, error: 'Game not found' };
+        const r = applyAction(doc, readTickets(id), action, asActor(user), ctx());
+        if (r.docChanged) kvSet(K.game(id), r.doc);
+        if (r.touched.length) kvSet(K.tickets(id), r.tickets);
+        if (r.docChanged || r.touched.length) changed(id);
+        return r.ok ? { ok: true } : { ok: false, error: r.error ?? 'Something went wrong' };
+      });
     },
     subscribe(code, cb) {
       const id = norm(code);

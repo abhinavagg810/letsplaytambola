@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
-import { Stack, type ErrorBoundaryProps } from 'expo-router';
+import { Stack, router, usePathname, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
@@ -21,15 +21,26 @@ function Crashed({ onRetry }: { onRetry: () => void }) {
   );
 }
 
-/** Catches render errors anywhere below the root layout. */
-class CrashGuard extends React.Component<{ children: React.ReactNode }, { failed: boolean; attempt: number }> {
+/**
+ * Catches render errors anywhere below the root layout. "Try again" remounts the navigator (a fresh start for
+ * whatever state broke) and then goes back to the route the person was on.
+ */
+class CrashGuard extends React.Component<{ path: string; children: React.ReactNode }, { failed: boolean; attempt: number }> {
   state = { failed: false, attempt: 0 };
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(error: unknown) { console.warn('Screen crashed:', error); }
-  retry = () => this.setState((s) => ({ failed: false, attempt: s.attempt + 1 }));
+  /** Where the person was when things were last fine (the path resets once the broken navigator is taken down). */
+  lastPath = this.props.path;
+  retry = () => {
+    const path = this.lastPath;
+    this.setState((s) => ({ failed: false, attempt: s.attempt + 1 }), () => {
+      // The remounted navigator starts at the entry route; put the person back where they were.
+      setTimeout(() => { try { router.replace(path as never); } catch { /* the entry route is a fine fallback */ } }, 0);
+    });
+  };
   render() {
     if (this.state.failed) return <Crashed onRetry={this.retry} />;
-    // A new key remounts the navigator, so the current route loads from scratch.
+    this.lastPath = this.props.path;
     return <React.Fragment key={this.state.attempt}>{this.props.children}</React.Fragment>;
   }
 }
@@ -42,13 +53,14 @@ export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
 export default function RootLayout() {
   const [fontsReady] = useFonts({ Baloo2_500Medium, Baloo2_600SemiBold, Baloo2_800ExtraBold, JetBrainsMono_500Medium });
   const ready = session.use((s) => s.ready);
+  const path = usePathname();
   useEffect(() => { initSession(); }, []);
   if (!fontsReady || !ready) return <View style={{ flex: 1, backgroundColor: C.bg }} />;
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
       <View style={{ flex: 1, backgroundColor: C.bg }}>
-        <CrashGuard>
+        <CrashGuard path={path}>
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.bg }, animation: 'fade' }} />
         </CrashGuard>
         <ToastHost />

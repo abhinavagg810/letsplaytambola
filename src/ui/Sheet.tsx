@@ -15,7 +15,7 @@ export function Sheet({ open, onClose, children, height, light }: { open: boolea
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <Pressable accessibilityLabel="Close" onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(10,4,24,0.6)' }} />
+        <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(10,4,24,0.6)' }} />
         <Animated.View style={{
           position: 'absolute', left: 0, right: 0, bottom: 0, alignItems: 'center',
           transform: [{ translateY: y.interpolate({ inputRange: [0, 1], outputRange: [0, H] }) }],

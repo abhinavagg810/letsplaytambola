@@ -135,12 +135,14 @@ export function SignIn() {
   const [peek, setPeek] = useState<PeekGame | null>(null);
   const [sheet, setSheet] = useState<null | 'phone' | 'link'>(null);
   const [busy, setBusy] = useState(false);
+  // A guest saving their account is already in that game — the "shared a link" card is only for newcomers.
+  const [isNew] = useState(() => !session.get().user);
   useEffect(() => {
     let live = true;
     setPeek(null);
-    if (pendingCode) backend.peekGame(pendingCode).then((p) => { if (live) setPeek(p); }).catch(() => {});
+    if (pendingCode && isNew) backend.peekGame(pendingCode).then((p) => { if (live) setPeek(p); }).catch(() => {});
     return () => { live = false; };
-  }, [pendingCode]);
+  }, [pendingCode, isNew]);
 
   const done = () => { setSheet(null); router.replace('/'); };
   const social = async (which: 'google' | 'apple') => {

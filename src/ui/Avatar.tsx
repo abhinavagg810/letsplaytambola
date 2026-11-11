@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { C } from '@/theme/tokens';
+import { C, MIN_TEXT } from '@/theme/tokens';
 import { T } from './Text';
 
 export const initial = (n?: string | null) => (n || '?').trim().slice(0, 1).toUpperCase() || '?';
@@ -9,7 +9,7 @@ export const first = (n?: string | null) => (n || '').trim().split(' ')[0] || ''
 export function Avatar({ name, color, size = 44, ring }: { name?: string | null; color: string; size?: number; ring?: string }) {
   return (
     <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color, alignItems: 'center', justifyContent: 'center', boxShadow: ring ? `0 0 0 ${size >= 90 ? 4 : 2}px ${ring}` : undefined }}>
-      <T w={800} size={Math.round(size * 0.43)} color={C.ink} lh={1.15} style={{ paddingTop: size * 0.04 }}>{initial(name)}</T>
+      <T w={800} size={Math.max(size >= 26 ? MIN_TEXT : 0, Math.round(size * 0.43))} color={C.ink} lh={1.15} style={{ paddingTop: size * 0.04 }}>{initial(name)}</T>
     </View>
   );
 }
