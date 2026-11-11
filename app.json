@@ -9,13 +9,14 @@
     "userInterfaceStyle": "dark",
     "backgroundColor": "#1B0F34",
     "ios": { "supportsTablet": true, "bundleIdentifier": "com.letsplaytambola.app", "usesAppleSignIn": true,
-      "infoPlist": { "NSContactsUsageDescription": "Pick friends to invite to your Tambola game. We never message anyone without you." } },
-    "android": { "package": "com.letsplaytambola.app", "adaptiveIcon": { "foregroundImage": "./assets/icon.png", "backgroundColor": "#1B0F34" },
+      "infoPlist": { "NSContactsUsageDescription": "Pick friends to invite to your Tambola game. We never message anyone without you.",
+        "ITSAppUsesNonExemptEncryption": false } },
+    "android": { "package": "com.letsplaytambola.app", "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#1B0F34" },
       "permissions": ["READ_CONTACTS"] },
-    "web": { "bundler": "metro", "output": "single", "favicon": "./assets/icon.png" },
+    "web": { "bundler": "metro", "output": "single", "favicon": "./assets/favicon.png" },
     "plugins": ["expo-router", "expo-font", "expo-apple-authentication",
       ["expo-contacts", { "contactsPermission": "Pick friends to invite to your Tambola game. We never message anyone without you." }],
-      ["expo-splash-screen", { "backgroundColor": "#1B0F34", "image": "./assets/icon.png", "imageWidth": 160 }]],
+      ["expo-splash-screen", { "backgroundColor": "#1B0F34", "image": "./assets/splash-icon.png", "imageWidth": 180 }]],
     "experiments": { "typedRoutes": false }
   }
 }

@@ -8,11 +8,15 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build:web": "expo export --platform web",
+    "build:web": "expo export --platform web && node scripts/web-postbuild.js",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "sync:core": "node scripts/sync-core.js",
-    "deploy:functions": "npm run sync:core && supabase functions deploy game"
+    "deploy:functions": "npm run sync:core && supabase functions deploy game",
+    "test:sql": "bash supabase/tests/run.sh",
+    "check:functions": "npm run sync:core && deno check supabase/functions/game/index.ts",
+    "test:functions": "npm run sync:core && deno test --allow-env --allow-net supabase/functions/game/",
+    "assets": "python3 scripts/make-assets.py"
   },
   "dependencies": {
     "@expo-google-fonts/baloo-2": "^0.4.2",
@@ -22,6 +26,7 @@
     "@supabase/supabase-js": "^2.119.0",
     "expo": "^58.0.23",
     "expo-apple-authentication": "~58.0.2",
+    "expo-application": "~58.1.2",
     "expo-clipboard": "~58.0.4",
     "expo-constants": "~58.0.15",
     "expo-contacts": "~58.0.10",

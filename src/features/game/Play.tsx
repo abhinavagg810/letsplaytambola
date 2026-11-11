@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, View, useWindowDimensions } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { backend } from '@/backend';
 import type { User } from '@/backend/types';
 import { hush } from '@/lib/speech';
 import { setSetting, settings } from '@/state/settings';
@@ -16,9 +15,9 @@ import { Board } from './Board';
 import { Confetti } from './Confetti';
 import { ReactionBar, ReactionBubbles } from './Reactions';
 import { ResetSheet } from './ResetSheet';
-import { Results } from './Results';
 import { useAutoCall } from './useAutoCall';
 import { useDabs } from './useDabs';
+import { resyncGame } from './useGame';
 import { useGameEvents } from './useGameEvents';
 import { act, useOnline, useReconnectProbe } from './useOnline';
 
@@ -26,19 +25,10 @@ const AUTO_STEPS = [0, 5, 8, 12] as const;
 const TWO_COL = 740; // two 340px columns + gap + side padding
 
 /**
- * Main game screen (README §4.13). The route gives us the live view; after an offline spell we also fetch a
- * fresh copy ourselves, and the newest of the two is what gets shown.
+ * Main game screen (README §4.13). The route owns the live view (`useGame` also refetches when the person comes back
+ * to the app or the connection returns); this screen adds the offline banner and the queue of dabs made while offline.
  */
-export function Play({ game: live, user }: { game: GameView; user: User }) {
-  const [synced, setSynced] = useState<GameView | null>(null);
-  useEffect(() => { setSynced(null); }, [live]);
-  const game = synced ?? live;
-  // The round can end while we were offline — the catch-up view then goes straight to the results.
-  if (game.status === 'ended') return <Results game={game} user={user} />;
-  return <PlayBoard game={game} user={user} onResync={setSynced} />;
-}
-
-function PlayBoard({ game, user, onResync }: { game: GameView; user: User; onResync: (g: GameView) => void }) {
+export function Play({ game, user }: { game: GameView; user: User }) {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const twoCol = width >= TWO_COL;
@@ -99,19 +89,14 @@ function PlayBoard({ game, user, onResync }: { game: GameView; user: User; onRes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [called.length, autoDab]);
 
-  // Back online: re-send queued dabs in order, then catch up with whatever we missed.
+  // Back online: re-send queued dabs in order, then have the route fetch a view that includes them.
   const wasOnline = useRef(online);
   useEffect(() => {
     if (online === wasOnline.current) return;
     wasOnline.current = online;
     if (!online) return;
-    let alive = true;
-    (async () => {
-      await flush();
-      try { const g = await backend.getGame(code); if (alive && g) onResync(g); } catch { /* still flaky — the subscription will catch up */ }
-    })();
-    return () => { alive = false; };
-  }, [online, flush, code, onResync]);
+    void flush().then(() => resyncGame(code));
+  }, [online, flush, code]);
 
   const toggleMute = () => { if (!muted) hush(); setSetting({ muted: !muted }); };
   const claim = (z: Prize) => { void act(code, { type: 'claim', prizeId: z.id }); };

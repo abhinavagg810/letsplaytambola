@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { profileStats } from '@core/stats.ts';
 import { backend } from '@/backend';
 import { C } from '@/theme/tokens';
-import { Avatar, Btn, HandleCopy, Screen, T, Toggle, copyText, toast } from '@/ui';
+import { Avatar, Btn, HandleCopy, Screen, Sheet, T, Toggle, copyText, toast } from '@/ui';
+import { shareSheet } from '@/lib/links';
 import { settings, setSetting } from '@/state/settings';
 import { useUser } from '@/state/session';
 import { PhoneSheet } from '@/features/auth/SignIn';
@@ -41,14 +42,24 @@ export function Profile() {
   const { muted, autoDab } = settings.use();
   const [phoneOpen, setPhoneOpen] = useState(false);
   const [leaving, setLeaving] = useState(false);
+  const [confirmOut, setConfirmOut] = useState(false);
   const stats = useMemo(() => (user && games ? profileStats(games, user.uid) : null), [games, user]);
   if (!user) return null;
 
   const signOut = async () => {
     if (leaving) return;
+    setConfirmOut(false);
     setLeaving(true);
     try { await backend.signOut(); router.replace('/sign-in'); } catch { toast('Couldn’t sign out — try again'); setLeaving(false); }
   };
+  // A guest has no way back in, so they get a warning (and the way to keep the account) first.
+  const askSignOut = () => (user.isGuest ? setConfirmOut(true) : void signOut());
+  // iOS can't present one sheet while another is still closing.
+  const addPhone = () => { setConfirmOut(false); setTimeout(() => setPhoneOpen(true), Platform.OS === 'ios' ? 350 : 0); };
+  // iOS/Android: the system share sheet. Web: there is nothing to share to, so copy.
+  const native = Platform.OS === 'ios' || Platform.OS === 'android';
+  const shareHandle = () => (native ? void shareSheet(`Add me on Tambola — I’m @${user.username}`) : void copyText('@' + user.username, 'Username copied'));
+  const needsPhone = !user.isGuest && !user.phone;   // signed in with Google/Apple and skipped the number
   const net = !stats ? '·' : stats.money ? signed(stats.net) : '—';
   const netColor = !stats || !stats.money ? C.cream : stats.net >= 0 ? C.teal : C.bogey;
 
@@ -73,6 +84,16 @@ export function Profile() {
         </View>
       )}
 
+      {needsPhone && (
+        <View style={{ padding: 16, borderRadius: 18, backgroundColor: C.surf, borderWidth: 1.5, borderColor: C.line, gap: 10 }}>
+          <View>
+            <T w={800}>Add your mobile number</T>
+            <T size={15} color={C.muted}>So friends can find you from their contacts</T>
+          </View>
+          <Btn label="Add mobile number" variant="outline" borderColor={C.cream} h={48} w={600} onPress={() => setPhoneOpen(true)} testID="add-phone" />
+        </View>
+      )}
+
       <View style={{ flexDirection: 'row', gap: 8 }}>
         <Stat value={stats ? String(stats.games) : '·'} label="Games" />
         <Stat value={stats ? String(stats.wins) : '·'} label="Prizes won" />
@@ -88,12 +109,24 @@ export function Profile() {
         <SettingRow top title="Friends & groups" onPress={() => toFriends()}
           right={<T size={15} color={C.muted}>{social ? `${social.friends.length} →` : '→'}</T>} />
         {!!user.username && (
-          <SettingRow top title="Share my username" onPress={() => copyText('@' + user.username, 'Username copied')} right={<T size={15} color={C.muted}>Copy</T>} />
+          <SettingRow top title="Share my username" label={native ? 'Share my username' : 'Share my username, copy'} onPress={shareHandle} right={<T size={15} color={C.muted}>{native ? 'Share' : 'Copy'}</T>} />
         )}
       </View>
 
-      <Btn label={leaving ? 'Signing out…' : 'Sign out'} variant="outline" h={50} size={17} w={600} color={C.bogey} disabled={leaving} onPress={signOut} testID="sign-out" />
-      <PhoneSheet open={phoneOpen} onClose={() => setPhoneOpen(false)} onDone={() => setPhoneOpen(false)} title="Save your account" sub="Add your mobile number to keep your games. We’ll text you a code." />
+      <Btn label={leaving ? 'Signing out…' : 'Sign out'} variant="outline" h={50} size={17} w={600} color={C.bogey} disabled={leaving} onPress={askSignOut} testID="sign-out" />
+      <PhoneSheet open={phoneOpen} onClose={() => setPhoneOpen(false)} onDone={() => setPhoneOpen(false)}
+        title={needsPhone ? 'Add your mobile number' : 'Save your account'}
+        sub={needsPhone ? 'So friends can find you from their contacts. We’ll text you a code.' : 'Add your mobile number to keep your games. We’ll text you a code.'} />
+      <Sheet open={confirmOut} onClose={() => setConfirmOut(false)} light>
+        <View style={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: 8, gap: 12 }}>
+          <View style={{ gap: 4 }}>
+            <T w={800} size={24} color={C.ink} accessibilityRole="header">Sign out?</T>
+            <T size={16} color={C.lightSub} lh={1.4}>You joined as a guest, so you won’t be able to get back to this account. Add your phone number to keep your games.</T>
+          </View>
+          <Btn label="Add phone number" onPress={addPhone} testID="confirm-add-phone" />
+          <Btn label="Sign out anyway" variant="outline" borderColor={C.lightLine} color={C.ink} h={50} size={17} w={600} onPress={signOut} testID="confirm-sign-out" />
+        </View>
+      </Sheet>
     </Screen>
   );
 }

@@ -1,0 +1,54 @@
+# Netlify equivalent of vercel.json. Set the EXPO_PUBLIC_* variables in Site settings -> Environment variables.
+[build]
+  command = "npm run build:web"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Missing build files must be a real 404, not the app shell.
+[[redirects]]
+  from = "/_expo/*"
+  to = "/404.html"
+  status = 404
+[[redirects]]
+  from = "/assets/*"
+  to = "/404.html"
+  status = 404
+[[redirects]]
+  from = "/.well-known/*"
+  to = "/404.html"
+  status = 404
+
+# Single-page app: every other path (e.g. /g/AB12C) is served by index.html. Real files always win.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/.well-known/apple-app-site-association"
+  [headers.values]
+    Content-Type = "application/json"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/.well-known/assetlinks.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/_expo/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

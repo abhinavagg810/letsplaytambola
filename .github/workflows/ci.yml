@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    name: Typecheck, tests, web build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test -- --ci
+      # No Supabase variables on purpose: this builds the demo-mode site and proves the export works.
+      - run: npm run build:web
+      - name: Check the exported site
+        run: |
+          test -s dist/index.html
+          test -s dist/og.png
+          test -s dist/manifest.json
+          grep -q 'property="og:image"' dist/index.html
+          node -e "for (const f of ['apple-app-site-association','assetlinks.json']) JSON.parse(require('fs').readFileSync('dist/.well-known/'+f,'utf8'))"
+          node -e "for (const f of ['vercel.json','eas.json','app.json','public/manifest.json']) JSON.parse(require('fs').readFileSync(f,'utf8'))"
+
+  database:
+    name: Database privacy rules (PostgreSQL 16)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make sure psql is available
+        run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+      - run: bash supabase/tests/run.sh
+
+  edge-function:
+    name: Edge Function (Deno)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      # Copies packages/game-core into supabase/functions/_shared/core (no npm install needed).
+      - run: node scripts/sync-core.js
+      - run: deno check supabase/functions/game/index.ts
+      - run: deno test --allow-env --allow-net supabase/functions/game/

@@ -31,7 +31,7 @@ function TabBar() {
             </View>
             {name === 'index' && badge > 0 && (
               <View style={{ position: 'absolute', top: 0, right: '12%', minWidth: 20, height: 20, borderRadius: 10, paddingHorizontal: 5, backgroundColor: C.pink, alignItems: 'center', justifyContent: 'center' }}>
-                <T w={800} size={12} color="#fff" lh={1.2}>{badge}</T>
+                <T mono size={12} ls={0} color="#fff" lh={1.2}>{badge}</T>
               </View>
             )}
           </Pressable>
@@ -56,7 +56,7 @@ function Sidebar() {
             style={{ height: 46, borderRadius: 14, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', backgroundColor: on ? C.mari : 'transparent' }}>
             <T w={800} size={17} color={on ? C.ink : C.muted} style={{ flex: 1 }}>{label}</T>
             {name === 'index' && badge > 0 && (
-              <View style={{ minWidth: 22, height: 22, borderRadius: 11, paddingHorizontal: 6, backgroundColor: C.pink, alignItems: 'center', justifyContent: 'center' }}><T w={800} size={12} color="#fff" lh={1.2}>{badge}</T></View>
+              <View style={{ minWidth: 22, height: 22, borderRadius: 11, paddingHorizontal: 6, backgroundColor: C.pink, alignItems: 'center', justifyContent: 'center' }}><T mono size={12} ls={0} color="#fff" lh={1.2}>{badge}</T></View>
             )}
           </Pressable>
         );

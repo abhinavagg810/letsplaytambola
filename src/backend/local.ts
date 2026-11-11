@@ -148,8 +148,9 @@ export function createLocalBackend(): Backend {
       const digits = phoneDigits(phone);
       const cur = me();
       let user = accounts().find((a) => samePhone(a, digits));
-      if (!user && cur?.isGuest) {
-        // A guest saving their account keeps their uid, and with it their games and friends.
+      if (!user && cur && !cur.phone) {
+        // A guest saving their account — or someone adding a number after Google/Apple sign-in — keeps their uid,
+        // and with it their games and friends.
         user = { ...cur, phone: toE164(digits), isGuest: false, name: cur.name || (name ?? '').trim() };
         kvSet(K.accounts, accounts().map((a) => (a.uid === user!.uid ? user! : a)));
       }

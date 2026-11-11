@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { formatINR } from '@core/stats.ts';
 import { backend } from '@/backend';
@@ -7,6 +7,7 @@ import type { PeekGame } from '@/backend/types';
 import { C } from '@/theme/tokens';
 import { Avatar, Btn, Input, Screen, T, first, toast } from '@/ui';
 import { refreshUser } from '@/state/session';
+import { openUrl, storeLinks } from '@/lib/links';
 import { GLOW, GoogleDot, PhoneSheet } from './SignIn';
 
 const OFFLINE = 'Can’t reach Tambola right now — check your internet';
@@ -90,8 +91,44 @@ export function InviteLanding({ code }: { code: string }) {
             returnKeyType="go" onSubmitEditing={guest} accessibilityLabel="Or just your name" box={{ flex: 1, minWidth: 0 }} />
           <Btn label={ended ? 'See' : 'Join'} h={50} size={17} disabled={busy} onPress={guest} testID="guest-join" />
         </View>
+        <GetTheApp code={code} />
       </View>
       <PhoneSheet open={sheet} onClose={() => setSheet(false)} onDone={() => setSheet(false)} />
     </Screen>
+  );
+}
+
+/**
+ * Web only, and only once the store pages exist (EXPO_PUBLIC_PLAY_URL / EXPO_PUBLIC_APPSTORE_URL): a quiet
+ * pointer to the native apps under the join buttons. Joining in the browser stays the main action.
+ * Android: the Play link carries the game code, so the freshly installed app opens this game (src/lib/install.ts).
+ * iPhone has no such hand-over, so the code is shown to type on Home.
+ */
+function GetTheApp({ code }: { code: string }) {
+  if (Platform.OS !== 'web') return null;
+  const { play, appStore } = storeLinks(code);
+  const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+  const android = /android/i.test(ua);
+  const apple = /iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && typeof navigator !== 'undefined' && navigator.maxTouchPoints > 1);
+  // On a phone show only its own store; on a computer show both.
+  const links = [
+    play && !apple ? { label: 'Google Play', url: play } : null,
+    appStore && !android ? { label: 'App Store', url: appStore } : null,
+  ].filter((l): l is { label: string; url: string } => !!l);
+  if (!links.length) return null;
+  return (
+    <View style={{ alignItems: 'center', gap: 2, paddingTop: 6 }} testID="get-the-app">
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', columnGap: 8 }}>
+        <T size={15} color={C.dim}>Get the app:</T>
+        {links.map((l) => (
+          <Pressable key={l.label} onPress={() => openUrl(l.url)} accessibilityRole="link" accessibilityLabel={`Get the app on ${l.label}`}
+            style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 4 }}>
+            <T size={15} w={600} color={C.muted} style={{ textDecorationLine: 'underline' }}>{l.label}</T>
+          </Pressable>
+        ))}
+      </View>
+      <T size={15} color={C.dim} center>Have the app? Enter this code on Home</T>
+      <T mono size={26} color={C.cream} selectable accessibilityLabel={`Game code ${code.split('').join(' ')}`} style={{ letterSpacing: 6 }}>{code}</T>
+    </View>
   );
 }

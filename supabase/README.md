@@ -129,5 +129,14 @@ runs `tests/rls_smoke.sql`, which fails loudly unless: players can't read each o
 non-members can't read a game, members can, clients can't write game state (with and without table
 grants), `peek_game` works signed-out, and pending invites turn into friendships.
 
-The Edge Function and the Supabase client are not covered by this; test them against a real project
-(or `supabase start`, which needs Docker) with two test phone numbers.
+The Edge Function has its own check (needs Deno — `npm i -g deno`):
+
+```sh
+npm run test:functions
+```
+
+It type-checks `functions/game/index.ts` and runs `functions/game/handler_test.ts`, which drives the real
+request handler against an in-memory fake of the database API (auth, create, join, host-only actions,
+retry after a lost race). Neither test talks to a real Supabase project or covers the client in
+`src/backend/supabase.ts`; test those against a real project (or `supabase start`, which needs Docker)
+with two test phone numbers.

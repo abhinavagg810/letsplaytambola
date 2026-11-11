@@ -4,7 +4,7 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { backend } from '@/backend';
 import { C } from '@/theme/tokens';
 import { Btn, Screen, T, toast } from '@/ui';
-import { needsUsername, session, useUser } from '@/state/session';
+import { needsUsername, setPendingCode, useUser } from '@/state/session';
 import { useGame } from '@/features/game/useGame';
 import { InviteLanding } from '@/features/auth/InviteLanding';
 import { Lobby } from '@/features/game/Lobby';
@@ -22,7 +22,9 @@ export default function GameRoute() {
   const [joinError, setJoinError] = useState<string | null>(null);
   const joining = useRef(false);
 
-  useEffect(() => { session.set({ pendingCode: user && !needsUsername(user) ? null : code }); }, [code, user]);
+  // Signed out (or still picking a username): remember the link so sign-in comes back here, even after a reload.
+  // Once the person is in, the link has done its job.
+  useEffect(() => { setPendingCode(user && !needsUsername(user) ? null : code); }, [code, user]);
 
   const member = !!game && !!user && (game.hostUid === user.uid || game.players.some((p) => p.uid === user.uid));
   useEffect(() => {

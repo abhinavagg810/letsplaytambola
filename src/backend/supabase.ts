@@ -46,7 +46,7 @@ export function createSupabaseBackend(url: string, anonKey: string): Backend {
   // ---- auth plumbing
   const authSubs = new Set<(u: User | null) => void>();
   let emitSeq = 0;
-  /** Phone a signed-in guest is in the middle of attaching to their account (OTP sent). */
+  /** Phone a signed-in user (guest, or Google/Apple without a number) is in the middle of attaching to their account (OTP sent). */
   let linkingPhone: string | null = null;
 
   const sessionUser = async (): Promise<AuthUser | null> => (await sb.auth.getSession()).data.session?.user ?? null;
@@ -144,8 +144,10 @@ export function createSupabaseBackend(url: string, anonKey: string): Backend {
       const e164 = toE164(phone);
       if (e164.length < 11) return { ok: false, error: 'Enter your mobile number with country code' };
       linkingPhone = null;
-      if ((await sessionUser())?.is_anonymous) {
-        // A guest saving their account: attach the number to the same user so their games carry over.
+      const cur = await sessionUser();
+      if (cur && (cur.is_anonymous || !cur.phone)) {
+        // A guest saving their account, or someone adding a number after Google/Apple sign-in: attach the number
+        // to the same user so their games carry over.
         // If the number already has an account this fails, and we fall back to signing in to that one.
         const { error } = await sb.auth.updateUser({ phone: e164 });
         if (!error) { linkingPhone = e164; return { ok: true }; }
