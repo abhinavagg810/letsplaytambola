@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { Stack, router, usePathname, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -10,12 +10,20 @@ import { C } from '@/theme/tokens';
 import { Btn, T, ToastHost } from '@/ui';
 import { initSession, session } from '@/state/session';
 
+/** On web each screen's code is fetched the first time it is opened — with no connection that fetch is what fails. */
+const looksOffline = (error: unknown) =>
+  /AsyncRequire|Loading (module|chunk)|Failed to fetch|NetworkError/i.test(`${(error as Error)?.name ?? ''} ${(error as Error)?.message ?? ''}`)
+  || (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.onLine === false);
+
 /** Friendly fallback for a render crash — never a blank screen. "Try again" renders the route afresh. */
-function Crashed({ onRetry }: { onRetry: () => void }) {
+function Crashed({ error, onRetry }: { error?: unknown; onRetry: () => void }) {
+  const offline = looksOffline(error);
   return (
     <View accessibilityRole="alert" style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 14 }}>
-      <T w={800} size={30} center accessibilityRole="header">Something went wrong</T>
-      <T size={17} color={C.muted} center lh={1.4} style={{ maxWidth: 360 }}>Sorry about that. Your game is safe — tap below to pick up where you were.</T>
+      <T w={800} size={30} center accessibilityRole="header">{offline ? 'You’re offline' : 'Something went wrong'}</T>
+      <T size={17} color={C.muted} center lh={1.4} style={{ maxWidth: 360 }}>
+        {offline ? 'Can’t reach Tambola right now — check your internet, then try again.' : 'Sorry about that. Your game is safe — tap below to pick up where you were.'}
+      </T>
       <Btn label="Try again" h={54} px={32} onPress={onRetry} testID="error-retry" />
     </View>
   );
@@ -25,29 +33,29 @@ function Crashed({ onRetry }: { onRetry: () => void }) {
  * Catches render errors anywhere below the root layout. "Try again" remounts the navigator (a fresh start for
  * whatever state broke) and then goes back to the route the person was on.
  */
-class CrashGuard extends React.Component<{ path: string; children: React.ReactNode }, { failed: boolean; attempt: number }> {
-  state = { failed: false, attempt: 0 };
-  static getDerivedStateFromError() { return { failed: true }; }
+class CrashGuard extends React.Component<{ path: string; children: React.ReactNode }, { failed: boolean; error: unknown; attempt: number }> {
+  state = { failed: false, error: null as unknown, attempt: 0 };
+  static getDerivedStateFromError(error: unknown) { return { failed: true, error }; }
   componentDidCatch(error: unknown) { console.warn('Screen crashed:', error); }
   /** Where the person was when things were last fine (the path resets once the broken navigator is taken down). */
   lastPath = this.props.path;
   retry = () => {
     const path = this.lastPath;
-    this.setState((s) => ({ failed: false, attempt: s.attempt + 1 }), () => {
+    this.setState((s) => ({ failed: false, error: null, attempt: s.attempt + 1 }), () => {
       // The remounted navigator starts at the entry route; put the person back where they were.
       setTimeout(() => { try { router.replace(path as never); } catch { /* the entry route is a fine fallback */ } }, 0);
     });
   };
   render() {
-    if (this.state.failed) return <Crashed onRetry={this.retry} />;
+    if (this.state.failed) return <Crashed error={this.state.error} onRetry={this.retry} />;
     this.lastPath = this.props.path;
     return <React.Fragment key={this.state.attempt}>{this.props.children}</React.Fragment>;
   }
 }
 
 /** Expo Router uses this if the root layout itself throws. */
-export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
-  return <Crashed onRetry={() => { void retry(); }} />;
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  return <Crashed error={error} onRetry={() => { void retry(); }} />;
 }
 
 export default function RootLayout() {
