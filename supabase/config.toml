@@ -1,0 +1,3 @@
+# Minimal config — `supabase link --project-ref <ref>` fills in the rest.
+[functions.game]
+verify_jwt = true
