@@ -32,7 +32,7 @@ export function Prizes() {
     <Screen gap={14} px={18} top={Math.max(8, 48 - insets.top)} footer={<Btn label="Done" size={20} onPress={done} testID="prizes-done" />}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <BackBtn onPress={done} />
-        <Eyebrow ls={0} lh={1.32}>Prizes · Optional</Eyebrow>
+        <Eyebrow ls={0} lh={1.25}>Prizes · Optional</Eyebrow>
       </View>
       <View style={{ gap: 4 }}>
         <T w={800} size={34} lh={1}>Prizes</T>
@@ -84,7 +84,7 @@ export function Prizes() {
           <T size={14} color={C.muted} lh={1.35}>Tap <T w={800} size={14} color={C.teal} lh={1.35}>Add</T> on any one. Pink boxes on the little ticket show what you need.</T>
           {GROUPS.map((g) => (
             <View key={g} style={{ gap: 6 }}>
-              <Eyebrow size={10} ls={0.8} lh={1.32} style={{ paddingTop: 4 }}>{g}</Eyebrow>
+              <Eyebrow size={10} ls={0.8} lh={1.1} style={{ paddingTop: 4 }}>{g}</Eyebrow>
               {RULES.filter((r) => r.group === g).map((r) => {
                 const { have, multi, nextName } = libraryState(d.prizeCfg, r.id);
                 const added = have > 0 && !multi;

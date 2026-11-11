@@ -144,7 +144,7 @@ function Message({ title, body, cta, onCta, onClose }: { title: string; body: st
       <Btn label={cta} variant="whatsapp" h={56} size={18} radius={16} lip={false} onPress={onCta} style={{ alignSelf: 'stretch', marginTop: 8 }} />
       {!!onClose && (
         <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Not now">
-          <T size={16} color={C.lightText} lh={1.6}>Not now</T>
+          <T size={16} color={C.lightText} lh={1.55}>Not now</T>
         </Pressable>
       )}
     </View>

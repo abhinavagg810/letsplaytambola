@@ -33,7 +33,7 @@ export function TicketView({ ticket, header, right, dabbed, hint, onCell }: Tick
     <View style={{ borderRadius: R.btn, backgroundColor: C.paper, overflow: 'hidden', boxShadow: TICKET_SHADOW }}>
       <View style={{ backgroundColor: C.pink, paddingVertical: 6, paddingHorizontal: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <T w={800} size={17} color="#fff" lh={1.6}>{header}</T>
-        {!!right && <T mono size={11} color="#fff" ls={0} lh={1.32}>{right}</T>}
+        {!!right && <T mono size={11} color="#fff" ls={0} lh={1.1}>{right}</T>}
       </View>
       <View style={{ padding: 8 }}>
        <View style={{ gap: 2, borderRadius: R.grid, overflow: 'hidden', backgroundColor: C.gridLine }}>

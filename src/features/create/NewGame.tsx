@@ -86,7 +86,7 @@ export function NewGame() {
     <Screen gap={14} top={Math.max(8, 48 - insets.top)} footer={<Btn label={busy ? 'Creating…' : createLabel} size={20} disabled={busy} onPress={create} testID="create-game" />}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <BackBtn onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
-        <Eyebrow ls={0} lh={1.32}>New game</Eyebrow>
+        <Eyebrow ls={0} lh={1.25}>New game</Eyebrow>
       </View>
 
       <Input value={d.name} onChangeText={(name) => setDraft({ name })} accessibilityLabel="Game name" placeholder="Name your game" maxLength={40}
@@ -94,7 +94,7 @@ export function NewGame() {
 
       <Card>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <T w={800} size={18} lh={1.6}>Who’s playing?</T>
+          <T w={800} size={18} lh={1.55}>Who’s playing?</T>
           <T size={13} color={C.muted}>{inv.length ? `${inv.length} invited` : 'Optional'}</T>
         </View>
 
@@ -109,7 +109,7 @@ export function NewGame() {
 
         {quick.length > 0 && (
           <View style={{ gap: 6 }}>
-            <Eyebrow size={10} ls={0.8} lh={1.32}>Quick add</Eyebrow>
+            <Eyebrow size={10} ls={0.8} lh={1.1}>Quick add</Eyebrow>
             <View style={{ flexDirection: 'row', gap: 6, overflow: 'hidden' }}>
               {quick.map((c) => (
                 <Chip key={c.key} label={`+ ${c.label}`} onPress={c.onPress} maxWidth={150} size={14} px={12} minH={35} fg={c.teal ? C.teal : C.cream} border={c.teal ? C.teal : C.line} />

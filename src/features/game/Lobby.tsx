@@ -79,7 +79,7 @@ export function Lobby({ game, user }: { game: GameView; user: User }) {
     <Screen gap={14} top={Math.max(8, 48 - insets.top)} style={{ paddingBottom: Math.max(insets.bottom, 16) + 4 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <BackBtn onPress={() => router.replace('/')} />
-        <Eyebrow ls={0} lh={1.32} accessibilityLabel={`Code ${code}, round ${game.round}`}>{code} · Round {game.round}</Eyebrow>
+        <Eyebrow ls={0} lh={1.25} accessibilityLabel={`Code ${code}, round ${game.round}`}>{code} · Round {game.round}</Eyebrow>
       </View>
       <View style={{ gap: 2 }}>
         <T w={800} size={34} lh={1}>{game.name}</T>
@@ -96,7 +96,7 @@ export function Lobby({ game, user }: { game: GameView; user: User }) {
             <View style={{ borderRadius: R.input, backgroundColor: C.bg, overflow: 'hidden' }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, paddingTop: 10, paddingHorizontal: 12, paddingBottom: 6 }}>
                 <T w={800} size={15} lh={1.6}>Send to your contacts</T>
-                <Eyebrow size={11} ls={0} lh={1.32}>{contacts.filter((c) => c.sent).length} of {contacts.length} sent</Eyebrow>
+                <Eyebrow size={11} ls={0} lh={1.1}>{contacts.filter((c) => c.sent).length} of {contacts.length} sent</Eyebrow>
               </View>
               {contacts.map((c, i) => {
                 const joined = hasJoined(c);
