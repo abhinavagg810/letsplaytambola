@@ -2,11 +2,11 @@
 // On web each tab can be a different person (session in sessionStorage, data in localStorage),
 // which is how one laptop demos a host and several players.
 import { Platform } from 'react-native';
-import { AVATAR_COLORS } from '@core/data.ts';
+import { AVATAR_COLORS, DELETED_NAME } from '@core/data.ts';
 import { applyAction, createGameDoc, newCode, project, type Ctx } from '@core/engine.ts';
 import type { Actor, GameDoc, GameView, InvitedUser, Tickets } from '@core/types.ts';
 import { KV_PREFIX, kvGet, kvReady, kvRemove, kvSet } from './kv';
-import { USERNAME_RE, cleanHandle, phoneDigits, toE164 } from './phone';
+import { PHONE_TAKEN, USERNAME_RE, cleanHandle, phoneDigits, toE164 } from './phone';
 import type {
   ActionResult, Backend, ContactMatch, DeviceContact, Friend, Group, PeekGame, PendingFriend, Social, User,
 } from './types';
@@ -75,6 +75,62 @@ export function peekOf(doc: GameDoc): PeekGame {
   };
 }
 
+/**
+ * What is left of a game once `uid` has deleted their account. `null` = remove the game altogether.
+ * Mirrors delete_my_account() in supabase/migrations/0002_delete_account.sql — keep the two in step.
+ *  - a game they host: removed, unless it is a finished game that other people played (their history)
+ *  - a lobby they only sat in (never played a round): their seat is freed
+ *  - anything they played: their name becomes "Deleted player", their username goes
+ */
+export function scrubGame(doc0: GameDoc, uid: string): GameDoc | null {
+  const doc = JSON.parse(JSON.stringify(doc0)) as GameDoc;
+  const hosts = doc.hostUid === uid;
+  const others = doc.players.some((p) => p.uid !== uid);
+  if (hosts && (doc.status !== 'ended' || !others)) return null;
+
+  const names = new Set<string>();
+  const note = (n?: string): void => { if (n && n !== DELETED_NAME) names.add(n); };
+  const fixClaims = (claims: GameDoc['claims']): void => {
+    for (const c of Object.values(claims || {})) if (c.uid === uid) { note(c.name); c.name = DELETED_NAME; }
+  };
+  let changed = false;
+  const played = (doc.history || []).some((h) => h.uids.includes(uid));
+
+  if (hosts) {
+    doc.hostName = DELETED_NAME;
+    doc.hostUsername = null;
+    doc.contacts = [];           // the host's own address-book picks go with the host
+    doc.feed = (doc.feed || []).map((f) => (f.kind === 'start' ? { ...f, text: `${DELETED_NAME} started the game` } : f));
+    changed = true;
+  }
+  if (doc.invited.some((u) => u.uid === uid)) {
+    doc.invited = doc.invited.filter((u) => u.uid !== uid);
+    changed = true;
+  }
+  if (doc.players.some((p) => p.uid === uid)) {
+    changed = true;
+    if (doc.status === 'lobby' && !played && !hosts) {
+      doc.players = doc.players.filter((p) => p.uid !== uid);
+    } else {
+      for (const p of doc.players) if (p.uid === uid) { note(p.name); p.name = DELETED_NAME; p.username = null; }
+    }
+  }
+  if (played || Object.values(doc.claims || {}).some((c) => c.uid === uid)) changed = true;
+  fixClaims(doc.claims);
+  for (const h of doc.history || []) fixClaims(h.claims);
+  for (const f of doc.feed || []) if (f.uid === uid) { note(f.name); changed = true; }
+  // The live feed spells names out in its text ("Full House for Asha").
+  doc.feed = (doc.feed || []).map((f) => {
+    if (f.uid !== uid) return f;
+    let text = f.text;
+    for (const n of names) text = text?.split(n).join(DELETED_NAME);
+    return { ...f, ...(f.name ? { name: DELETED_NAME } : null), ...(text !== undefined ? { text } : null) };
+  });
+  if (!changed) return doc0;
+  doc.version = (doc.version || 0) + 1;
+  return doc;
+}
+
 export function createLocalBackend(): Backend {
   const isWeb = Platform.OS === 'web';
   const ss: Storage | null = isWeb && typeof sessionStorage !== 'undefined' ? sessionStorage : null;
@@ -96,6 +152,12 @@ export function createLocalBackend(): Backend {
   const saveAccount = (user: User): void => {
     kvSet(K.accounts, accounts().map((a) => (a.uid === user.uid ? user : a)));
     authSubs.forEach((cb) => cb(user));
+  };
+
+  /** Signed in without a number (guest, Google/Apple) and trying to add one that is already another account. */
+  const takenByOther = (digits: string): boolean => {
+    const cur = me();
+    return !!cur && !cur.phone && accounts().some((a) => a.uid !== cur.uid && samePhone(a, digits));
   };
 
   // ---- games
@@ -147,12 +209,16 @@ export function createLocalBackend(): Backend {
     async currentUser() { await ready; return me(); },
     onAuthChange(cb) { authSubs.add(cb); return () => { authSubs.delete(cb); }; },
     async sendOtp(phone) {
-      return phoneDigits(phone).length >= 10 ? { ok: true } : { ok: false, error: 'Enter your mobile number with country code' };
+      await ready;
+      if (phoneDigits(phone).length < 10) return { ok: false, error: 'Enter your mobile number with country code' };
+      return takenByOther(phoneDigits(phone)) ? { ok: false, error: PHONE_TAKEN } : { ok: true };
     },
     async verifyOtp(phone, code, name) {
       await ready;
       if (code.trim() !== DEMO_OTP) return { ok: false, error: `That code isn’t right — try ${DEMO_OTP} in demo mode` };
       const digits = phoneDigits(phone);
+      // Never switch someone who is adding a number into a different account: they would lose sight of this one.
+      if (takenByOther(digits)) return { ok: false, error: PHONE_TAKEN };
       const cur = me();
       let user = accounts().find((a) => samePhone(a, digits));
       if (!user && cur && !cur.phone) {
@@ -174,6 +240,42 @@ export function createLocalBackend(): Backend {
       return { ok: true };
     },
     async signOut() { setSession(null); },
+    async deleteAccount() {
+      await ready;
+      const user = me();
+      if (!user) return signedOut;
+      const uid = user.uid;
+      for (const code of kvGet<string[]>(K.index, [])) {
+        await exclusive(code, () => {
+          const doc = readDoc(code);
+          if (!doc) return;
+          const next = scrubGame(doc, uid);
+          const tickets = readTickets(code);
+          if (!next) {
+            kvRemove(K.game(code));
+            kvRemove(K.tickets(code));
+            kvSet(K.index, kvGet<string[]>(K.index, []).filter((c) => c !== code));
+          } else {
+            if (next !== doc) kvSet(K.game(code), next);
+            if (uid in tickets) { delete tickets[uid]; kvSet(K.tickets(code), tickets); }
+            if (next !== doc) changed(code);
+          }
+        });
+      }
+      kvRemove(K.friends(uid));
+      kvRemove(K.groups(uid));
+      kvRemove(K.pending(uid));
+      for (const a of accounts()) {
+        if (a.uid === uid) continue;
+        const friends = kvGet<string[]>(K.friends(a.uid), []);
+        if (friends.includes(uid)) kvSet(K.friends(a.uid), friends.filter((f) => f !== uid));
+        const groups = kvGet<Group[]>(K.groups(a.uid), []);
+        if (groups.some((g) => g.uids.includes(uid))) kvSet(K.groups(a.uid), groups.map((g) => ({ ...g, uids: g.uids.filter((u) => u !== uid) })));
+      }
+      kvSet(K.accounts, accounts().filter((a) => a.uid !== uid));
+      setSession(null);
+      return { ok: true };
+    },
     async usernameAvailable(handle) {
       await ready;
       const h = cleanHandle(handle);

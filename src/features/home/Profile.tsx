@@ -43,6 +43,8 @@ export function Profile() {
   const [phoneOpen, setPhoneOpen] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [confirmOut, setConfirmOut] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const stats = useMemo(() => (user && games ? profileStats(games, user.uid) : null), [games, user]);
   if (!user) return null;
 
@@ -51,6 +53,17 @@ export function Profile() {
     setConfirmOut(false);
     setLeaving(true);
     try { await backend.signOut(); router.replace('/sign-in'); } catch { toast('Couldn’t sign out — try again'); setLeaving(false); }
+  };
+  const deleteAccount = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      const r = await backend.deleteAccount();
+      if (!r.ok) { toast(r.error); setDeleting(false); return; }
+      setConfirmDelete(false);
+      router.replace('/sign-in');
+      toast('Your account was deleted');
+    } catch { toast('Can’t reach Tambola right now — check your internet'); setDeleting(false); }
   };
   // A guest has no way back in, so they get a warning (and the way to keep the account) first.
   const askSignOut = () => (user.isGuest ? setConfirmOut(true) : void signOut());
@@ -111,9 +124,12 @@ export function Profile() {
         {!!user.username && (
           <SettingRow top title="Share my username" label={native ? 'Share my username' : 'Share my username, copy'} onPress={shareHandle} right={<T size={15} color={C.muted}>{native ? 'Share' : 'Copy'}</T>} />
         )}
+        <SettingRow top title="Privacy policy" onPress={() => router.push('/privacy')} right={<T size={15} color={C.muted}>→</T>} />
+        <SettingRow top title="Terms of use" onPress={() => router.push('/terms')} right={<T size={15} color={C.muted}>→</T>} />
       </View>
 
       <Btn label={leaving ? 'Signing out…' : 'Sign out'} variant="outline" h={50} size={17} w={600} color={C.bogey} disabled={leaving} onPress={askSignOut} testID="sign-out" />
+      <Btn label="Delete my account" variant="ghost" h={44} size={15} w={600} color={C.bogey} disabled={leaving || deleting} onPress={() => setConfirmDelete(true)} testID="delete-account" />
       <PhoneSheet open={phoneOpen} onClose={() => setPhoneOpen(false)} onDone={() => setPhoneOpen(false)}
         title={needsPhone ? 'Add your mobile number' : 'Save your account'}
         sub={needsPhone ? 'So friends can find you from their contacts. We’ll text you a code.' : 'Add your mobile number to keep your games. We’ll text you a code.'} />
@@ -125,6 +141,16 @@ export function Profile() {
           </View>
           <Btn label="Add phone number" onPress={addPhone} testID="confirm-add-phone" />
           <Btn label="Sign out anyway" variant="outline" borderColor={C.lightLine} color={C.ink} h={50} size={17} w={600} onPress={signOut} testID="confirm-sign-out" />
+        </View>
+      </Sheet>
+      <Sheet open={confirmDelete} onClose={() => { if (!deleting) setConfirmDelete(false); }} light>
+        <View style={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: 8, gap: 12 }}>
+          <View style={{ gap: 4 }}>
+            <T w={800} size={24} color={C.ink} accessibilityRole="header">Delete your account?</T>
+            <T size={16} color={C.lightSub} lh={1.4}>This removes your profile, friends, groups and tickets for good. Games you played stay in your friends’ history as “Deleted player”. This can’t be undone.</T>
+          </View>
+          <Btn label={deleting ? 'Deleting…' : 'Delete my account'} color={C.white} style={{ backgroundColor: C.pink }} disabled={deleting} onPress={deleteAccount} testID="confirm-delete-account" />
+          <Btn label="Keep my account" variant="outline" borderColor={C.lightLine} color={C.ink} h={50} size={17} w={600} disabled={deleting} onPress={() => setConfirmDelete(false)} testID="keep-account" />
         </View>
       </Sheet>
     </Screen>

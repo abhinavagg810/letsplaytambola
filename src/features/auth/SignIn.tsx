@@ -13,6 +13,12 @@ const RESEND_S = 30;
 /** The little blue ring the design uses in place of the Google mark. */
 export const GoogleDot = () => <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 3, borderColor: '#2784D5' }} />;
 
+const LegalLink = ({ label, href }: { label: string; href: '/terms' | '/privacy' }) => (
+  <Pressable onPress={() => router.push(href)} hitSlop={{ top: 14, bottom: 14, left: 4, right: 4 }} accessibilityRole="link" accessibilityLabel={label} testID={`legal-${href.slice(1)}`}>
+    <T size={13} color={C.muted} style={{ textDecorationLine: 'underline' }}>{label}</T>
+  </Pressable>
+);
+
 type Step = 'phone' | 'code' | 'name';
 
 /**
@@ -184,6 +190,12 @@ export function SignIn() {
           <Btn label="Continue with Apple" variant="black" h={54} size={18} radius={16} lip={false} disabled={busy} onPress={() => social('apple')} />
         )}
         <T size={15} color={C.muted} center style={{ paddingTop: 2 }}>We only use your name and number to find your friends</T>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: -4 }}>
+          <T size={13} color={C.dim}>By continuing you agree to our </T>
+          <LegalLink label="Terms" href="/terms" />
+          <T size={13} color={C.dim}> and </T>
+          <LegalLink label="Privacy Policy" href="/privacy" />
+        </View>
       </View>
       <PhoneSheet open={sheet === 'phone'} onClose={() => setSheet(null)} onDone={done} />
       <PhoneSheet open={sheet === 'link'} onClose={done} onDone={done} skippable title="Add your mobile number" sub="So friends can find you from their contacts. We’ll text you a code." />

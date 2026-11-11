@@ -176,8 +176,9 @@ need to run it if the artwork changes.
 
 Have ready for both stores:
 
-- [ ] **Privacy policy** at a public URL (e.g. `https://<your-domain>/privacy`). *Not written yet — see section 12*
-- [ ] **Account deletion**: both stores require a way to delete your account from inside the app, and Google also wants a web link for it. *Not built yet — see section 12*
+- [ ] **Privacy policy** URL: `https://<your-domain>/privacy` (terms: `https://<your-domain>/terms`). Both pages are part of the website and open without signing in. **The text is a DRAFT — have a lawyer review it before you submit (section 12).** Use the same privacy URL on the Google sign-in consent screen (step 3)
+- [ ] **Account deletion**: built — Profile → *Delete my account* (app and website). For Google's "delete account URL" field give `https://<your-domain>/privacy` — its section "Deleting your account" has the steps and the address to write to. For Apple, mention the Profile path in the review notes
+- [ ] The **contact mailbox** `privacy@letsplaytambola.app` exists and someone reads it (it is printed on both pages — a placeholder until you create it; change it in `src/features/legal/LegalPage.tsx`)
 - [ ] Support email address and (Play) a contact phone/website
 - [ ] A **reviewer login**: a Supabase test phone number + fixed code (`supabase/README.md` → "Test OTP numbers"), valid for at least a month
 - [ ] Screenshots of: Home, New game, Lobby, Play (ticket with numbers called), Results. Use a made-up family, not real contacts
@@ -195,7 +196,23 @@ Have ready for both stores:
    - **Content rating** questionnaire: category Game. Answer honestly: no violence, no sexual content; *users can interact* (emoji reactions, names) — yes; *simulated gambling* — Tambola is a game of chance, so say yes if asked about simulated gambling, and **no** to real-money gambling
    - **Target audience**: 18 and over (simplest; avoids the children's-apps rules)
    - **Real-money gambling, games and contests** declaration: **No**
-   - **Data safety**: collected — Phone number (account management, app functionality), Name, Email (only with Google/Apple sign-in), User IDs, Contacts (see below; optional), App interactions. Encrypted in transit: yes. Users can request deletion: yes (needs section 12). Shared with third parties: no. No advertising or tracking
+   - **Data safety** — answer exactly what `/privacy` says; if you change one, change the other:
+     - *Does your app collect or share user data?* Yes. *Encrypted in transit?* Yes. *Can users request that their data is deleted?* Yes — in the app (Profile → Delete my account) and by the URL above
+     - **Collected** (all *linked to the user*, none *shared*, none used for advertising or tracking):
+
+       | Data type | Required? | Purposes |
+       |---|---|---|
+       | Phone number | Required for an account (optional for a guest who joins from a link, or after Google/Apple sign-in) | App functionality, Account management |
+       | Name | Required | App functionality, Account management |
+       | Email address | Only with Google/Apple sign-in | Account management |
+       | User IDs (username, internal id) | Required for an account | App functionality, Account management |
+       | Contacts | Optional | App functionality (find friends, invite people the user picks) |
+       | App interactions (games played, tickets, prizes, reactions) | Required | App functionality |
+       | Other user-generated content (game names, group names) | Optional | App functionality |
+
+     - **Not collected**: location, photos/videos, audio, files, calendar, messages, health, financial or payment info (prices and prizes are typed-in notes; the app takes no payments), web browsing, device or advertising IDs, crash logs/diagnostics (nothing of the kind is in the app today — re-answer if you add analytics or crash reporting)
+     - **Shared with third parties: No.** Supabase (database and sign-in) and the SMS provider act as *service providers* on your behalf, which Google does not count as sharing. Google/Apple sign-in is initiated by the user
+     - No advertising or tracking. If ads are ever switched on (`docs/ADS.md`), update `/privacy` **first**, then this form and the *Ads* answer above
    - **Contacts**: in Data safety state that contacts are optional and are used only to find friends and send invites the user chooses. Suggested wording for any permission question: *"The host can pick people from their phone's contacts to invite to a game. Phone numbers are turned into one-way hashes on the device; only the hashes are sent, to show which contacts already play. Names and numbers the host picks are stored so the host can message them on WhatsApp themselves. Nothing is ever sent to a contact automatically. The app works fully without this permission."*
 5. Store listing: icon `assets/icon.png` (Play wants 512×512 — resize it), feature graphic 1024×500 (make one from `docs/design_handoff/assets/logo-on-plum-4x.png`), at least 2 phone screenshots.
 6. Internal testing → (closed testing, if your account type requires it) → Production. Review usually takes 1–7 days.
@@ -206,7 +223,7 @@ Have ready for both stores:
 1. App Store Connect → Apps → **+** → New App. Platform iOS, bundle id `com.letsplaytambola.app`, SKU `letsplaytambola`.
    Copy the numeric **Apple ID** of the app (App Information page) and your **Team ID** into `eas.json` → `submit.production.ios`.
 2. `eas submit -p ios --profile production` uploads the build to TestFlight. Test it there first.
-3. **App Privacy** form: Contact Info — Phone Number, Name, Email Address; Contacts; Identifiers — User ID; Usage Data — Product Interaction. All *linked to the user*, purpose *App Functionality*, **not** used for tracking.
+3. **App Privacy** form (same facts as the Play Data safety table above and as `/privacy`): Contact Info — Phone Number, Name, Email Address; Contacts; Identifiers — User ID; Usage Data — Product Interaction; User Content — Other User Content (game and group names). All *linked to the user*, purpose *App Functionality*, **not** used for tracking. Privacy Policy URL: `https://<your-domain>/privacy`.
 4. **Age rating** questionnaire: everything "None" except *Simulated Gambling* — answer truthfully (Tambola is a game of chance played here without money); expect a 12+ or 17+ result depending on your answer. *Gambling and Contests*: **No**.
 5. **Review notes** (paste and adapt): *"Tambola (Housie) is a traditional Indian family number game, like bingo. This app has no real-money gaming, no in-app purchases and no payments: prices and prizes a host enters are text only and settled outside the app. Sign in with phone number +91 XXXXX XXXXX, code 123456. Contacts access is optional and only used when a host chooses friends to invite; nothing is sent to anyone automatically. To test a multiplayer game, open the invite link from the lobby in Safari on another device."*
 6. Sign in with Apple is offered on iPhone because Google sign-in is (Apple requires this); it is already built.
@@ -265,11 +282,35 @@ Stop the launch if 4, 8, 9, 10 or 12 fails.
 | `app.json` | `com.letsplaytambola.app` (Android package, iOS bundle id) | confirm before the first upload — permanent afterwards |
 | Supabase dashboard | SMS provider keys, DLT entity/template ids, Google client id/secret, Apple Services ID + secret, test phone numbers | see `supabase/README.md` |
 
-## 12. Known gaps to close before store review
+## 12. Store-review blockers — built; one legal review left
 
-- **Privacy policy and terms pages** do not exist. Both stores and the Google sign-in consent screen need a privacy-policy URL. It must name the legal owner, and cover phone number, name, email, hashed contacts, where data is stored (Supabase, Mumbai) and how to delete it.
-- **Delete my account** is not in the app. Apple (guideline 5.1.1(v)) and Google Play both reject apps with sign-up but no in-app deletion; Play also needs a web URL for deletion requests.
-- The first-launch hand-over from Play (section 9) needs one line added to `app/_layout.tsx`; until then the code is set aside but nothing calls it.
+The two blockers that used to be listed here are resolved in code:
+
+- **Delete my account** — Profile → *Delete my account* → confirm. Works for phone, Google/Apple and guest accounts, in the
+  app and on the website. On the server it is one database function, `delete_my_account()`
+  (`supabase/migrations/0002_delete_account.sql`): it removes the profile, phone hash, friendships, groups, pending
+  invites, tickets, memberships and the sign-in itself; deletes games the person hosts (except finished games other people
+  played); and replaces their name with "Deleted player" in games they played, so their friends' history still adds up.
+  `supabase db push` applies it together with the first migration — if your project was set up before this file existed, run
+  `supabase db push` again.
+- **Privacy policy and terms** — `https://<your-domain>/privacy` and `/terms`, readable signed-out, linked from the
+  sign-in screen and from Profile. Source: `src/features/legal/privacy.ts`, `terms.ts`.
+- The first-launch hand-over from Play (section 9) is wired up: `app/_layout.tsx` calls `checkInstallReferrer()`.
+
+> **DRAFT — legal review required before launch.** The privacy policy and terms were written from what the code does,
+> not by a lawyer. Do not submit to the stores, or publish the Google consent screen, until a lawyer has reviewed both
+> files. Each source file starts with the same warning and a list of what is still missing. (End users never see the
+> word "draft".)
+
+Still to do by a person, before submitting:
+
+- [ ] A lawyer reviews `src/features/legal/privacy.ts` and `terms.ts` (India: Digital Personal Data Protection Act 2023; the stores' own rules)
+- [ ] Add the **legal name and address** of whoever operates the app, and a named grievance contact, to the privacy policy
+- [ ] Create the mailbox `privacy@letsplaytambola.app` (placeholder) or change `CONTACT_EMAIL` in `src/features/legal/LegalPage.tsx`
+- [ ] Confirm the facts the policy states about your setup: Supabase project in **Mumbai** ("servers in India"), the SMS provider, how long Supabase keeps backups on your plan, no analytics or crash reporting added since
+- [ ] Decide the minimum age (the pages say: not directed at under-13s; under-18s with a parent) and keep it consistent with the store "target audience" answer in section 8
+- [ ] Set the "Last updated" date in both files to the day the reviewed text goes live
+- [ ] After deploying, run the live check for deletion in section 14
 
 ## 13. Optional: per-game link previews
 
@@ -302,6 +343,9 @@ scheme and the contacts permission; launcher icon and splash image were generate
 - `vercel.json` and `netlify.toml` on the real hosts — in particular the `application/json` header on the extension-less Apple file (step 6 has the one-line check)
 - The GitHub Actions workflow itself (its commands were run by hand; the workflow has never run on GitHub)
 - The Edge Function against a real Supabase project; SMS delivery and DLT; Google and Apple sign-in
+- **Account deletion on a real Supabase project.** `delete_my_account()` is proven only on local PostgreSQL with a stand-in `auth.users` table (`npm run test:sql`). On the live project check once, with a throw-away account: sign up, join a game hosted by a second account, delete from Profile → you land on sign-in; in the dashboard the user is gone from Authentication → Users and from `profiles`; the second account still opens the game and sees "Deleted player"; signing in again with the same number gives a new, empty account. If the delete fails with a permission error, the role that ran the migration cannot delete from `auth.users` — re-create the function as `postgres` (SQL editor)
+- **Adding a number that is already another account** (guest or Google/Apple user): the app now refuses instead of switching accounts. The refusal relies on Supabase Auth rejecting the phone change (`phone_exists`); confirm the message "That number already has a Tambola account…" appears on the live project
+- The privacy policy and terms: not reviewed by a lawyer (section 12)
 - The WhatsApp preview on a real phone
 - Store-console menu names and policy details — they change often; treat the paths above as directions, not exact labels
 - Whether `letsplaytambola.app` is available or owned by you (`.env.example` previously said `.com`)

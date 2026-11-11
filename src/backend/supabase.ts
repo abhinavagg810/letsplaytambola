@@ -11,7 +11,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
 import { AVATAR_COLORS } from '@core/data.ts';
 import type { ContactInvite, GameDoc, GameView, InvitedUser, Ticket } from '@core/types.ts';
-import { USERNAME_RE, cleanHandle, phoneDigits, toE164 } from './phone';
+import { PHONE_TAKEN, USERNAME_RE, cleanHandle, phoneDigits, toE164 } from './phone';
 import type { ActionResult, Backend, ContactMatch, Friend, Group, PeekGame, PendingFriend, User } from './types';
 
 // Row shapes of the few tables/RPCs read here (see supabase/migrations/0001_init.sql).
@@ -148,14 +148,20 @@ export function createSupabaseBackend(url: string, anonKey: string): Backend {
       if (cur && (cur.is_anonymous || !cur.phone)) {
         // A guest saving their account, or someone adding a number after Google/Apple sign-in: attach the number
         // to the same user so their games carry over.
-        // If the number already has an account this fails, and we fall back to signing in to that one.
+        // If the number already belongs to another account this fails — and we stop there: quietly signing in to
+        // that other account would leave this one (and its games) behind.
         const { error } = await sb.auth.updateUser({ phone: e164 });
         if (!error) { linkingPhone = e164; return { ok: true }; }
+        const taken = error.code === 'phone_exists' || /already (been )?(registered|exists|in use)/i.test(error.message);
+        return { ok: false, error: taken ? PHONE_TAKEN : error.message };
       }
       return result((await sb.auth.signInWithOtp({ phone: e164 })).error);
     },
     async verifyOtp(phone, code, name) {
       const e164 = toE164(phone);
+      const cur = await sessionUser();
+      // Someone adding a number may only confirm the change we started in sendOtp — never sign in as someone else.
+      if (cur && (cur.is_anonymous || !cur.phone) && linkingPhone !== e164) return { ok: false, error: 'Please send the code again' };
       const { data, error } = await sb.auth.verifyOtp({ phone: e164, token: code.trim(), type: linkingPhone === e164 ? 'phone_change' : 'sms' });
       if (error || !data.user) return { ok: false, error: 'That code isn’t right — check it and try again' };
       linkingPhone = null;
@@ -195,6 +201,19 @@ export function createSupabaseBackend(url: string, anonKey: string): Backend {
       return result((await sb.auth.signInAnonymously({ options: { data: { name: name.trim().slice(0, 40) } } })).error);
     },
     async signOut() { await sb.auth.signOut(); },
+    async deleteAccount() {
+      if (!(await myUid())) return SIGNED_OUT;
+      try {
+        // Everything happens in one transaction on the server (supabase/migrations/0002_delete_account.sql).
+        const { error } = await sb.rpc('delete_my_account');
+        if (error) return { ok: false, error: 'Couldn’t delete your account — try again' };
+      } catch {
+        return { ok: false, error: OFFLINE };
+      }
+      // The server-side session went with the user; just forget it on this device.
+      await sb.auth.signOut({ scope: 'local' }).catch(() => undefined);
+      return { ok: true };
+    },
     async usernameAvailable(handle) {
       const h = cleanHandle(handle);
       if (!USERNAME_RE.test(h)) return false;

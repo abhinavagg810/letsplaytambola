@@ -149,6 +149,9 @@ export const PRESETS: { name: string; rules: RuleId[] }[] = [
 
 export const REACTS: string[] = ['Waah!', 'Arre yaar', 'Jaldi!', 'So close', 'One more!'];
 
+/** Shown in a game's history in place of the name of someone who deleted their account. */
+export const DELETED_NAME = 'Deleted player';
+
 export const AVATAR_COLORS: string[] = ['#FA4A98', '#FFB831', '#40D9C1', '#78AEFF', '#87D576', '#FE8674'];
 
 const RULE_BY_ID: Record<string, RuleDef> = {};

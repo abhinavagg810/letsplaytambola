@@ -1,6 +1,7 @@
 // Pure helpers for the Results / Settle-up / Games / Profile screens.
 import type { GameDoc, PlayerPublic, Prize } from './types.ts';
 import { roundsOf } from './engine.ts';
+import { DELETED_NAME } from './data.ts';
 
 export type Fmt = (n: number) => string;
 
@@ -58,7 +59,7 @@ export function settleSummary(doc: GameDoc, viewerUid: string | null, fmt: Fmt =
     return `You collected ${fmt(pot)} · pay out ${fmt(out)} · ${fmt(pot - out)} stays with you`;
   }
   const mine = viewerUid != null ? results.find((r) => r.player.uid === viewerUid) : undefined;
-  const hostFirst = doc.hostName.split(' ')[0];
+  const hostFirst = doc.hostName === DELETED_NAME ? DELETED_NAME : doc.hostName.split(' ')[0];
   return mine && mine.w ? `${hostFirst} owes you ${fmt(mine.w)}` : `Pot ${fmt(pot)} · better luck next round`;
 }
 

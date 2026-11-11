@@ -33,6 +33,12 @@ export interface Backend {
   signInWithApple(): Promise<ActionResult>;
   signInGuest(name: string): Promise<ActionResult>;
   signOut(): Promise<void>;
+  /**
+   * Permanently deletes the signed-in account: profile, phone, friends, groups, pending invites and tickets.
+   * Games it hosts are removed unless they are finished games other people played; in games it played, the name
+   * becomes "Deleted player" so everyone else's history still adds up. Signs out on success.
+   */
+  deleteAccount(): Promise<ActionResult>;
   usernameAvailable(handle: string): Promise<boolean>;
   updateProfile(patch: { name?: string; username?: string }): Promise<ActionResult>;
   // ---- social

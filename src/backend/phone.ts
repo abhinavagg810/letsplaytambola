@@ -14,3 +14,6 @@ export const toE164 = (phone: string): string => '+' + phoneDigits(phone);
 
 export const USERNAME_RE = /^[a-z0-9_]{3,15}$/;
 export const cleanHandle = (handle: string): string => (handle || '').trim().replace(/^@/, '').toLowerCase();
+
+/** Adding a number to the account you are signed in to, when that number is already someone else's account. */
+export const PHONE_TAKEN = 'That number already has a Tambola account — sign out and sign in with it instead';

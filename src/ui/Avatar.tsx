@@ -1,10 +1,12 @@
 import React from 'react';
 import { View } from 'react-native';
+import { DELETED_NAME } from '@core/data.ts';
 import { C } from '@/theme/tokens';
 import { T } from './Text';
 
 export const initial = (n?: string | null) => (n || '?').trim().slice(0, 1).toUpperCase() || '?';
-export const first = (n?: string | null) => (n || '').trim().split(' ')[0] || '';
+/** First name. A deleted account's placeholder name is kept whole (“Deleted player”, not “Deleted”). */
+export const first = (n?: string | null) => (n === DELETED_NAME ? n : (n || '').trim().split(' ')[0] || '');
 
 /** Initial sizes the prototype uses for each avatar diameter (others ≈ 44%). */
 const LETTER: Record<number, number> = { 96: 42, 72: 32, 50: 22, 46: 20, 44: 18, 40: 17, 38: 16, 36: 16, 32: 14 };

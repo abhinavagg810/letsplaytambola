@@ -5,6 +5,7 @@ with no Supabase env vars set the app runs in demo mode instead (`src/backend/lo
 
 ```
 migrations/0001_init.sql   schema, row-level security, RPCs, realtime
+migrations/0002_delete_account.sql   delete_my_account() — "Delete my account" in the app
 functions/game/index.ts    the ONLY write path for games (runs packages/game-core)
 functions/_shared/core/    git-ignored copy of packages/game-core/src (npm run sync:core)
 tests/                     RLS smoke test against a plain local PostgreSQL
@@ -56,7 +57,7 @@ tests/                     RLS smoke test against a plain local PostgreSQL
    supabase db push
    ```
 
-   This applies `migrations/0001_init.sql`. It needs the `citext` and `pgcrypto` extensions (created in
+   This applies `migrations/0001_init.sql` and `0002_delete_account.sql`. It needs the `citext` and `pgcrypto` extensions (created in
    the `extensions` schema, which is where Supabase keeps them).
 
 4. **HMAC secret for phone hashes.** The migration inserts a random secret, so nothing is required. If
