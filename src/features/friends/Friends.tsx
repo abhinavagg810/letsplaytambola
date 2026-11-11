@@ -117,7 +117,7 @@ export function Friends() {
               <View key={gr.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 18, backgroundColor: C.surf }}>
                 <Faces people={people} />
                 <View style={{ flex: 1, minWidth: 0 }}>
-                  <T w={800} numberOfLines={1}>{gr.name}</T>
+                  <T w={800} numberOfLines={2}>{gr.name}</T>
                   <T size={15} color={C.muted} numberOfLines={1}>{groupLine(gr, people)}</T>
                 </View>
                 <IconBtn label="×" a11y={`Delete group ${gr.name}`} size={30} bg={C.surf2} color={C.muted} fontSize={18} onPress={() => setConfirm(gr)} />
@@ -147,16 +147,18 @@ export function Friends() {
             <T size={15} color={C.muted}>Become friends when they join</T>
           </View>
           {pending.map((p, i) => (
-            <View key={p.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, paddingHorizontal: 14, borderTopWidth: 1, borderTopColor: C.surf2 }}>
+            <View key={p.id} style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 10, paddingVertical: 10, paddingHorizontal: 14, borderTopWidth: 1, borderTopColor: C.surf2 }}>
               <Avatar name={p.name} color={AVATARS[(i + 3) % 6]} size={38} />
-              <View style={{ flex: 1, minWidth: 0 }}>
+              <View style={{ flexGrow: 1, flexShrink: 1, flexBasis: 130, minWidth: 0 }}>
                 <T w={800} size={16} numberOfLines={1}>{p.name}</T>
                 <T size={15} color={C.muted} numberOfLines={1}>{p.sent ? 'Invite sent · waiting to join' : 'Not on Tambola yet'}</T>
               </View>
-              {p.sent
-                ? <Btn label="Send again" variant="outline" h={36} size={15} px={12} radius={R.pill} color={C.muted} onPress={() => sendInvite(p)} />
-                : <Btn label="Invite on WhatsApp" variant="whatsapp" h={36} size={15} px={12} radius={R.pill} onPress={() => sendInvite(p)} />}
-              <IconBtn label="×" a11y={`Remove ${p.name}`} size={28} bg={C.surf2} color={C.muted} fontSize={17} onPress={() => guard(() => backend.removePending(p.id))} />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginLeft: 'auto' }}>
+                {p.sent
+                  ? <Btn label="Send again" variant="outline" h={36} size={15} px={12} radius={R.pill} color={C.muted} onPress={() => sendInvite(p)} />
+                  : <Btn label="Invite on WhatsApp" variant="whatsapp" h={36} size={15} px={12} radius={R.pill} onPress={() => sendInvite(p)} />}
+                <IconBtn label="×" a11y={`Remove ${p.name}`} size={28} bg={C.surf2} color={C.muted} fontSize={17} onPress={() => guard(() => backend.removePending(p.id))} />
+              </View>
             </View>
           ))}
         </View>

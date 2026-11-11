@@ -1,9 +1,9 @@
 import React from 'react';
 import { Platform, Pressable, View } from 'react-native';
-
-const STRIPES = 'repeating-linear-gradient(45deg,#F0DCAE 0 3px,#F7EBD0 3px 6px)';
 import { C, R, TICKET_SHADOW } from '@/theme/tokens';
 import { T } from './Text';
+
+const STRIPES = 'repeating-linear-gradient(45deg,#F0DCAE 0 3px,#F7EBD0 3px 6px)';
 
 /** Tiny 3×9 pattern preview. `cells` = 27 booleans (true = part of the pattern). */
 export function MiniTicket({ cells, width = 72, on = C.pink, off = '#E6DCC8' }: { cells: boolean[]; width?: number; on?: string; off?: string }) {
