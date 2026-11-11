@@ -4,7 +4,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { backend } from '@/backend';
 import type { ContactMatch, DeviceContact, Friend, Group, PendingFriend } from '@/backend/types';
 import { AVATARS, C, R } from '@/theme/tokens';
-import { Avatar, Btn, Empty, Eyebrow, Faces, HandleCopy, IconBtn, Input, LinkBtn, Screen, Sheet, T, first, toast } from '@/ui';
+import { Avatar, Btn, Empty, Eyebrow, Faces, HandleCopy, IconBtn, Input, Screen, Sheet, T, first, toast } from '@/ui';
 import { appLink, openWhatsApp } from '@/lib/links';
 import { useUser } from '@/state/session';
 import { ContactsPicker } from '@/features/create/ContactsPicker';
@@ -24,8 +24,8 @@ export function autoGroupName(names: string[]) {
 const BigBtn = ({ label, bg, onPress, testID }: { label: string; bg: string; onPress: () => void; testID?: string }) => (
   <Pressable testID={testID} onPress={onPress} accessibilityRole="button" accessibilityLabel={label}
     style={({ pressed }) => ({ flex: 1, height: 64, borderRadius: 18, backgroundColor: bg, alignItems: 'center', justifyContent: 'center', transform: [{ translateY: pressed ? 2 : 0 }] })}>
-    <T w={800} size={22} color={C.ink} lh={1}>+</T>
-    <T w={800} size={17} color={C.ink} lh={1.2}>{label}</T>
+    <T w={800} size={22} color={C.ink} lh={1.1}>+</T>
+    <T w={800} size={17} color={C.ink} lh={1.1}>{label}</T>
   </Pressable>
 );
 
@@ -88,12 +88,12 @@ export function Friends() {
   };
 
   return (
-    <Screen gap={16} refreshControl={pullRefresh(refreshing, refresh)}
-      footer={selMode ? <Btn label={picked.length ? `Create group · ${plural(picked.length, 'person', 'people')}` : 'Pick at least one friend'} variant="teal" disabled={busy} onPress={createGroup} testID="create-group" /> : undefined}>
+    <Screen gap={16} fixedTop={48} bottom={12} footerTop={14} footerFade refreshControl={pullRefresh(refreshing, refresh)}
+      footer={selMode ? <Btn lip={false} label={picked.length ? `Create group · ${plural(picked.length, 'person', 'people')}` : 'Pick at least one friend'} variant="teal" disabled={busy} onPress={createGroup} testID="create-group" /> : undefined}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 10 }}>
-          <T w={800} size={34} lh={1.1} accessibilityRole="header">Friends</T>
-          {!!social && <Eyebrow accessibilityLabel={plural(friends.length, 'friend', 'friends')}>{friends.length}</Eyebrow>}
+          <T w={800} size={34} lh={1} accessibilityRole="header">Friends</T>
+          {!!social && <Eyebrow ls={0} accessibilityLabel={plural(friends.length, 'friend', 'friends')}>{friends.length}</Eyebrow>}
         </View>
         <HandleCopy handle={user.username} />
       </View>
@@ -110,17 +110,17 @@ export function Friends() {
 
       {!selMode && groups.length > 0 && !!social && (
         <View style={{ gap: 8 }}>
-          <T w={800} size={15} color={C.muted} ls={0.9} upper>Your groups</T>
+          <T mono size={14} color={C.muted} ls={0.84} lh={1.6}>Your groups</T>
           {groups.map((gr) => {
             const people = groupPeople(gr, social);
             return (
               <View key={gr.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 18, backgroundColor: C.surf }}>
                 <Faces people={people} />
                 <View style={{ flex: 1, minWidth: 0 }}>
-                  <T w={800} numberOfLines={2}>{gr.name}</T>
-                  <T size={15} color={C.muted} numberOfLines={1}>{groupLine(gr, people)}</T>
+                  <T w={800} lh={1.15} numberOfLines={2}>{gr.name}</T>
+                  <T size={13} lh={1.15} color={C.muted} numberOfLines={1}>{groupLine(gr, people)}</T>
                 </View>
-                <IconBtn label="×" a11y={`Delete group ${gr.name}`} size={30} bg={C.surf2} color={C.muted} fontSize={18} onPress={() => setConfirm(gr)} />
+                <IconBtn label="×" a11y={`Delete group ${gr.name}`} size={30} bg={C.surf2} color={C.muted} fontSize={16} onPress={() => setConfirm(gr)} />
                 <Btn label="Play" h={38} size={15} px={16} radius={R.pill} onPress={() => playGroup(gr, social)} />
               </View>
             );
@@ -130,34 +130,34 @@ export function Friends() {
 
       {selMode && (
         <View style={{ gap: 10, padding: 14, borderRadius: 18, backgroundColor: C.surf, borderWidth: 1.5, borderColor: C.teal }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <T w={800} size={18}>New group</T>
-            <LinkBtn label="Cancel" color={C.muted} onPress={() => setSel(null)} />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <T w={800} size={18} lh={1.6}>New group</T>
+            <Pressable onPress={() => setSel(null)} hitSlop={14} accessibilityRole="button" accessibilityLabel="Cancel"><T size={15} lh={1.6} color={C.muted}>Cancel</T></Pressable>
           </View>
           <Input testID="group-name" value={draftName} onChangeText={setDraftName} placeholder={autoName || 'Group name, e.g. Sharma Parivaar'} maxLength={40}
-            accessibilityLabel="Group name" h={46} bg={C.bg} border="none" radius={12} />
-          <T size={15} color={C.teal}>Tap friends below to add them</T>
+            accessibilityLabel="Group name" h={46} px={14} bg={C.bg} border="none" radius={12} />
+          <T size={14} lh={1.6} color={C.teal}>Tap friends below to add them</T>
         </View>
       )}
 
       {pending.length > 0 && (
         <View style={{ borderRadius: 18, backgroundColor: C.surf, overflow: 'hidden' }}>
-          <View style={{ paddingTop: 12, paddingHorizontal: 14, paddingBottom: 8 }}>
-            <T w={800} size={16}>Invited to Tambola</T>
-            <T size={15} color={C.muted}>Become friends when they join</T>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'baseline', columnGap: 8, paddingTop: 12, paddingHorizontal: 14, paddingBottom: 8 }}>
+            <T w={800} size={16} lh={1.6}>Invited to Tambola</T>
+            <T size={12} lh={1.6} color={C.muted}>Become friends when they join</T>
           </View>
           {pending.map((p, i) => (
-            <View key={p.id} style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 10, paddingVertical: 10, paddingHorizontal: 14, borderTopWidth: 1, borderTopColor: C.surf2 }}>
+            <View key={p.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, paddingHorizontal: 14, borderTopWidth: 1, borderTopColor: C.surf2 }}>
               <Avatar name={p.name} color={AVATARS[(i + 3) % 6]} size={38} />
-              <View style={{ flexGrow: 1, flexShrink: 1, flexBasis: 130, minWidth: 0 }}>
-                <T w={800} size={16} numberOfLines={1}>{p.name}</T>
-                <T size={15} color={C.muted} numberOfLines={1}>{p.sent ? 'Invite sent · waiting to join' : 'Not on Tambola yet'}</T>
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <T w={700} size={16} lh={1.15}>{p.name}</T>
+                <T size={12} lh={1.15} color={C.muted}>{p.sent ? 'Invite sent · waiting to join' : 'Not on Tambola yet'}</T>
               </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginLeft: 'auto' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 {p.sent
-                  ? <Btn label="Send again" variant="outline" h={36} size={15} px={12} radius={R.pill} color={C.muted} onPress={() => sendInvite(p)} />
-                  : <Btn label="Invite on WhatsApp" variant="whatsapp" h={36} size={15} px={12} radius={R.pill} onPress={() => sendInvite(p)} />}
-                <IconBtn label="×" a11y={`Remove ${p.name}`} size={28} bg={C.surf2} color={C.muted} fontSize={17} onPress={() => guard(() => backend.removePending(p.id))} />
+                  ? <Btn label="Send again" variant="outline" h={36} size={13} px={12} radius={R.pill} color={C.muted} onPress={() => sendInvite(p)} />
+                  : <Btn label="Invite on WhatsApp" variant="whatsapp" h={36} size={13} px={12} radius={R.pill} onPress={() => sendInvite(p)} />}
+                <IconBtn label="×" a11y={`Remove ${p.name}`} size={28} bg={C.surf2} color={C.muted} fontSize={15} onPress={() => guard(() => backend.removePending(p.id))} />
               </View>
             </View>
           ))}
@@ -165,7 +165,7 @@ export function Friends() {
       )}
 
       {!!social && friends.length === 0 && (
-        <Empty>No friends yet. Tap <T w={800} size={16} color={C.mari}>Add friend</T> — or just play a game, everyone you play with shows up here.</Empty>
+        <Empty pad={20} radius={18}>No friends yet. Tap <T w={800} size={16} color={C.mari}>Add friend</T> — or just play a game, everyone you play with shows up here.</Empty>
       )}
 
       <View style={{ gap: 4 }}>
@@ -174,14 +174,14 @@ export function Friends() {
           const body = (<>
             <Avatar name={f.name} color={f.color} size={44} />
             <View style={{ flex: 1, minWidth: 0 }}>
-              <T w={600} numberOfLines={1}>{f.name}</T>
-              <T size={15} color={C.muted} numberOfLines={1}>
-                <T size={15} color={C.mari}>{f.username ? '@' + f.username : 'guest'}</T> · {f.together ? plural(f.together, 'game', 'games') + ' together' : 'added'}
+              <T w={600} lh={1.15} numberOfLines={1}>{f.name}</T>
+              <T size={13} lh={1.15} color={C.muted} numberOfLines={1}>
+                <T size={13} lh={1.15} color={C.mari}>{f.username ? '@' + f.username : 'guest'}</T> · {f.together ? plural(f.together, 'game', 'games') + ' together' : 'added'}
               </T>
             </View>
-            {selMode && (
-              <View style={{ width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: on ? C.teal : C.line, backgroundColor: on ? C.teal : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-                <T w={800} size={15} color={C.ink} lh={1.1}>{on ? '✓' : ''}</T>
+            {(
+              <View style={{ opacity: selMode ? 1 : 0, width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: on ? C.teal : C.line, backgroundColor: on ? C.teal : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+                <T w={800} size={14} color={C.ink} lh={1}>{on ? '✓' : ''}</T>
               </View>
             )}
           </>);

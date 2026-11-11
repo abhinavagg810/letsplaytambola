@@ -4,11 +4,11 @@ import { backend } from '@/backend';
 import type { ContactMatch, DeviceContact } from '@/backend/types';
 import { acceptContacts, contactsAccepted, formatPhone, loadContacts } from '@/lib/contacts';
 import { AVATARS, C } from '@/theme/tokens';
-import { Avatar, Btn, Input, LinkBtn, Sheet, T } from '@/ui';
+import { Avatar, Btn, Input, Sheet, T } from '@/ui';
 
 type Phase = 'checking' | 'explain' | 'loading' | 'list' | 'denied' | 'unavailable';
 
-const SEL_BG = 'rgba(59,179,96,0.12)';
+const SEL_BG = C.waSel;
 
 /**
  * Pick people from the phone's address book (light sheet, big rows).
@@ -67,7 +67,7 @@ export function ContactsPicker(props: {
   const toggle = (id: string) => setSel((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
 
   return (
-    <Sheet open={open} onClose={onClose} height={0.9} light>
+    <Sheet open={open} onClose={onClose} height={0.9} light top={12} handle={phase === 'list'}>
       {phase === 'checking' || phase === 'loading' ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
           <ActivityIndicator color={C.wa} size="large" />
@@ -93,13 +93,13 @@ export function ContactsPicker(props: {
         />
       ) : (
         <View style={{ flex: 1 }}>
-          <View style={{ paddingHorizontal: 18, paddingTop: 4, paddingBottom: 10, gap: 10 }}>
+          <View style={{ paddingHorizontal: 18, paddingTop: 1, paddingBottom: 10, gap: 10 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <T w={800} size={24} color={C.ink}>Your contacts</T>
-              {!!n && <T size={15} color={C.lightSub}>{n} selected</T>}
+              <T w={800} size={24} color={C.ink} lh={1}>Your contacts</T>
+              {!!n && <T size={15} color={C.lightText} lh={1}>{n} selected</T>}
             </View>
             <Input value={q} onChangeText={setQ} placeholder="Search a name" accessibilityLabel="Search a name" autoCorrect={false}
-              h={50} size={18} bg={C.white} border={C.lightLine} radius={14} color={C.ink} />
+              h={50} size={18} bg={C.white} border={C.lightBorder} radius={14} color={C.ink} />
           </View>
           <FlatList
             data={rows} keyExtractor={(c) => c.id} keyboardShouldPersistTaps="handled" style={{ flex: 1 }}
@@ -112,19 +112,19 @@ export function ContactsPicker(props: {
                 <Pressable onPress={locked ? undefined : () => toggle(c.id)} disabled={locked}
                   accessibilityRole="checkbox" accessibilityState={{ checked: on, disabled: locked }} accessibilityLabel={`${c.name}, ${sub}`}
                   style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 60, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 14, backgroundColor: on && !locked ? SEL_BG : 'transparent' }}>
-                  <Avatar name={c.name} color={colorOf.get(c.id) ?? AVATARS[0]} size={44} />
+                  <Avatar name={c.name} color={colorOf.get(c.id) ?? AVATARS[0]} size={44} fontSize={18} />
                   <View style={{ flex: 1, minWidth: 0 }}>
-                    <T w={600} size={18} color={C.ink} lh={1.2} numberOfLines={1}>{c.name}</T>
-                    <T size={15} color={app && !locked ? C.waText : C.lightSub} lh={1.2} numberOfLines={1}>{sub}</T>
+                    <T w={800} size={18} color={C.ink} lh={1.2} numberOfLines={1}>{c.name}</T>
+                    <T size={14} color={app && !locked ? C.waText : C.lightText} lh={1.2} numberOfLines={1}>{sub}</T>
                   </View>
-                  <View style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 2.5, borderColor: on ? C.wa : C.lightLine, backgroundColor: on ? C.wa : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-                    {on && <T w={800} size={16} color={C.white} lh={1.1}>✓</T>}
+                  <View style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 2.5, borderColor: on ? C.wa : C.lightCheck, backgroundColor: on ? C.wa : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+                    {on && <T w={800} size={16} color={C.white} lh={1}>✓</T>}
                   </View>
                 </Pressable>
               );
             }}
           />
-          <View style={{ paddingHorizontal: 18, paddingTop: 10, paddingBottom: 4, borderTopWidth: 1, borderTopColor: C.lightLine }}>
+          <View style={{ paddingHorizontal: 18, paddingTop: 10, paddingBottom: 4, borderTopWidth: 1, borderTopColor: C.lightHair }}>
             <Btn label={doneLabel} variant="whatsapp" h={56} size={18} radius={16} lip={false} onPress={done} />
           </View>
         </View>
@@ -137,12 +137,16 @@ function Message({ title, body, cta, onCta, onClose }: { title: string; body: st
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 14, padding: 28 }}>
       <View style={{ width: 72, height: 72, borderRadius: 22, backgroundColor: C.wa, alignItems: 'center', justifyContent: 'center' }}>
-        <T w={800} size={30} color={C.white}>+</T>
+        <T w={800} size={30} color={C.white} lh={1.6}>+</T>
       </View>
       <T w={800} size={26} color={C.ink} center lh={1.1}>{title}</T>
-      <T size={17} color={C.lightSub} center lh={1.4}>{body}</T>
+      <T size={17} color={C.lightText} center lh={1.4}>{body}</T>
       <Btn label={cta} variant="whatsapp" h={56} size={18} radius={16} lip={false} onPress={onCta} style={{ alignSelf: 'stretch', marginTop: 8 }} />
-      {!!onClose && <LinkBtn label="Not now" color={C.lightSub} size={16} onPress={onClose} />}
+      {!!onClose && (
+        <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Not now">
+          <T size={16} color={C.lightText} lh={1.6}>Not now</T>
+        </Pressable>
+      )}
     </View>
   );
 }

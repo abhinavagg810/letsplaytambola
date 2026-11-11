@@ -18,18 +18,18 @@ const prettyPhone = (p: string | null) => (p ? p.replace(/^\+91(\d{5})(\d{5})$/,
 function Stat({ value, label, color = C.cream }: { value: string; label: string; color?: string }) {
   return (
     <View accessible accessibilityLabel={`${label}: ${value}`} style={{ flex: 1, minWidth: 0, paddingVertical: 12, paddingHorizontal: 6, borderRadius: 18, backgroundColor: C.surf, alignItems: 'center' }}>
-      <T w={800} size={26} color={color} numberOfLines={1} adjustsFontSizeToFit>{value}</T>
-      <T size={15} color={C.muted} numberOfLines={1}>{label}</T>
+      <T w={800} size={26} lh={1.1} color={color} numberOfLines={1} adjustsFontSizeToFit>{value}</T>
+      <T size={13} lh={1.1} color={C.muted} numberOfLines={1}>{label}</T>
     </View>
   );
 }
 function SettingRow({ title, sub, right, onPress, top, label }: { title: string; sub?: string; right: React.ReactNode; onPress: () => void; top?: boolean; label?: string }) {
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label ?? title}
-      style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 16, minHeight: 56, borderTopWidth: top ? 1 : 0, borderTopColor: C.surf2 }}>
+      style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 16, borderTopWidth: top ? 1 : 0, borderTopColor: C.surf2 }}>
       <View style={{ flex: 1, minWidth: 0 }}>
-        <T w={600}>{title}</T>
-        {!!sub && <T size={15} color={C.muted}>{sub}</T>}
+        <T w={600} lh={sub ? 1.15 : 1.6}>{title}</T>
+        {!!sub && <T size={13} lh={1.15} color={C.muted}>{sub}</T>}
       </View>
       {right}
     </Pressable>
@@ -64,12 +64,12 @@ export function Profile() {
   const netColor = !stats || !stats.money ? C.cream : stats.net >= 0 ? C.teal : C.bogey;
 
   return (
-    <Screen refreshControl={pullRefresh(refreshing, refresh)}>
-      <View style={{ alignItems: 'center', gap: 8, paddingTop: 12 }}>
+    <Screen fixedTop={48} refreshControl={pullRefresh(refreshing, refresh)}>
+      <View style={{ alignItems: 'center', gap: 8, paddingTop: 8 }}>
         <Avatar name={user.name} color={user.color} size={96} ring={C.mari} />
-        <View style={{ alignItems: 'center', marginTop: 4 }}>
-          <T w={800} size={28} center accessibilityRole="header">{user.name}</T>
-          <T size={15} color={C.muted} center>{user.isGuest ? 'Guest account' : user.email || prettyPhone(user.phone) || ''}</T>
+        <View style={{ alignItems: 'center' }}>
+          <T w={800} size={28} lh={1.2} center accessibilityRole="header">{user.name}</T>
+          <T size={14} lh={1.2} color={C.muted} center>{user.isGuest ? 'Guest account' : user.email || prettyPhone(user.phone) || ''}</T>
         </View>
         <View><HandleCopy handle={user.username} /></View>
       </View>

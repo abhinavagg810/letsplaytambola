@@ -1,6 +1,8 @@
 import React from 'react';
 import { Pressable, StyleProp, View, ViewStyle } from 'react-native';
 import { C, LIP, MIN_TAP, R } from '@/theme/tokens';
+
+const LIP_WA = 'inset 0 -4px 0 rgba(0,0,0,0.15)'; // the prototype's green buttons use a slightly lighter lip
 import { T } from './Text';
 
 type Variant = 'primary' | 'teal' | 'cream' | 'whatsapp' | 'black' | 'outline' | 'ghost' | 'ink' | 'dashed';
@@ -25,7 +27,7 @@ export function Btn({ label, onPress, variant = 'primary', h = 56, size, lip, di
         backgroundColor: BG[variant], alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10,
         borderWidth: bordered ? 1.5 : 0, borderColor: borderColor ?? (variant === 'dashed' ? C.teal : C.line), borderStyle: variant === 'dashed' ? 'dashed' : 'solid',
         opacity: disabled ? 0.5 : 1, transform: [{ translateY: pressed ? 2 : 0 }],
-        boxShadow: showLip ? LIP : undefined, flex: flex ? 1 : undefined,
+        boxShadow: showLip ? (variant === 'whatsapp' ? LIP_WA : LIP) : undefined, flex: flex ? 1 : undefined,
       } as ViewStyle, style]}
     >
       {left}
@@ -43,11 +45,11 @@ export function LinkBtn({ label, onPress, color = C.mari, size = 15, underline }
   );
 }
 
-export function IconBtn({ label, onPress, size = 40, bg = C.surf, color = C.cream, fontSize = 20, a11y }: { label: string; onPress?: () => void; size?: number; bg?: string; color?: string; fontSize?: number; a11y?: string }) {
+export function IconBtn({ label, onPress, size = 40, bg = C.surf, color = C.cream, fontSize = 20, a11y, w = 500, radius }: { label: string; onPress?: () => void; size?: number; bg?: string; color?: string; fontSize?: number; a11y?: string; w?: 500 | 600 | 800; radius?: number }) {
   return (
     <Pressable onPress={onPress} hitSlop={Math.max(0, (MIN_TAP - size) / 2)} accessibilityRole="button" accessibilityLabel={a11y ?? label}
-      style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
-      <T w={600} size={fontSize} color={color} lh={1.1}>{label}</T>
+      style={{ width: size, height: size, borderRadius: radius ?? size / 2, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
+      <T w={w} size={fontSize} color={color} lh={1.1}>{label}</T>
     </Pressable>
   );
 }

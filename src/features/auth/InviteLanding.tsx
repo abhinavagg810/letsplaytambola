@@ -8,7 +8,7 @@ import { C } from '@/theme/tokens';
 import { Avatar, Btn, Input, Screen, T, first, toast } from '@/ui';
 import { refreshUser } from '@/state/session';
 import { openUrl, storeLinks } from '@/lib/links';
-import { GLOW, GoogleDot, PhoneSheet } from './SignIn';
+import { GoogleDot, PhoneSheet } from './SignIn';
 
 const OFFLINE = 'Can’t reach Tambola right now — check your internet';
 
@@ -69,16 +69,16 @@ export function InviteLanding({ code }: { code: string }) {
   const verb = ended ? 'See results' : 'Join';
 
   return (
-    <Screen glow={GLOW} px={22} top={36} max={520} gap={16}>
-      <View style={{ flex: 1, justifyContent: 'center', gap: 14, paddingVertical: 12 }}>
+    <Screen px={22} fixedTop={56} max={520} gap={16}>
+      <View style={{ flex: 1, justifyContent: 'center', gap: 14 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <Avatar name={peek.hostName} color={peek.hostColor} size={50} />
           <T size={17} color={C.muted} style={{ flex: 1 }}>{ended ? `${first(peek.hostName)}’s game has ended` : `${first(peek.hostName)} invited you`}</T>
         </View>
-        <T w={800} size={50} lh={1} accessibilityRole="header">{peek.name}</T>
+        <T w={800} size={50} lh={0.95} accessibilityRole="header">{peek.name}</T>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
           {chips.map((c) => (
-            <View key={c} style={{ paddingVertical: 4, paddingHorizontal: 12, borderRadius: 999, backgroundColor: C.surf }}><T size={15}>{c}</T></View>
+            <View key={c} style={{ paddingVertical: 4, paddingHorizontal: 12, borderRadius: 999, backgroundColor: C.surf }}><T size={15} lh={1.6}>{c}</T></View>
           ))}
         </View>
         {peek.price > 0 && <T size={15} color={C.muted}>Settled outside the app</T>}

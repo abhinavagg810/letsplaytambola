@@ -26,19 +26,19 @@ export function Stepper({ value, onDec, onInc, label }: { value: number | string
   );
 }
 
-export interface InputProps extends TextInputProps { h?: number; size?: number; bold?: boolean; bg?: string; border?: string; radius?: number; color?: string; box?: StyleProp<ViewStyle> }
-export function Input({ h = 50, size = 17, bold, bg = 'transparent', border = C.line, radius = R.btn, color = C.cream, box, style, ...rest }: InputProps) {
+export interface InputProps extends TextInputProps { h?: number; size?: number; bold?: boolean; mono?: boolean; px?: number; bg?: string; border?: string; radius?: number; color?: string; box?: StyleProp<ViewStyle> }
+export function Input({ h = 50, size = 17, bold, mono, px = 16, bg = 'transparent', border = C.line, radius = R.btn, color = C.cream, box, style, ...rest }: InputProps) {
   return (
     <TextInput placeholderTextColor={C.dim} {...rest}
-      style={[{ height: h, borderRadius: radius, borderWidth: border === 'none' ? 0 : 1.5, borderColor: border === 'none' ? 'transparent' : border, backgroundColor: bg, paddingHorizontal: 16, fontSize: size, color, fontFamily: bold ? F.bold : F.medium, outlineStyle: 'none' } as any, box, style]} />
+      style={[{ height: h, borderRadius: radius, borderWidth: border === 'none' ? 0 : 1.5, borderColor: border === 'none' ? 'transparent' : border, backgroundColor: bg, paddingHorizontal: px, fontSize: size, color, fontFamily: mono ? F.mono : bold ? F.bold : F.medium, outlineStyle: 'none' } as any, box, style]} />
   );
 }
 
-export function Chip({ label, onPress, bg = 'transparent', fg = C.cream, border = C.line, size = 15, maxWidth }: { label: string; onPress?: () => void; bg?: string; fg?: string; border?: string; size?: number; maxWidth?: number }) {
+export function Chip({ label, onPress, bg = 'transparent', fg = C.cream, border = C.line, size = 15, maxWidth, px = 14, minH = 36, w = 800 }: { label: string; onPress?: () => void; bg?: string; fg?: string; border?: string; size?: number; maxWidth?: number; px?: number; minH?: number; w?: 500 | 600 | 800 }) {
   return (
-    <Pressable onPress={onPress} disabled={!onPress} hitSlop={6} accessibilityRole={onPress ? 'button' : 'text'} accessibilityLabel={label}
-      style={{ minHeight: 36, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1.5, borderColor: border, backgroundColor: bg, alignItems: 'center', justifyContent: 'center', maxWidth }}>
-      <T w={800} size={size} color={fg} numberOfLines={1}>{label}</T>
+    <Pressable onPress={onPress} disabled={!onPress} hitSlop={Math.max(6, (MIN_TAP - minH) / 2)} accessibilityRole={onPress ? 'button' : 'text'} accessibilityLabel={label}
+      style={{ minHeight: minH, paddingHorizontal: px, borderRadius: 999, borderWidth: 1.5, borderColor: border, backgroundColor: bg, alignItems: 'center', justifyContent: 'center', maxWidth, flexShrink: 0 }}>
+      <T w={w} size={size} color={fg} numberOfLines={1}>{label}</T>
     </Pressable>
   );
 }
@@ -53,9 +53,9 @@ export function Row({ children, onPress, top, style }: { children: React.ReactNo
   return onPress ? <Pressable onPress={onPress} accessibilityRole="button" style={s}>{children}</Pressable> : <View style={s}>{children}</View>;
 }
 
-export function Empty({ children }: { children: React.ReactNode }) {
+export function Empty({ children, pad = 22, radius = 20 }: { children: React.ReactNode; pad?: number; radius?: number }) {
   return (
-    <View style={{ padding: 22, borderRadius: 20, borderWidth: 1.5, borderStyle: 'dashed', borderColor: C.line }}>
+    <View style={{ padding: pad, borderRadius: radius, borderWidth: 1.5, borderStyle: 'dashed', borderColor: C.line }}>
       <T size={16} color={C.muted} center lh={1.4}>{children}</T>
     </View>
   );

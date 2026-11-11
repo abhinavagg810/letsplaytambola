@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, Platform, View } from 'react-native';
+import { Animated, Easing, Platform, Pressable, View } from 'react-native';
 import { AVATARS, C, MOTION } from '@/theme/tokens';
-import { Chip, T } from '@/ui';
+import { T } from '@/ui';
 import { REACTS } from '@core/data.ts';
 import type { Bubble } from './useGameEvents';
 
@@ -11,7 +11,12 @@ const native = Platform.OS !== 'web';
 export function ReactionBar({ onReact }: { onReact: (text: string) => void }) {
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-      {REACTS.map((r) => <Chip key={r} label={r} onPress={() => onReact(r)} />)}
+      {REACTS.map((r) => (
+        <Pressable key={r} onPress={() => onReact(r)} hitSlop={6} accessibilityRole="button" accessibilityLabel={r}
+          style={({ pressed }) => ({ paddingVertical: 4, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, transform: [{ scale: pressed ? 0.92 : 1 }] })}>
+          <T w={600} size={14} lh={1.57}>{r}</T>
+        </Pressable>
+      ))}
     </View>
   );
 }
@@ -29,11 +34,11 @@ function Floater({ b }: { b: Bubble }) {
       boxShadow: '0 10px 24px -8px rgba(0,0,0,0.6)',
       opacity: a.interpolate({ inputRange: [0, 0.12, 0.8, 1], outputRange: [0, 1, 1, 0] }),
       transform: [
-        { translateY: a.interpolate({ inputRange: [0, 0.12, 0.8, 1], outputRange: [20, 0, 0, -60] }) },
+        { translateY: a.interpolate({ inputRange: [0, 0.12, 0.2, 1], outputRange: [20, 0, 0, -60] }) },
         { scale: a.interpolate({ inputRange: [0, 0.12, 0.2, 1], outputRange: [0.6, 1.08, 1, 1] }) },
       ],
     }}>
-      <T w={800} size={17} color={C.ink}>{b.who}: {b.text}</T>
+      <T w={800} size={17} lh={1.6} color={C.ink}>{b.who}: {b.text}</T>
     </Animated.View>
   );
 }

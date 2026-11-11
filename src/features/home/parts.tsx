@@ -31,10 +31,10 @@ export function LiveGameCard({ row }: { row: GameRowData }) {
       style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 18, backgroundColor: C.surf, minHeight: 44 }}>
       <LiveDot />
       <View style={{ flex: 1, minWidth: 0 }}>
-        <T w={600} numberOfLines={1}>{row.name}</T>
-        <T size={15} color={C.muted} numberOfLines={1}>{row.right === 'LIVE' ? 'Live now' : 'In the lobby'} · {row.sub}</T>
+        <T w={600} lh={1.15} numberOfLines={1}>{row.name}</T>
+        <T size={13} lh={1.15} color={C.muted} numberOfLines={1}>{row.sub}</T>
       </View>
-      <T w={800} size={15} color={C.mari}>Open →</T>
+      <T w={800} size={14} lh={1.6} color={C.mari}>Open →</T>
     </Pressable>
   );
 }
@@ -69,4 +69,4 @@ export function SkeletonRows({ n = 3, h = 74 }: { n?: number; h?: number }) {
 export const pullRefresh = (refreshing: boolean, onRefresh: () => void) =>
   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.mari} colors={[C.mari]} progressBackgroundColor={C.surf} />;
 
-export const SectionTitle = ({ children }: { children: React.ReactNode }) => <T w={800} size={20} lh={1.15} accessibilityRole="header">{children}</T>;
+export const SectionTitle = ({ children }: { children: React.ReactNode }) => <T w={800} size={20} lh={1} accessibilityRole="header">{children}</T>;

@@ -21,17 +21,17 @@ function TabBar() {
   const active = useActive();
   const badge = invitesStore.use((s) => s.list.length);
   return (
-    <View style={{ flexDirection: 'row', gap: 4, paddingTop: 8, paddingHorizontal: 10, paddingBottom: Math.max(insets.bottom, 12), backgroundColor: C.sidebar, borderTopWidth: 1, borderTopColor: C.surf }}>
+    <View style={{ flexDirection: 'row', gap: 4, paddingTop: 8, paddingHorizontal: 10, paddingBottom: Math.max(insets.bottom, 16), backgroundColor: C.sidebar, borderTopWidth: 1, borderTopColor: C.barLine }}>
       {TABS.map(([name, label]) => {
         const on = active === name;
         return (
-          <Pressable key={name} onPress={() => go(name)} accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel={label} style={{ flex: 1, alignItems: 'center', minHeight: 44, justifyContent: 'center' }}>
-            <View style={{ width: '100%', maxWidth: 88, height: 36, borderRadius: 999, backgroundColor: on ? C.mari : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-              <T w={800} size={15} color={on ? C.ink : C.muted}>{label}</T>
+          <Pressable key={name} onPress={() => go(name)} accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel={label} hitSlop={{ top: 6, bottom: 6 }} style={{ flex: 1, alignItems: 'center', paddingVertical: 4 }}>
+            <View style={{ width: '100%', maxWidth: 84, paddingVertical: 7, borderRadius: 999, backgroundColor: on ? C.mari : 'transparent', alignItems: 'center' }}>
+              <T w={800} size={15} lh={1.1} color={on ? C.ink : C.muted} style={{ lineHeight: 16.5 }}>{label}</T>
             </View>
             {name === 'index' && badge > 0 && (
-              <View style={{ position: 'absolute', top: 0, right: '12%', minWidth: 20, height: 20, borderRadius: 10, paddingHorizontal: 5, backgroundColor: C.pink, alignItems: 'center', justifyContent: 'center' }}>
-                <T mono size={12} ls={0} color="#fff" lh={1.2}>{badge}</T>
+              <View style={{ position: 'absolute', top: 0, right: '12%', height: 16, borderRadius: 8, paddingHorizontal: 6, backgroundColor: C.pink, alignItems: 'center', justifyContent: 'center' }}>
+                <T mono size={10} ls={0} color="#fff" lh={1.6}>{badge}</T>
               </View>
             )}
           </Pressable>
@@ -47,7 +47,7 @@ function Sidebar() {
   const active = useActive();
   const badge = invitesStore.use((s) => s.list.length);
   return (
-    <View style={{ width: SIDEBAR_W, backgroundColor: C.sidebar, borderRightWidth: 1, borderRightColor: C.surf, paddingVertical: 24, paddingHorizontal: 16, gap: 6 }}>
+    <View style={{ width: SIDEBAR_W, backgroundColor: C.sidebar, borderRightWidth: 1, borderRightColor: C.barLine, paddingVertical: 24, paddingHorizontal: 16, gap: 6 }}>
       <View style={{ paddingHorizontal: 8, paddingBottom: 22 }}><Logo size={38} /></View>
       {TABS.map(([name, label]) => {
         const on = active === name;
@@ -56,17 +56,17 @@ function Sidebar() {
             style={{ height: 46, borderRadius: 14, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', backgroundColor: on ? C.mari : 'transparent' }}>
             <T w={800} size={17} color={on ? C.ink : C.muted} style={{ flex: 1 }}>{label}</T>
             {name === 'index' && badge > 0 && (
-              <View style={{ minWidth: 22, height: 22, borderRadius: 11, paddingHorizontal: 6, backgroundColor: C.pink, alignItems: 'center', justifyContent: 'center' }}><T mono size={12} ls={0} color="#fff" lh={1.2}>{badge}</T></View>
+              <View style={{ paddingVertical: 1, paddingHorizontal: 7, borderRadius: 999, backgroundColor: C.pink, alignItems: 'center', justifyContent: 'center' }}><T mono size={11} ls={0} color="#fff" lh={1.3}>{badge}</T></View>
             )}
           </Pressable>
         );
       })}
       <Btn label="Host a game" h={50} size={17} lip={false} radius={16} style={{ marginTop: 16 }} onPress={() => router.push('/new')} />
-      <View style={{ marginTop: 'auto', flexDirection: 'row', alignItems: 'center', gap: 10, padding: 8 }}>
+      <View style={{ marginTop: 'auto', flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 8 }}>
         <Avatar name={user.name} color={user.color} size={36} />
-        <View style={{ gap: 4, flexShrink: 1 }}>
-          <T w={600} size={15} numberOfLines={1}>{user.name}</T>
-          <HandleCopy handle={user.username} h={28} />
+        <View style={{ gap: 4, flexShrink: 1, minWidth: 0 }}>
+          <T w={600} size={15} lh={1.15} numberOfLines={1}>{user.name}</T>
+          <HandleCopy handle={user.username} h={26} size={13} />
         </View>
       </View>
     </View>

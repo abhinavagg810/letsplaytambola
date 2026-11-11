@@ -47,7 +47,7 @@ export function Ball({ n, rolling }: { n: number | null; rolling: boolean }) {
         boxShadow: has ? `0 0 0 4px ${C.mari}, 0 0 40px rgba(250,74,152,0.6)` : `inset 0 0 0 2px ${C.line}`,
       }}>
       <View style={{ width: 68, height: 68, borderRadius: 34, backgroundColor: has ? C.cream : C.surf, alignItems: 'center', justifyContent: 'center' }}>
-        <T w={800} size={38} color={has ? C.ink : C.muted} lh={1.1} style={{ paddingTop: 4 }}>{has ? String(n) : '?'}</T>
+        <T w={800} size={38} color={has ? C.ink : C.muted} lh={1} style={{ paddingTop: 5 }}>{has ? String(n) : '?'}</T>
       </View>
     </Animated.View>
   );

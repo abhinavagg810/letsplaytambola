@@ -72,12 +72,12 @@ export function Username({ user }: { user: User }) {
   const hi = first(name).toUpperCase();
 
   return (
-    <Screen px={24} top={44} max={520} gap={16}
+    <Screen px={24} fixedTop={64} footerBottom={28} max={520} gap={16}
       footer={<Btn label={busy ? 'Saving…' : 'Continue'} size={20} disabled={busy} onPress={save} testID="username-continue" />}>
       <Avatar name={name} color={user.color} size={72} />
       <View style={{ gap: 6 }}>
-        <Eyebrow color={C.mari}>{hi ? `Hi ${hi} · one last thing` : 'One last thing'}</Eyebrow>
-        <T w={800} size={34} lh={1.05} accessibilityRole="header">Pick a username</T>
+        <Eyebrow color={C.mari} ls={1.2} lh={1.6}>{hi ? `Hi ${hi} · one last thing` : 'One last thing'}</Eyebrow>
+        <T w={800} size={34} lh={1} accessibilityRole="header">Pick a username</T>
         <T size={17} lh={1.4} color={C.muted}>Friends find and invite you with it — no more “which Rahul?”</T>
       </View>
       {askName && (
@@ -90,7 +90,7 @@ export function Username({ user }: { user: User }) {
           autoCapitalize="none" autoCorrect={false} autoComplete="off" spellCheck={false} maxLength={16} returnKeyType="done" onSubmitEditing={save} accessibilityLabel="Username"
           style={{ flex: 1, minWidth: 0, height: 54, fontSize: 22, fontFamily: F.bold, color: C.cream, paddingLeft: 4, outlineStyle: 'none' } as any} />
       </View>
-      <T size={15} color={color} accessibilityLiveRegion="polite">{text}</T>
+      <T size={15} lh={1.6} color={color} accessibilityLiveRegion="polite">{text}</T>
     </Screen>
   );
 }

@@ -6,7 +6,7 @@ import { useUser } from '@/state/session';
 import { C } from '@/theme/tokens';
 import { Avatar, Btn, Faces, Input, Sheet, T, first, toast } from '@/ui';
 
-const SHEET_BG = C.surf;
+const SHEET_BG = C.sheet;
 const asInvited = (f: Friend): InvitedUser => ({ uid: f.uid, name: f.name, username: f.username, color: f.color });
 
 /**
@@ -67,17 +67,17 @@ export function PeoplePicker({ open, onClose, friends, groups, selected, onChang
   const count = selected.length;
 
   return (
-    <Sheet open={open} onClose={onClose} height={0.88}>
+    <Sheet open={open} onClose={onClose} height={0.88} bg={SHEET_BG} top={12}>
       <View style={{ flex: 1 }}>
-        <View style={{ paddingHorizontal: 18, paddingTop: 4, paddingBottom: 10, gap: 10 }}>
+        <View style={{ paddingHorizontal: 18, paddingTop: 1, paddingBottom: 10, gap: 10 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <T w={800} size={24}>Add people</T>
-            <T size={15} color={C.muted}>{count ? `${count} invited` : 'Optional'}</T>
+            <T w={800} size={24} lh={1}>Add people</T>
+            <T size={14} color={C.muted} lh={1}>{count ? `${count} invited` : 'Optional'}</T>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', height: 46, borderRadius: 14, backgroundColor: C.bg, paddingLeft: 14 }}>
-            <T size={15} color={C.dim}>Search</T>
+            <T size={15} color={C.dim2}>Search</T>
             <Input value={q} onChangeText={setQ} placeholder="name or @username" accessibilityLabel="Search by name or username"
-              autoCapitalize="none" autoCorrect={false} h={46} size={17} border="none" box={{ flex: 1, minWidth: 0, paddingHorizontal: 8 }} />
+              autoCapitalize="none" autoCorrect={false} h={46} size={17} border="none" box={{ flex: 1, minWidth: 0, paddingLeft: 6, paddingRight: 14 }} />
           </View>
           <View accessibilityRole="tablist" style={{ flexDirection: 'row', gap: 4, padding: 4, borderRadius: 999, backgroundColor: C.bg }}>
             {([['friends', `Friends · ${friends.length}`], ['groups', `Groups · ${groups.length}`]] as const).map(([k, label]) => (
@@ -96,13 +96,13 @@ export function PeoplePicker({ open, onClose, friends, groups, selected, onChang
               style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', borderColor: C.mari, marginBottom: 6 }}>
               <Avatar name={ext.name} color={ext.color} size={40} />
               <View style={{ flex: 1, minWidth: 0 }}>
-                <T w={600} size={16} numberOfLines={1}>{ext.name}</T>
-                <T size={15} color={C.mari} numberOfLines={1}>@{ext.username} · not a friend yet</T>
+                <T w={600} size={16} lh={1.15} numberOfLines={1}>{ext.name}</T>
+                <T size={13} color={C.mari} lh={1.15} numberOfLines={1}>@{ext.username} · not a friend yet</T>
               </View>
-              <T w={800} size={15} color={C.mari}>Invite</T>
+              <T w={800} size={14} color={C.mari} lh={1.6}>Invite</T>
             </Pressable>
           )}
-          {empty && <T size={15} color={C.muted} center lh={1.4} style={{ paddingVertical: 24, paddingHorizontal: 8 }}>{emptyText}</T>}
+          {empty && <T size={15} color={C.muted} center lh={1.6} style={{ paddingVertical: 24, paddingHorizontal: 8 }}>{emptyText}</T>}
 
           {tab === 'friends' && friendRows.map((f) => {
             const lock = locked.has(f.uid), on = lock || selIds.has(f.uid);
@@ -110,14 +110,14 @@ export function PeoplePicker({ open, onClose, friends, groups, selected, onChang
             return (
               <Pressable key={f.uid} disabled={lock} onPress={() => (on ? remove([f.uid]) : add([asInvited(f)]))}
                 accessibilityRole="checkbox" accessibilityState={{ checked: on, disabled: lock }} accessibilityLabel={f.name}
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingVertical: 8, paddingHorizontal: 6, borderRadius: 14, backgroundColor: on ? C.tealSoft : 'transparent', opacity: lock ? 0.6 : 1 }}>
-                <Avatar name={f.name} color={f.color} size={40} />
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingHorizontal: 6, borderRadius: 14, backgroundColor: on ? C.tealSel : 'transparent', opacity: lock ? 0.6 : 1 }}>
+                <Avatar name={f.name} color={f.color} size={40} fontSize={15} />
                 <View style={{ flex: 1, minWidth: 0 }}>
-                  <T w={600} size={16} numberOfLines={1}>{f.name}</T>
-                  {!!sub && <T size={15} color={C.muted} numberOfLines={1}>{sub}</T>}
+                  <T w={800} size={16} lh={1.15} numberOfLines={1}>{f.name}</T>
+                  {!!sub && <T size={13} color={C.muted} lh={1.15} numberOfLines={1}>{sub}</T>}
                 </View>
                 <View style={{ width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: on ? C.teal : C.line, backgroundColor: on ? C.teal : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-                  {on && <T w={800} size={15} color={C.ink} lh={1.1}>✓</T>}
+                  {on && <T w={800} size={13} color={C.ink} lh={1}>✓</T>}
                 </View>
               </Pressable>
             );
@@ -130,21 +130,21 @@ export function PeoplePicker({ open, onClose, friends, groups, selected, onChang
             return (
               <Pressable key={g.id} onPress={() => (all ? remove(g.uids) : add(members.map(asInvited)))}
                 accessibilityRole="button" accessibilityLabel={`${g.name}, ${all ? 'added' : 'add all'}`}
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingVertical: 8, paddingHorizontal: 6, borderRadius: 14, backgroundColor: all ? C.tealSoft : 'transparent' }}>
-                <View style={{ minWidth: 40 }}><Faces people={members} size={32} max={3} ring={SHEET_BG} /></View>
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingHorizontal: 6, borderRadius: 14, backgroundColor: all ? C.tealSel : 'transparent' }}>
+                <View style={{ minWidth: 40 }}><Faces people={members} size={32} max={3} ring={SHEET_BG} fontSize={15} overlap={10} /></View>
                 <View style={{ flex: 1, minWidth: 0 }}>
-                  <T w={600} size={16} numberOfLines={1}>{g.name}</T>
-                  <T size={15} color={C.muted} numberOfLines={1}>{sub}</T>
+                  <T w={800} size={16} lh={1.15} numberOfLines={1}>{g.name}</T>
+                  <T size={13} color={C.muted} lh={1.15} numberOfLines={1}>{sub}</T>
                 </View>
-                <View style={{ height: 30, paddingHorizontal: 10, borderRadius: 999, borderWidth: 2, borderColor: all ? C.teal : C.line, backgroundColor: all ? C.teal : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-                  <T w={800} size={15} color={all ? C.ink : C.cream} lh={1.15}>{all ? 'Added ✓' : 'Add all'}</T>
+                <View style={{ height: 26, paddingHorizontal: 10, borderRadius: 999, borderWidth: 2, borderColor: all ? C.teal : C.line, backgroundColor: all ? C.teal : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+                  <T w={800} size={13} color={all ? C.ink : C.cream} lh={1}>{all ? 'Added ✓' : 'Add all'}</T>
                 </View>
               </Pressable>
             );
           })}
         </ScrollView>
 
-        <View style={{ paddingHorizontal: 18, paddingTop: 10, paddingBottom: 4, borderTopWidth: 1, borderTopColor: C.surf2 }}>
+        <View style={{ paddingHorizontal: 18, paddingTop: 10, paddingBottom: 4, borderTopWidth: 1, borderTopColor: C.hair }}>
           <Btn label={count ? `Done · ${count} invited` : 'Done'} h={52} size={18} radius={16} onPress={onClose} />
         </View>
       </View>

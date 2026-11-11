@@ -21,9 +21,9 @@ export function ToastHost() {
   useEffect(() => { if (msg) { a.setValue(0); Animated.timing(a, { toValue: 1, duration: 220, useNativeDriver: true }).start(); } }, [msg, at, a]);
   if (!msg) return null;
   return (
-    <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 92, alignItems: 'center', zIndex: 100 }}>
-      <Animated.View accessibilityLiveRegion="polite" style={{ opacity: a, transform: [{ translateY: a.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }], maxWidth: 340, backgroundColor: C.cream, borderRadius: 999, paddingVertical: 10, paddingHorizontal: 18, boxShadow: '0 12px 30px -10px rgba(0,0,0,0.7)' }}>
-        <T w={800} size={16} color={C.ink} center>{msg}</T>
+    <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 28, alignItems: 'center', zIndex: 100 }}>
+      <Animated.View accessibilityLiveRegion="polite" style={{ opacity: a, transform: [{ translateY: a.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }], maxWidth: '90%', backgroundColor: C.cream, borderRadius: 999, paddingVertical: 10, paddingHorizontal: 18, boxShadow: '0 12px 30px -10px rgba(0,0,0,0.6)' }}>
+        <T w={800} size={16} lh={1.6} color={C.ink} center numberOfLines={1}>{msg}</T>
       </Animated.View>
     </View>
   );

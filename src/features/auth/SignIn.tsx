@@ -11,7 +11,7 @@ export const GLOW = 'radial-gradient(ellipse at 20% 0%, rgba(122,24,98,0.6), tra
 const RESEND_S = 30;
 
 /** The little blue ring the design uses in place of the Google mark. */
-export const GoogleDot = () => <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 3, borderColor: '#4C8DF6' }} />;
+export const GoogleDot = () => <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 3, borderColor: '#2784D5' }} />;
 
 type Step = 'phone' | 'code' | 'name';
 
@@ -159,22 +159,22 @@ export function SignIn() {
   };
 
   return (
-    <Screen glow={GLOW} px={24} top={44} max={520}>
+    <Screen glow={GLOW} glowHeight="100%" px={24} fixedTop={64} bottom={28} max={520}>
       {!!peek && (
         <Pressable onPress={() => router.push(`/g/${peek.id}`)} accessibilityRole="button" accessibilityLabel={`${first(peek.hostName)} shared a link. Join ${peek.name}`}
           style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 18, backgroundColor: C.cream, boxShadow: '0 12px 30px -12px rgba(0,0,0,0.6)' }}>
-          <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: C.wa, alignItems: 'center', justifyContent: 'center' }}>
-            <T mono size={12} color={C.white} ls={0}>LINK</T>
+          <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: C.chat, alignItems: 'center', justifyContent: 'center' }}>
+            <T mono size={10} color={C.white} ls={0}>LINK</T>
           </View>
           <View style={{ flex: 1, minWidth: 0 }}>
-            <T size={15} color={C.lightSub} numberOfLines={1}>{first(peek.hostName)} shared a link</T>
-            <T w={800} size={16} color={C.ink} numberOfLines={1}>Join {peek.name}</T>
+            <T size={13} lh={1.15} color={C.lightSub} numberOfLines={1}>{first(peek.hostName)} shared a link</T>
+            <T w={800} size={15} lh={1.15} color={C.ink} numberOfLines={1}>Join {peek.name}</T>
           </View>
         </Pressable>
       )}
-      <View style={{ flex: 1, justifyContent: 'center', gap: 18, paddingVertical: 12 }}>
+      <View style={{ flex: 1, justifyContent: 'center', gap: 18 }}>
         <Logo size={72} />
-        <T w={800} size={44} lh={1} ls={-0.9} accessibilityRole="header">Housie night, <T w={800} size={44} lh={1} ls={-0.9} color={C.mari}>sorted.</T></T>
+        <T w={800} size={44} lh={0.95} ls={-0.88} accessibilityRole="header">Housie night, <T w={800} size={44} lh={0.95} ls={-0.88} color={C.mari}>sorted.</T></T>
         <T size={18} lh={1.35} color={C.muted}>Host or join a game with family and friends in seconds.</T>
       </View>
       <View style={{ gap: 10 }}>

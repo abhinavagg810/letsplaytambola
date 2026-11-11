@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { backend } from '@/backend';
 import type { User } from '@/backend/types';
 import { AdSlot } from '@/lib/ads';
 import { say } from '@/lib/speech';
 import { setPendingCode } from '@/state/session';
 import { C, R } from '@/theme/tokens';
-import { Avatar, BackBtn, Btn, Eyebrow, LinkBtn, Screen, T, first, toast } from '@/ui';
+import { Btn, Screen, T, first, toast } from '@/ui';
 import { formatINR, roundResults } from '@core/stats.ts';
 import type { GameView } from '@core/types';
+import { Back, Face } from './bits';
 import { Confetti } from './Confetti';
 import { liveSeen } from './useGameEvents';
 import { act } from './useOnline';
 
-const GLOW = 'radial-gradient(ellipse at 50% 0%, rgba(150,98,0,0.5), transparent 55%)';
+const GLOW = 'radial-gradient(ellipse at 50% 0%, rgba(113,54,0,0.5), transparent 55%)';
 
 /** Round results (README §4.15). Shown to everyone with the link once the round has ended. */
 export function Results({ game, user }: { game: GameView; user: User }) {
+  const insets = useSafeAreaInsets();
   const code = game.id;
   const isHost = game.hostUid === user.uid;
   const price = game.price || 0;
@@ -67,12 +70,13 @@ export function Results({ game, user }: { game: GameView; user: User }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
-      <Screen glow={GLOW} px={18} gap={16}>
+      {/* Prototype: 52px above the header (status bar included), 20px below the last button; the glow covers the screen. */}
+      <Screen glow={GLOW} glowHeight="100%" px={18} gap={16} top={Math.max(52 - insets.top, 20)} style={{ paddingBottom: 20 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <BackBtn onPress={() => router.replace('/')} />
-          <Eyebrow color={C.mari}>Round {game.round} · {game.called.length} numbers</Eyebrow>
+          <Back onPress={() => router.replace('/')} />
+          <T mono size={12} ls={0} color={C.mari}>Round {game.round} · {game.called.length} numbers</T>
         </View>
-        <T w={800} size={38} center lh={1.05} accessibilityRole="header">{title}</T>
+        <T w={800} size={38} center lh={1} accessibilityRole="header">{title}</T>
 
         {podium.length > 0 && (
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-end', gap: 10 }}>
@@ -81,11 +85,11 @@ export function Results({ game, user }: { game: GameView; user: User }) {
               return (
                 <View key={r.player.uid} accessibilityLabel={`Number ${rank}: ${r.player.name}, ${price ? formatINR(r.w) : `${r.won.length} prizes`}`}
                   style={{ width: top ? 104 : 90, alignItems: 'center', gap: 6 }}>
-                  <View style={{ marginTop: 4 }}><Avatar name={r.player.name} color={r.player.color} size={top ? 60 : 48} ring={top ? C.pink : undefined} /></View>
-                  <T w={800} size={15} numberOfLines={1} style={{ maxWidth: '100%' }}>{first(r.player.name)}{r.player.uid === user.uid ? ' (you)' : ''}</T>
+                  <Face name={r.player.name} color={r.player.color} size={top ? 60 : 48} font={22} ring={top ? C.pink : undefined} />
+                  <T w={800} size={15} lh={1.6} numberOfLines={1} style={{ maxWidth: '100%' }}>{first(r.player.name)}</T>
                   <View style={{ width: '100%', height: rank === 1 ? 110 : rank === 2 ? 80 : 58, borderTopLeftRadius: 14, borderTopRightRadius: 14, backgroundColor: top ? C.mari : C.surf2, alignItems: 'center', justifyContent: 'center' }}>
-                    <T w={800} size={20} color={top ? C.ink : C.cream} numberOfLines={1}>{price ? formatINR(r.w) : r.won.length}</T>
-                    <T mono size={12} color={top ? C.ink : C.cream} style={{ marginTop: 2 }}>#{rank}</T>
+                    <T w={800} size={20} lh={1} color={top ? C.ink : C.cream} numberOfLines={1}>{price ? formatINR(r.w) : r.won.length}</T>
+                    <T mono size={11} ls={0} lh={1} color={top ? C.ink : C.cream} style={{ marginTop: 4 }}>#{rank}</T>
                   </View>
                 </View>
               );
@@ -93,16 +97,16 @@ export function Results({ game, user }: { game: GameView; user: User }) {
           </View>
         )}
 
-        <T w={800} size={20}>Winners</T>
+        <T w={800} size={20} lh={1}>Winners</T>
         {game.prizes.length > 0 ? (
           <View style={{ borderRadius: R.card, backgroundColor: C.surf, overflow: 'hidden' }}>
-            {game.prizes.map((z, i) => {
+            {game.prizes.map((z) => {
               const c = claims[z.id], full = z.rule === 'full';
               return (
-                <View key={z.id} style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10, paddingVertical: 10, paddingHorizontal: 14, borderTopWidth: i ? 1 : 0, borderTopColor: C.surf2, backgroundColor: full && c ? C.mariSoft : 'transparent' }}>
-                  <T size={15} color={C.muted} style={{ flexShrink: 1 }}>{z.label}</T>
-                  <T w={800} size={15} color={c ? (full ? C.mari : C.cream) : C.muted} style={{ textAlign: 'right', flexShrink: 1 }}>
-                    {c ? `${c.uid === user.uid ? 'You' : first(c.name)}${price ? ' · ' + formatINR(z.amt) : ''}` : 'Unclaimed'}
+                <View key={z.id} style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10, paddingVertical: 10, paddingHorizontal: 14, borderBottomWidth: 1, borderBottomColor: C.surf2, backgroundColor: full && c ? C.mariSoft : 'transparent' }}>
+                  <T size={15} lh={1.6} color={C.muted} style={{ flexShrink: 1 }}>{z.label}</T>
+                  <T w={800} size={15} lh={1.6} color={c ? (full ? C.mari : C.cream) : C.muted} style={{ textAlign: 'right', flexShrink: 1 }}>
+                    {c ? `${first(c.name)}${price ? ' · ' + formatINR(z.amt) : ''}` : 'Unclaimed'}
                   </T>
                 </View>
               );
@@ -123,14 +127,12 @@ export function Results({ game, user }: { game: GameView; user: User }) {
           </Pressable>
         )}
 
-        <View style={{ flexGrow: 1 }} />
-        <View style={{ gap: 8 }}>
+        <View style={{ marginTop: 'auto', gap: 8 }}>
           {!user.isGuest && game.players.some((p) => p.uid !== user.uid) && (
             <Btn label={saved ? 'Saved as a group ✓' : 'Save these players as a group'} variant="dashed" h={46} size={16} onPress={saveGroup} />
           )}
-          <Btn label={settleLabel} h={54} onPress={() => router.push(`/g/${code}/settle`)} testID="settle" />
+          <Btn label={settleLabel} h={54} size={19} radius={R.card} onPress={() => router.push(`/g/${code}/settle`)} testID="settle" />
           {isHost && <Btn label="Next round — fresh tickets" variant="outline" borderColor={C.cream} h={50} size={17} w={600} disabled={busy} onPress={nextRound} testID="next-round" />}
-          <View style={{ alignItems: 'center', paddingTop: 8 }}><LinkBtn label="Back to home" color={C.muted} onPress={() => router.replace('/')} /></View>
         </View>
         <AdSlot placement="results_footer" />
       </Screen>

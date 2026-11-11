@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatINR } from '@core/stats.ts';
 import { backend } from '@/backend';
 import type { Social } from '@/backend/types';
@@ -15,6 +16,7 @@ const EMPTY: Social = { friends: [], groups: [], pending: [] };
 /** New game — who's playing, seats, ticket price, prizes. README §4.8. */
 export function NewGame() {
   const d = draft.use();
+  const insets = useSafeAreaInsets();
   const [social, setSocial] = useState<Social>(EMPTY);
   const [people, setPeople] = useState(false);
   const [contactsOpen, setContactsOpen] = useState(false);
@@ -81,10 +83,10 @@ export function NewGame() {
   const createLabel = onPrizes.length ? `Create game · ${onPrizes.length} prize${onPrizes.length > 1 ? 's' : ''}` : 'Create game';
 
   return (
-    <Screen gap={14} footer={<Btn label={busy ? 'Creating…' : createLabel} size={20} disabled={busy} onPress={create} testID="create-game" />}>
+    <Screen gap={14} top={Math.max(8, 48 - insets.top)} footer={<Btn label={busy ? 'Creating…' : createLabel} size={20} disabled={busy} onPress={create} testID="create-game" />}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <BackBtn onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
-        <Eyebrow>New game</Eyebrow>
+        <Eyebrow ls={0} lh={1.32}>New game</Eyebrow>
       </View>
 
       <Input value={d.name} onChangeText={(name) => setDraft({ name })} accessibilityLabel="Game name" placeholder="Name your game" maxLength={40}
@@ -92,25 +94,25 @@ export function NewGame() {
 
       <Card>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <T w={800} size={18}>Who’s playing?</T>
-          <T size={15} color={C.muted}>{inv.length ? `${inv.length} invited` : 'Optional'}</T>
+          <T w={800} size={18} lh={1.6}>Who’s playing?</T>
+          <T size={13} color={C.muted} lh={1.6}>{inv.length ? `${inv.length} invited` : 'Optional'}</T>
         </View>
 
         {inv.length > 0 && (
           <Pressable onPress={() => setPeople(true)} accessibilityRole="button" accessibilityLabel={`${invNames}. Edit invited people`}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 }}>
-            <Faces people={inv} size={34} max={5} />
+            hitSlop={{ top: 5, bottom: 5 }} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Faces people={inv} size={34} max={5} fontSize={14} />
             <T size={15} lh={1.25} style={{ flex: 1, minWidth: 0 }}>{invNames}</T>
-            <T w={800} size={15} color={C.mari}>Edit</T>
+            <T w={800} size={14} color={C.mari} lh={1.6}>Edit</T>
           </Pressable>
         )}
 
         {quick.length > 0 && (
           <View style={{ gap: 6 }}>
-            <Eyebrow>Quick add</Eyebrow>
+            <Eyebrow size={10} ls={0.8} lh={1.32}>Quick add</Eyebrow>
             <View style={{ flexDirection: 'row', gap: 6, overflow: 'hidden' }}>
               {quick.map((c) => (
-                <Chip key={c.key} label={`+ ${c.label}`} onPress={c.onPress} maxWidth={150} fg={c.teal ? C.teal : C.cream} border={c.teal ? C.teal : C.line} />
+                <Chip key={c.key} label={`+ ${c.label}`} onPress={c.onPress} maxWidth={150} size={14} px={12} minH={35} fg={c.teal ? C.teal : C.cream} border={c.teal ? C.teal : C.line} />
               ))}
             </View>
           </View>
@@ -118,21 +120,21 @@ export function NewGame() {
 
         {cs.length > 0 && (
           <Pressable onPress={() => setContactsOpen(true)} accessibilityRole="button" accessibilityLabel={`${cs.length} contacts selected. Edit`}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderRadius: R.input, backgroundColor: C.waSoft }}>
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderRadius: R.input, backgroundColor: C.waSoft16 }}>
             <View style={{ flex: 1, minWidth: 0 }}>
               <T size={15} lh={1.3}><T w={800} size={15}>{cs.length} {cs.length === 1 ? 'contact' : 'contacts'}</T> · {csNames}</T>
-              <T size={15} color={C.muted} lh={1.3}>You’ll send the WhatsApp invite after creating</T>
+              <T size={13} color={C.muted} lh={1.5}>You’ll send the WhatsApp invite after creating</T>
             </View>
-            <T w={800} size={15} color={C.mari}>Edit</T>
+            <T w={800} size={14} color={C.mari} lh={1.6}>Edit</T>
           </Pressable>
         )}
 
         <Btn label="Choose from contacts" variant="whatsapp" h={56} size={18} radius={R.btn} onPress={() => setContactsOpen(true)} />
-        <Btn label={pickLabel} variant="outline" h={46} size={16} w={600} radius={R.input} onPress={() => setPeople(true)} />
+        <Btn label={pickLabel} variant="outline" h={46} size={16} radius={R.input} onPress={() => setPeople(true)} />
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-          <T size={15} color={C.muted} lh={1.3} style={{ flex: 1 }}>Or skip — share to a WhatsApp group next.</T>
-          {inv.length > 0 && <LinkBtn label="Save as group" color={C.teal} onPress={saveGroup} />}
+          <T size={13} color={C.muted} lh={1.6} style={{ flexShrink: 1 }}>Or skip — share to a WhatsApp group next.</T>
+          {inv.length > 0 && <LinkBtn label="Save as group" color={C.teal} size={14} onPress={saveGroup} />}
         </View>
       </Card>
 
@@ -142,12 +144,12 @@ export function NewGame() {
         </SettingRow>
 
         <SettingRow title="Ticket price" sub={price ? `Pot ${formatINR(draftPot(d))} if all join` : 'Set 0 to play just for fun'} note="Settled outside the app">
-          <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: C.bg, borderRadius: R.small, paddingHorizontal: 12, width: 110, height: 44 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: C.bg, borderRadius: R.small, paddingHorizontal: 12, width: 110, height: 48 }}>
             <T w={800} size={18} color={C.mari}>₹</T>
             <TextInput
               value={d.price ? String(d.price) : ''} placeholder="0" placeholderTextColor={C.dim} keyboardType="number-pad" inputMode="numeric" maxLength={5}
               onChangeText={(v) => setDraft({ price: Number(v.replace(/\D/g, '')) || 0 })} accessibilityLabel="Ticket price in rupees" selectTextOnFocus
-              style={{ flex: 1, minWidth: 0, height: 44, fontSize: 20, fontFamily: F.bold, color: C.cream, textAlign: 'right', paddingLeft: 4, paddingVertical: 0, outlineStyle: 'none' } as any}
+              style={{ flex: 1, minWidth: 0, height: 48, fontSize: 20, fontFamily: F.bold, color: C.cream, textAlign: 'right', paddingLeft: 4, paddingVertical: 0, outlineStyle: 'none' } as any}
             />
           </View>
         </SettingRow>
@@ -159,13 +161,10 @@ export function NewGame() {
         <Pressable onPress={() => router.push('/prizes')} accessibilityRole="button" accessibilityLabel="Edit prizes" testID="edit-prizes"
           style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 16, borderTopWidth: 1, borderTopColor: C.surf2 }}>
           <View style={{ flex: 1, minWidth: 0 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
-              <T w={600} size={17}>Prizes</T>
-              <Eyebrow>Optional</Eyebrow>
-            </View>
-            <T size={15} color={C.muted} lh={1.25}>{prizeSummary(d)}</T>
+            <T w={600} size={17} lh={1.2}>Prizes <T mono size={10} ls={0.6} color={C.muted}>Optional</T></T>
+            <T size={13} color={C.muted} lh={1.2}>{prizeSummary(d)}</T>
           </View>
-          <T w={800} size={15} color={C.mari}>Edit →</T>
+          <T w={800} size={15} color={C.mari} lh={1.6}>Edit →</T>
         </Pressable>
       </View>
 
@@ -181,14 +180,14 @@ function SettingRow({ title, sub, note, children, first: isFirst, onPress }: { t
   const body = (
     <>
       <View style={{ flex: 1, minWidth: 0 }}>
-        <T w={600} size={17} lh={1.2}>{title}</T>
-        <T size={15} color={C.muted} lh={1.2}>{sub}</T>
-        {!!note && <T size={15} color={C.dim} lh={1.2}>{note}</T>}
+        <T w={600} size={17} lh={1.15}>{title}</T>
+        <T size={13} color={C.muted} lh={1.15}>{sub}</T>
+        {!!note && <T size={12} color={C.dim2} lh={1.15}>{note}</T>}
       </View>
       {children}
     </>
   );
-  const style = { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingVertical: 10, paddingLeft: 16, paddingRight: 12, minHeight: 60, borderTopWidth: isFirst ? 0 : 1, borderTopColor: C.surf2 } as const;
+  const style = { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingVertical: onPress ? 12 : 10, paddingLeft: 16, paddingRight: onPress ? 16 : 12, borderTopWidth: isFirst ? 0 : 1, borderTopColor: C.surf2 } as const;
   return onPress
     ? <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={title} style={style}>{body}</Pressable>
     : <View style={style}>{body}</View>;

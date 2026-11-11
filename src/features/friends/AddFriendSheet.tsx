@@ -9,7 +9,7 @@ import { openWhatsApp } from '@/lib/links';
 const Divider = ({ label }: { label: string }) => (
   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
     <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
-    <T size={15} color={C.dim}>{label}</T>
+    <T size={13} lh={1.6} color={C.dim}>{label}</T>
     <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
   </View>
 );
@@ -42,7 +42,7 @@ export function AddFriendSheet({ open, onClose, user, onContacts, onAdded }: {
   return (
     <Sheet open={open} onClose={onClose}>
       <View style={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: 10, gap: 12 }}>
-        <T w={800} size={24} accessibilityRole="header">Add friends</T>
+        <T w={800} size={24} lh={1} accessibilityRole="header">Add friends</T>
         <Btn label="Choose from contacts" variant="whatsapp" h={56} size={18} radius={16} onPress={onContacts} testID="choose-contacts" />
         <Divider label="or by username" />
         <View style={{ flexDirection: 'row', gap: 8 }}>
