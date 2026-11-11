@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Pressable, TextInput, TextInputProps, View, ViewStyle, StyleProp } from 'react-native';
+import { Animated, Platform, Pressable, Text, TextInput, TextInputProps, View, ViewStyle, StyleProp } from 'react-native';
 import { C, F, MIN_TAP, R } from '@/theme/tokens';
 import { T } from './Text';
 import { IconBtn } from './Btn';
@@ -78,4 +78,13 @@ export function CardIn({ children, style }: { children: React.ReactNode; style?:
   const a = useRef(new Animated.Value(0)).current;
   useEffect(() => { Animated.timing(a, { toValue: 1, duration: 380, useNativeDriver: true }).start(); }, [a]);
   return <Animated.View style={[{ opacity: a, transform: [{ scale: a.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1] }) }] }, style]}>{children}</Animated.View>;
+}
+
+/**
+ * "Added ✓" — Baloo 2 has no ✓, so browsers draw it in a fallback font at regular weight while the prototype's is bold.
+ * On web this bolds just the tick; native keeps the plain string.
+ */
+export function tick(label: string): React.ReactNode {
+  if (Platform.OS !== 'web' || !label.includes('✓')) return label;
+  return label.split('✓').flatMap((part, i) => (i ? [<Text key={i} style={{ fontWeight: '800' }}>✓</Text>, part] : [part]));
 }

@@ -48,7 +48,7 @@ function Sidebar() {
   const badge = invitesStore.use((s) => s.list.length);
   return (
     <View style={{ width: SIDEBAR_W, backgroundColor: C.sidebar, borderRightWidth: 1, borderRightColor: C.barLine, paddingVertical: 24, paddingHorizontal: 16, gap: 6 }}>
-      <View style={{ paddingHorizontal: 8, paddingBottom: 22 }}><Logo size={38} /></View>
+      <View style={{ paddingHorizontal: 8, paddingTop: 5, paddingBottom: 22 }}><Logo size={38} /></View>
       {TABS.map(([name, label]) => {
         const on = active === name;
         return (

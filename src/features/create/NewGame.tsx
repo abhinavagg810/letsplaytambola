@@ -11,6 +11,8 @@ import { BackBtn, Btn, Card, Chip, Eyebrow, Faces, Input, LinkBtn, Screen, Stepp
 import { ContactsPicker } from './ContactsPicker';
 import { PeoplePicker } from './PeoplePicker';
 
+/** Exact (fractional) line-height from the prototype, where rounding would drift the card height. */
+const LH = (px: number) => ({ lineHeight: px });
 const EMPTY: Social = { friends: [], groups: [], pending: [] };
 
 /** New game — who's playing, seats, ticket price, prizes. README §4.8. */
@@ -109,10 +111,10 @@ export function NewGame() {
 
         {quick.length > 0 && (
           <View style={{ gap: 6 }}>
-            <Eyebrow size={10} ls={0.8} lh={1.1}>Quick add</Eyebrow>
+            <Eyebrow size={10} ls={0.8} lh={1.3}>Quick add</Eyebrow>
             <View style={{ flexDirection: 'row', gap: 6, overflow: 'hidden' }}>
               {quick.map((c) => (
-                <Chip key={c.key} label={`+ ${c.label}`} onPress={c.onPress} maxWidth={150} size={14} px={12} minH={35} fg={c.teal ? C.teal : C.cream} border={c.teal ? C.teal : C.line} />
+                <Chip key={c.key} label={`+ ${c.label}`} onPress={c.onPress} maxWidth={150} size={14} px={12} minH={34} fg={c.teal ? C.teal : C.cream} border={c.teal ? C.teal : C.line} />
               ))}
             </View>
           </View>
@@ -122,8 +124,8 @@ export function NewGame() {
           <Pressable onPress={() => setContactsOpen(true)} accessibilityRole="button" accessibilityLabel={`${cs.length} contacts selected. Edit`}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderRadius: R.input, backgroundColor: C.waSoft16 }}>
             <View style={{ flex: 1, minWidth: 0 }}>
-              <T size={15} lh={1.3}><T w={800} size={15}>{cs.length} {cs.length === 1 ? 'contact' : 'contacts'}</T> · {csNames}</T>
-              <T size={13} color={C.muted} lh={1.5}>You’ll send the WhatsApp invite after creating</T>
+              <T size={15} style={LH(19.5)}><T w={800} size={15} style={LH(19.5)}>{cs.length} {cs.length === 1 ? 'contact' : 'contacts'}</T> · {csNames}</T>
+              <T size={13} color={C.muted} style={LH(19.5)}>You’ll send the WhatsApp invite after creating</T>
             </View>
             <T w={800} size={14} color={C.mari} lh={1.6}>Edit</T>
           </Pressable>
@@ -161,8 +163,8 @@ export function NewGame() {
         <Pressable onPress={() => router.push('/prizes')} accessibilityRole="button" accessibilityLabel="Edit prizes" testID="edit-prizes"
           style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 16, borderTopWidth: 1, borderTopColor: C.surf2 }}>
           <View style={{ flex: 1, minWidth: 0 }}>
-            <T w={600} size={17} lh={1.2}>Prizes <T mono size={10} ls={0.6} color={C.muted}>Optional</T></T>
-            <T size={13} color={C.muted} lh={1.2}>{prizeSummary(d)}</T>
+            <T w={600} size={17} style={LH(20.4)}>Prizes <T mono size={10} ls={0.6} color={C.muted}>Optional</T></T>
+            <T size={13} color={C.muted} style={LH(15.6)}>{prizeSummary(d)}</T>
           </View>
           <T w={800} size={15} color={C.mari} lh={1.6}>Edit →</T>
         </Pressable>
@@ -180,9 +182,9 @@ function SettingRow({ title, sub, note, children, first: isFirst, onPress }: { t
   const body = (
     <>
       <View style={{ flex: 1, minWidth: 0 }}>
-        <T w={600} size={17} lh={1.15}>{title}</T>
-        <T size={13} color={C.muted} lh={1.15}>{sub}</T>
-        {!!note && <T size={12} color={C.dim2} lh={1.15}>{note}</T>}
+        <T w={600} size={17} style={LH(19.55)}>{title}</T>
+        <T size={13} color={C.muted} style={LH(14.95)}>{sub}</T>
+        {!!note && <T size={12} color={C.dim2} style={LH(13.8)}>{note}</T>}
       </View>
       {children}
     </>

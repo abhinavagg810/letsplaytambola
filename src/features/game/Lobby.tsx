@@ -8,12 +8,14 @@ import { backend } from '@/backend';
 import type { Social, User } from '@/backend/types';
 import { gameLink, openWhatsApp } from '@/lib/links';
 import { AVATARS, C, R } from '@/theme/tokens';
-import { Avatar, BackBtn, Btn, Eyebrow, LiveDot, Screen, T, TicketView, copyText, first, toast } from '@/ui';
+import { Avatar, BackBtn, Btn, Eyebrow, LiveDot, Screen, T, TicketView, copyText, first, tick, toast } from '@/ui';
 import { ContactsPicker } from '@/features/create/ContactsPicker';
 import { PeoplePicker } from '@/features/create/PeoplePicker';
 
 /** The three small invite pills share the row by content width, so “From contacts” never truncates on a 390px phone. */
 const PILL = { flex: 1, minWidth: 0 } as const;
+/** Exact (fractional) line-height from the prototype, where rounding would drift row heights. */
+const LH = (px: number) => ({ lineHeight: px });
 const EMPTY: Social = { friends: [], groups: [], pending: [] };
 
 /** "0421" — a stable, friendly ticket number for this player (decorative only). */
@@ -105,13 +107,13 @@ export function Lobby({ game, user }: { game: GameView; user: User }) {
                   <View key={c.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, paddingHorizontal: 12, borderTopWidth: 1, borderTopColor: C.hair }}>
                     <Avatar name={c.name} color={AVATARS[(i + 2) % AVATARS.length]} size={36} fontSize={16} />
                     <View style={{ flex: 1, minWidth: 0 }}>
-                      <T w={800} size={16} lh={1.15} numberOfLines={2}>{c.name}</T>
-                      <T size={12} color={C.muted} lh={1.15} numberOfLines={1}>{joined ? 'Joined the game' : c.sent ? 'Invite sent' : 'Not sent yet'}</T>
+                      <T w={800} size={16} style={LH(18.4)} numberOfLines={2}>{c.name}</T>
+                      <T size={12} color={C.muted} style={LH(13.8)} numberOfLines={1}>{joined ? 'Joined the game' : c.sent ? 'Invite sent' : 'Not sent yet'}</T>
                     </View>
                     <Pressable onPress={joined ? undefined : () => sendTo(c)} disabled={joined} hitSlop={4}
                       accessibilityRole="button" accessibilityLabel={joined ? `${c.name} joined` : `${label} to ${c.name}`}
                       style={{ height: 38, paddingHorizontal: 14, borderRadius: 999, alignItems: 'center', justifyContent: 'center', backgroundColor: joined || c.sent ? 'transparent' : C.wa, borderWidth: joined || c.sent ? 1.5 : 0, borderColor: joined ? C.teal : C.line }}>
-                      <T w={800} size={14} color={joined ? C.teal : c.sent ? C.muted : C.white} numberOfLines={1}>{label}</T>
+                      <T w={800} size={14} color={joined ? C.teal : c.sent ? C.muted : C.white} numberOfLines={1}>{tick(label)}</T>
                     </Pressable>
                   </View>
                 );
@@ -171,8 +173,8 @@ function PlayerRow({ name, full, color, tag, pill, joined }: { name: string; ful
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, opacity: joined ? 1 : 0.5 }}>
       <Avatar name={full} color={color} size={38} fontSize={17} />
       <View style={{ flex: 1, minWidth: 0 }}>
-        <T w={600} size={17} lh={1.1} numberOfLines={1}>{name}</T>
-        <T size={13} color={C.muted} lh={1.1} numberOfLines={1}>{tag}</T>
+        <T w={600} size={17} style={LH(18.7)} numberOfLines={1}>{name}</T>
+        <T size={13} color={C.muted} style={LH(14.3)} numberOfLines={1}>{tag}</T>
       </View>
       <View style={{ paddingVertical: 3, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1.5, borderColor: joined ? C.teal : C.line }}>
         <T w={800} size={13} color={joined ? C.teal : C.muted} lh={1.6}>{pill}</T>

@@ -95,7 +95,7 @@ export function Friends() {
           <T w={800} size={34} lh={1} accessibilityRole="header">Friends</T>
           {!!social && <Eyebrow ls={0} accessibilityLabel={plural(friends.length, 'friend', 'friends')}>{friends.length}</Eyebrow>}
         </View>
-        <HandleCopy handle={user.username} />
+        <View><HandleCopy handle={user.username} /></View>
       </View>
 
       {!selMode && (
@@ -110,7 +110,7 @@ export function Friends() {
 
       {!selMode && groups.length > 0 && !!social && (
         <View style={{ gap: 8 }}>
-          <T mono size={14} color={C.muted} ls={0.84} lh={1.6}>Your groups</T>
+          <T mono size={14} color={C.muted} ls={0.84} lh={1.32}>Your groups</T>
           {groups.map((gr) => {
             const people = groupPeople(gr, social);
             return (
@@ -180,7 +180,7 @@ export function Friends() {
               </T>
             </View>
             {(
-              <View style={{ opacity: selMode ? 1 : 0, width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: on ? C.teal : C.line, backgroundColor: on ? C.teal : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ opacity: selMode ? 1 : 0, width: 30, height: 30, borderRadius: 15, borderWidth: 2, borderColor: on ? C.teal : C.line, backgroundColor: on ? C.teal : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
                 <T w={800} size={14} color={C.ink} lh={1}>{on ? '✓' : ''}</T>
               </View>
             )}

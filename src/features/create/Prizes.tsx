@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { Platform, Pressable, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PRESETS, RULES, miniCells, ruleDesc } from '@core/data.ts';
@@ -11,8 +11,11 @@ import {
   setPrizeAmt, stepPrizeAmt, togglePrize,
 } from '@/state/draft';
 import { C, F, R } from '@/theme/tokens';
-import { BackBtn, Btn, Chip, Eyebrow, IconBtn, LinkBtn, MiniTicket, Screen, T, Toggle, toast } from '@/ui';
+import { BackBtn, Btn, Chip, Eyebrow, LinkBtn, tick, MiniTicket, Screen, T, Toggle, toast } from '@/ui';
 
+/** Exact (fractional) line-height from the prototype, where rounding would drift row heights. */
+const LH = (px: number) => ({ lineHeight: px });
+const SYSTEM_FONT = { fontFamily: Platform.select({ web: 'Arial, sans-serif', default: undefined }) };
 const GROUPS = RULES.map((r) => r.group).filter((g, i, a) => a.indexOf(g) === i);
 
 /** Prizes (optional) — presets, pot meter, per-prize amounts, and the "More ways to win" library. README §4.11. */
@@ -36,13 +39,13 @@ export function Prizes() {
       </View>
       <View style={{ gap: 4 }}>
         <T w={800} size={34} lh={1}>Prizes</T>
-        <T size={15} color={C.muted} lh={1.35}>We’ve picked the classics. Tweak them, add your own, or skip.</T>
+        <T size={15} color={C.muted} style={LH(20.25)}>We’ve picked the classics. Tweak them, add your own, or skip.</T>
       </View>
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
         {PRESETS.map((ps) => {
           const active = ps.rules.slice().sort().join() === presetKey;
-          return <Chip key={ps.name} label={ps.name} onPress={() => applyPreset(ps.rules)} bg={active ? C.mari : 'transparent'} fg={active ? C.ink : C.cream} border={active ? C.mari : C.line} size={14} w={600} px={14} minH={35} />;
+          return <Chip key={ps.name} label={ps.name} onPress={() => applyPreset(ps.rules)} bg={active ? C.mari : 'transparent'} fg={active ? C.ink : C.cream} border={active ? C.mari : C.line} size={14} w={600} px={14} minH={34} />;
         })}
       </View>
 
@@ -55,8 +58,8 @@ export function Prizes() {
             </View>
             <Pressable onPress={resetAutoSplit} hitSlop={6} accessibilityRole="button" accessibilityState={{ selected: !d.prizesTouched }}
               accessibilityLabel={d.prizesTouched ? 'Auto-split the pot' : 'Auto-split is on'} testID="auto-split"
-              style={{ minHeight: 37, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1.5, borderColor: C.teal, backgroundColor: d.prizesTouched ? 'transparent' : C.tealSoft18, alignItems: 'center', justifyContent: 'center' }}>
-              <T w={800} size={14} color={C.teal} lh={1.6}>{d.prizesTouched ? 'Auto-split' : 'Auto-split ✓'}</T>
+              style={{ minHeight: 36, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1.5, borderColor: C.teal, backgroundColor: d.prizesTouched ? 'transparent' : C.tealSoft18, alignItems: 'center', justifyContent: 'center' }}>
+              <T w={800} size={14} color={C.teal} lh={1.6}>{tick(d.prizesTouched ? 'Auto-split' : 'Auto-split ✓')}</T>
             </Pressable>
           </View>
           <View style={{ height: 8, borderRadius: 99, backgroundColor: C.bg, overflow: 'hidden' }}>
@@ -64,7 +67,7 @@ export function Prizes() {
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
             <T size={14} color={C.muted} lh={1.6}>{formatINR(assigned)} of {formatINR(pot)} assigned</T>
-            <T w={800} size={14} color={meterColor} lh={1.6}>{over ? `${formatINR(over)} over` : left ? `${formatINR(left)} left` : 'All set ✓'}</T>
+            <T w={800} size={14} color={meterColor} lh={1.6}>{tick(over ? `${formatINR(over)} over` : left ? `${formatINR(left)} left` : 'All set ✓')}</T>
           </View>
         </View>
       )}
@@ -81,10 +84,10 @@ export function Prizes() {
             <T w={800} size={19} lh={1.6}>More ways to win</T>
             <LinkBtn label="Done" size={16} onPress={() => setLibOpen(false)} />
           </View>
-          <T size={14} color={C.muted} lh={1.35}>Tap <T w={800} size={14} color={C.teal} lh={1.35}>Add</T> on any one. Pink boxes on the little ticket show what you need.</T>
+          <T size={14} color={C.muted} style={LH(18.9)}>Tap <T w={800} size={14} color={C.teal} style={LH(18.9)}>Add</T> on any one. Pink boxes on the little ticket show what you need.</T>
           {GROUPS.map((g) => (
             <View key={g} style={{ gap: 6 }}>
-              <Eyebrow size={10} ls={0.8} lh={1.1} style={{ paddingTop: 4 }}>{g}</Eyebrow>
+              <Eyebrow size={10} ls={0.8} lh={1.3} style={{ paddingTop: 4 }}>{g}</Eyebrow>
               {RULES.filter((r) => r.group === g).map((r) => {
                 const { have, multi, nextName } = libraryState(d.prizeCfg, r.id);
                 const added = have > 0 && !multi;
@@ -93,8 +96,8 @@ export function Prizes() {
                   <View key={r.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, borderRadius: R.input, backgroundColor: C.bg }}>
                     <MiniTicket cells={miniCells(r.id)} width={58} />
                     <View style={{ flex: 1, minWidth: 0 }}>
-                      <T w={800} size={16} lh={1.2}>{r.name}</T>
-                      <T size={13} color={C.soft} lh={1.2}>{r.rule}</T>
+                      <T w={800} size={16} style={LH(19.2)}>{r.name}</T>
+                      <T size={13} color={C.soft} style={LH(15.6)}>{r.rule}</T>
                     </View>
                     <Pressable hitSlop={4} accessibilityRole="button" accessibilityLabel={added ? `${r.name} added` : `Add ${nextName}`}
                       onPress={() => {
@@ -102,7 +105,7 @@ export function Prizes() {
                         toast(name ? `Added ${name}` : `${r.name} is already in`);
                       }}
                       style={{ height: 36, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1.5, borderColor: C.teal, backgroundColor: added ? 'transparent' : C.teal, alignItems: 'center', justifyContent: 'center' }}>
-                      <T w={800} size={14} color={added ? C.teal : C.ink} numberOfLines={1}>{label}</T>
+                      <T w={800} size={14} color={added ? C.teal : C.ink} numberOfLines={1}>{tick(label)}</T>
                     </Pressable>
                   </View>
                 );
@@ -115,8 +118,8 @@ export function Prizes() {
   );
 }
 
-/** Brief rule under a prize name. Full House's library hint ("— add again for Second House") is dropped on the card. */
-const brief = (p: PrizeCfg) => (p.rule === 'full' ? ruleDesc(p.rule).split(' — ')[0] : ruleDesc(p.rule));
+/** Rule under a prize name — the same line the library shows (prototype). */
+const brief = (p: PrizeCfg) => ruleDesc(p.rule);
 
 function PrizeCard({ p, showMoney }: { p: PrizeCfg; showMoney: boolean }) {
   return (
@@ -124,10 +127,16 @@ function PrizeCard({ p, showMoney }: { p: PrizeCfg; showMoney: boolean }) {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
         <MiniTicket cells={miniCells(p.rule)} width={72} on={p.on ? C.pink : C.miniDim} />
         <View style={{ flex: 1, minWidth: 0 }}>
-          <T w={800} size={17} lh={1.15}>{p.label}</T>
-          <T size={13} color={C.muted} lh={1.15}>{brief(p)}{p.custom ? ' · your prize' : ''}</T>
+          <T w={800} size={17} style={LH(19.55)}>{p.label}</T>
+          <T size={13} color={C.muted} style={LH(14.95)}>{brief(p)}{p.custom ? ' · your prize' : ''}</T>
         </View>
-        {p.custom && <IconBtn label="×" a11y={`Remove ${p.label}`} size={28} bg={C.surf2} color={C.muted} fontSize={17} onPress={() => removePrize(p.id)} />}
+        {p.custom && (
+          <Pressable onPress={() => removePrize(p.id)} hitSlop={8} accessibilityRole="button" accessibilityLabel={`Remove ${p.label}`}
+            style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: C.surf2, alignItems: 'center', justifyContent: 'center' }}>
+            {/* The prototype draws this × in the system font, not Baloo. */}
+            <T size={17} color={C.muted} lh={1} style={SYSTEM_FONT}>×</T>
+          </Pressable>
+        )}
         <Toggle small on={p.on} onChange={() => togglePrize(p.id)} label={p.label} />
       </View>
       {showMoney && (
@@ -163,7 +172,7 @@ function AmountInput({ id, amt, label }: { id: string; amt: number; label: strin
       value={text} keyboardType="number-pad" inputMode="numeric" maxLength={6} selectTextOnFocus accessibilityLabel={`${label} amount in rupees`}
       onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
       onChangeText={(v) => { const clean = v.replace(/\D/g, ''); setText(clean); setPrizeAmt(id, Number(clean) || 0); }}
-      style={{ width: 80, height: 40, fontSize: 20, fontFamily: F.bold, color: C.cream, paddingLeft: 4, paddingVertical: 0, outlineStyle: 'none' } as any}
+      style={{ width: 84, height: 40, fontSize: 20, fontFamily: F.bold, color: C.cream, paddingLeft: 4, paddingVertical: 0, outlineStyle: 'none' } as any}
     />
   );
 }

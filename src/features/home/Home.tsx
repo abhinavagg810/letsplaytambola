@@ -46,7 +46,7 @@ export function Home() {
 
   return (
     <Screen fixedTop={48} refreshControl={pullRefresh(refreshing, refresh)}>
-      {width < WIDE && <Logo size={30} />}
+      {width < WIDE && <View style={{ paddingTop: 8 }}><Logo size={30} /></View>}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
         <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
           <T w={800} size={24} lh={1.15} numberOfLines={1} accessibilityRole="header">Namaste, {first(user.name)}</T>

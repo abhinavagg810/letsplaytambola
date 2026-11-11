@@ -4,11 +4,13 @@ import { backend } from '@/backend';
 import type { ContactMatch, DeviceContact } from '@/backend/types';
 import { acceptContacts, contactsAccepted, formatPhone, loadContacts } from '@/lib/contacts';
 import { AVATARS, C } from '@/theme/tokens';
-import { Avatar, Btn, Input, Sheet, T } from '@/ui';
+import { Avatar, Btn, Input, Sheet, T, tick } from '@/ui';
 
 type Phase = 'checking' | 'explain' | 'loading' | 'list' | 'denied' | 'unavailable';
 
 const SEL_BG = C.waSel;
+/** Exact (fractional) line-height from the prototype, where rounding would drift row heights. */
+const LH = (px: number) => ({ lineHeight: px });
 
 /**
  * Pick people from the phone's address book (light sheet, big rows).
@@ -96,7 +98,7 @@ export function ContactsPicker(props: {
           <View style={{ paddingHorizontal: 18, paddingTop: 1, paddingBottom: 10, gap: 10 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <T w={800} size={24} color={C.ink} lh={1}>Your contacts</T>
-              {!!n && <T size={15} color={C.lightText} lh={1}>{n} selected</T>}
+              {!!n && <T size={15} color={C.lightText} lh={1.6}>{n} selected</T>}
             </View>
             <Input value={q} onChangeText={setQ} placeholder="Search a name" accessibilityLabel="Search a name" autoCorrect={false}
               h={50} size={18} bg={C.white} border={C.lightBorder} radius={14} color={C.ink} />
@@ -114,11 +116,11 @@ export function ContactsPicker(props: {
                   style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 60, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 14, backgroundColor: on && !locked ? SEL_BG : 'transparent' }}>
                   <Avatar name={c.name} color={colorOf.get(c.id) ?? AVATARS[0]} size={44} fontSize={18} />
                   <View style={{ flex: 1, minWidth: 0 }}>
-                    <T w={800} size={18} color={C.ink} lh={1.2} numberOfLines={1}>{c.name}</T>
-                    <T size={14} color={app && !locked ? C.waText : C.lightText} lh={1.2} numberOfLines={1}>{sub}</T>
+                    <T w={800} size={18} color={C.ink} style={LH(21.6)} numberOfLines={1}>{c.name}</T>
+                    <T size={14} color={app && !locked ? C.waDeep : C.lightSub2} style={LH(16.8)} numberOfLines={1}>{sub}</T>
                   </View>
                   <View style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 2.5, borderColor: on ? C.wa : C.lightCheck, backgroundColor: on ? C.wa : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-                    {on && <T w={800} size={16} color={C.white} lh={1}>✓</T>}
+                    {on && <T w={800} size={16} color={C.white} lh={1}>{tick('✓')}</T>}
                   </View>
                 </Pressable>
               );
@@ -135,12 +137,12 @@ export function ContactsPicker(props: {
 
 function Message({ title, body, cta, onCta, onClose }: { title: string; body: string; cta: string; onCta: () => void; onClose?: () => void }) {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 14, padding: 28 }}>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 14, padding: 28, paddingTop: 44 }}>
       <View style={{ width: 72, height: 72, borderRadius: 22, backgroundColor: C.wa, alignItems: 'center', justifyContent: 'center' }}>
         <T w={800} size={30} color={C.white} lh={1.6}>+</T>
       </View>
-      <T w={800} size={26} color={C.ink} center lh={1.1}>{title}</T>
-      <T size={17} color={C.lightText} center lh={1.4}>{body}</T>
+      <T w={800} size={26} color={C.ink} center style={LH(28.6)}>{title}</T>
+      <T size={17} color={C.lightText} center style={LH(23.8)}>{body}</T>
       <Btn label={cta} variant="whatsapp" h={56} size={18} radius={16} lip={false} onPress={onCta} style={{ alignSelf: 'stretch', marginTop: 8 }} />
       {!!onClose && (
         <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Not now">

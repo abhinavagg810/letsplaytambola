@@ -68,7 +68,7 @@ export function Username({ user }: { user: User }) {
     : status === 'checking' ? ['Checking…', C.muted]
     : status === 'offline' ? ['Can’t reach Tambola right now — check your internet', C.bogey]
     : ['3–15 letters, numbers or _', C.muted];
-  const border = status === 'free' ? C.teal : status === 'taken' ? C.bogey : C.line;
+  const border = status === 'free' ? C.teal : 'transparent';   // prototype: only the "available" state is outlined
   const hi = first(name).toUpperCase();
 
   return (
@@ -76,7 +76,7 @@ export function Username({ user }: { user: User }) {
       footer={<Btn label={busy ? 'Saving…' : 'Continue'} size={20} disabled={busy} onPress={save} testID="username-continue" />}>
       <Avatar name={name} color={user.color} size={72} />
       <View style={{ gap: 6 }}>
-        <Eyebrow color={C.mari} ls={1.2} lh={1.6}>{hi ? `Hi ${hi} · one last thing` : 'One last thing'}</Eyebrow>
+        <Eyebrow color={C.mari} ls={1.2} lh={1.33}>{hi ? `Hi ${hi} · one last thing` : 'One last thing'}</Eyebrow>
         <T w={800} size={34} lh={1} accessibilityRole="header">Pick a username</T>
         <T size={17} lh={1.4} color={C.muted}>Friends find and invite you with it — no more “which Rahul?”</T>
       </View>

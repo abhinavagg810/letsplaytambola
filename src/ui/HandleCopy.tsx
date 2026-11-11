@@ -16,8 +16,8 @@ export function HandleCopy({ handle, inline, h = 30, size = 15 }: { handle: stri
   if (inline) {
     return (
       <Pressable onPress={onPress} hitSlop={12} accessibilityRole="button" accessibilityLabel={`Copy username @${handle}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start' }}>
-        <T w={600} size={14} lh={1.15} color={C.muted}>@{handle}</T>
-        <T w={800} size={12} lh={1.15} color={C.mari} style={{ textDecorationLine: 'underline' }}>Copy</T>
+        <T w={600} size={14} lh={1.6} color={C.muted}>@{handle}</T>
+        <T w={800} size={12} lh={1.6} color={C.mari} style={{ textDecorationLine: 'underline' }}>Copy</T>
       </Pressable>
     );
   }

@@ -9,6 +9,7 @@ export const C = {
   lightSub: '#6B6480', lightLine: '#D8D0C0', waText: '#2A8748',
   barLine: '#31254D', chat: '#4AC06C',
   // Prototype-exact neutrals (fidelity pass): picker sheet, hairlines, light-sheet greys, mini-ticket cells, soft text.
+  lightSub2: '#646073', waDeep: '#007834',
   sheet: '#23153E', hair: '#31254D', soft: '#C5C1D6', dim2: '#8881A2', miniOff: '#E1D6C2', miniDim: '#A09AB5',
   lightText: '#565265', lightHair: '#E4DDCF', lightBorder: '#DDD7C9', lightCheck: '#C4BDB0', lightHandle: '#D4CDBF',
   gridLine: 'rgba(37,25,63,0.2)', scrim: 'rgba(10,6,16,0.6)', waSel: 'rgba(59,179,96,0.12)', waSoft16: 'rgba(59,179,96,0.16)', tealSel: 'rgba(64,217,193,0.12)', tealSoft18: 'rgba(64,217,193,0.18)',
