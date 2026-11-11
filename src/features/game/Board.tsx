@@ -17,7 +17,7 @@ export function Board({ called, last, defaultOpen }: { called: number[]; last: n
         <T w={800} size={17}>Board</T>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <Eyebrow>{called.length} / 90 called</Eyebrow>
-          <Eyebrow color={C.mari}>{open ? 'Hide ▴' : 'Show ▾'}</Eyebrow>
+          <Eyebrow color={C.mari}>{open ? 'Hide' : 'Show'}</Eyebrow>
         </View>
       </Pressable>
       {open && (
