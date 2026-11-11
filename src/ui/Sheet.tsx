@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, KeyboardAvoidingView, Modal, Platform, Pressable, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { C, CONTENT_MAX, MOTION, R } from '@/theme/tokens';
+import { ToastHost } from './Toast';
 
 /** Bottom sheet: slides up 0.3s cubic-bezier(.2,.9,.3,1); tap the scrim to close. `height` is a 0–1 fraction of the screen. */
 export function Sheet({ open, onClose, children, height, light }: { open: boolean; onClose: () => void; children: React.ReactNode; height?: number; light?: boolean }) {
@@ -28,6 +29,8 @@ export function Sheet({ open, onClose, children, height, light }: { open: boolea
             {children}
           </View>
         </Animated.View>
+        {/* A Modal covers the root toast host, so sheets carry their own. */}
+        <ToastHost />
       </KeyboardAvoidingView>
     </Modal>
   );

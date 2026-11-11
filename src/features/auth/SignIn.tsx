@@ -90,7 +90,7 @@ export function PhoneSheet({ open, onClose, onDone, skippable, title = 'Your mob
             </View>
             <Input testID="phone-input" value={num} onChangeText={(v) => setNum(v.replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '').slice(0, 10))}
               placeholder="98100 11001" keyboardType="number-pad" inputMode="numeric" autoComplete="tel-national" textContentType="telephoneNumber"
-              autoFocus maxLength={12} returnKeyType="done" onSubmitEditing={send} accessibilityLabel="Mobile number"
+              autoFocus maxLength={14} returnKeyType="done" onSubmitEditing={send} accessibilityLabel="Mobile number"
               h={58} size={22} bold color={C.ink} bg={C.white} border={C.lightLine} box={{ flex: 1, minWidth: 0 }} />
           </View>
           <Btn label={busy ? 'Sending…' : 'Send code'} disabled={busy} onPress={send} testID="send-code" />

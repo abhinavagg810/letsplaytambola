@@ -4,8 +4,23 @@
     "strict": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "paths": { "@/*": ["./src/*"], "@core/*": ["./packages/game-core/src/*"] }
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@core/*": [
+        "./packages/game-core/src/*"
+      ]
+    }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
-  "exclude": ["node_modules", "supabase/functions", "docs", "dist"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "supabase/functions",
+    "docs",
+    "dist"
+  ]
 }

@@ -1,0 +1,164 @@
+import React, { useEffect, useState } from 'react';
+import { Pressable, TextInput, View } from 'react-native';
+import { router } from 'expo-router';
+import { PRESETS, RULES, miniCells, ruleDesc } from '@core/data.ts';
+import { potTotals } from '@core/autosplit.ts';
+import { formatINR } from '@core/stats.ts';
+import type { PrizeCfg } from '@core/types.ts';
+import {
+  activePresetKey, addPrize, applyPreset, draft, draftPot, effectivePrizes, libraryState, removePrize, resetAutoSplit,
+  setPrizeAmt, stepPrizeAmt, togglePrize,
+} from '@/state/draft';
+import { C, F, R } from '@/theme/tokens';
+import { BackBtn, Btn, Chip, Eyebrow, IconBtn, LinkBtn, MiniTicket, Screen, T, Toggle, toast } from '@/ui';
+
+const GROUPS = RULES.map((r) => r.group).filter((g, i, a) => a.indexOf(g) === i);
+
+/** Prizes (optional) — presets, pot meter, per-prize amounts, and the "More ways to win" library. README §4.11. */
+export function Prizes() {
+  const d = draft.use();
+  const [libOpen, setLibOpen] = useState(false);
+  const price = Math.max(0, d.price || 0);
+  const pot = draftPot(d);
+  const eff = effectivePrizes(d);
+  const { assigned, left, over, pct } = potTotals(eff, pot);
+  const meterColor = over ? C.pink : left ? C.mari : C.teal;
+  const presetKey = activePresetKey(d.prizeCfg);
+  const done = () => (router.canGoBack() ? router.back() : router.replace('/new'));
+
+  return (
+    <Screen gap={14} px={18} footer={<Btn label="Done" size={20} onPress={done} testID="prizes-done" />}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <BackBtn onPress={done} />
+        <Eyebrow>Prizes · Optional</Eyebrow>
+      </View>
+      <View style={{ gap: 4 }}>
+        <T w={800} size={34} lh={1.05}>Prizes</T>
+        <T size={15} color={C.muted} lh={1.35}>We’ve picked the classics. Tweak them, add your own, or skip.</T>
+      </View>
+
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+        {PRESETS.map((ps) => {
+          const active = ps.rules.slice().sort().join() === presetKey;
+          return <Chip key={ps.name} label={ps.name} onPress={() => applyPreset(ps.rules)} bg={active ? C.mari : 'transparent'} fg={active ? C.ink : C.cream} border={active ? C.mari : C.line} />;
+        })}
+      </View>
+
+      {price > 0 && (
+        <View style={{ gap: 10, padding: 14, borderRadius: R.cardLg, backgroundColor: C.surf }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 10 }}>
+            <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+              <Eyebrow numberOfLines={1}>Pot if all {d.seats} join</Eyebrow>
+              <T w={800} size={38} lh={1.05}>{formatINR(pot)}</T>
+            </View>
+            <Pressable onPress={resetAutoSplit} hitSlop={6} accessibilityRole="button" accessibilityState={{ selected: !d.prizesTouched }}
+              accessibilityLabel={d.prizesTouched ? 'Auto-split the pot' : 'Auto-split is on'} testID="auto-split"
+              style={{ minHeight: 36, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1.5, borderColor: C.teal, backgroundColor: d.prizesTouched ? 'transparent' : C.tealSoft, alignItems: 'center', justifyContent: 'center' }}>
+              <T w={800} size={15} color={C.teal}>{d.prizesTouched ? 'Auto-split' : 'Auto-split ✓'}</T>
+            </Pressable>
+          </View>
+          <View style={{ height: 8, borderRadius: 99, backgroundColor: C.bg, overflow: 'hidden' }}>
+            <View style={{ width: `${pct}%`, height: '100%', borderRadius: 99, backgroundColor: meterColor }} />
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
+            <T size={15} color={C.muted}>{formatINR(assigned)} of {formatINR(pot)} assigned</T>
+            <T w={800} size={15} color={meterColor}>{over ? `${formatINR(over)} over` : left ? `${formatINR(left)} left` : 'All set ✓'}</T>
+          </View>
+        </View>
+      )}
+
+      <View style={{ gap: 8 }}>
+        {eff.map((p) => <PrizeCard key={p.id} p={p} showMoney={price > 0 && p.on} />)}
+      </View>
+
+      {!libOpen ? (
+        <Btn label="+ More ways to win" variant="dashed" h={52} size={17} radius={R.card} onPress={() => setLibOpen(true)} testID="more-ways" />
+      ) : (
+        <View style={{ gap: 12, padding: 14, borderRadius: R.card, backgroundColor: C.surf, borderWidth: 1.5, borderColor: C.teal }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <T w={800} size={19}>More ways to win</T>
+            <LinkBtn label="Done" size={16} onPress={() => setLibOpen(false)} />
+          </View>
+          <T size={15} color={C.muted} lh={1.35}>Tap <T w={800} size={15} color={C.teal}>Add</T> on any one. Pink boxes on the little ticket show what you need.</T>
+          {GROUPS.map((g) => (
+            <View key={g} style={{ gap: 6 }}>
+              <Eyebrow style={{ paddingTop: 4 }}>{g}</Eyebrow>
+              {RULES.filter((r) => r.group === g).map((r) => {
+                const { have, multi, nextName } = libraryState(d.prizeCfg, r.id);
+                const added = have > 0 && !multi;
+                const label = added ? 'Added ✓' : multi && have ? `+ ${nextName}` : 'Add';
+                return (
+                  <View key={r.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, borderRadius: R.input, backgroundColor: C.bg }}>
+                    <MiniTicket cells={miniCells(r.id)} width={58} />
+                    <View style={{ flex: 1, minWidth: 0 }}>
+                      <T w={800} size={16} lh={1.2}>{r.name}</T>
+                      <T size={15} color={C.muted} lh={1.2}>{r.rule}</T>
+                    </View>
+                    <Pressable hitSlop={4} accessibilityRole="button" accessibilityLabel={added ? `${r.name} added` : `Add ${nextName}`}
+                      onPress={() => {
+                        const name = addPrize(r.id);
+                        toast(name ? `Added ${name}` : `${r.name} is already in`);
+                      }}
+                      style={{ height: 36, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1.5, borderColor: C.teal, backgroundColor: added ? 'transparent' : C.teal, alignItems: 'center', justifyContent: 'center' }}>
+                      <T w={800} size={15} color={added ? C.teal : C.ink} numberOfLines={1}>{label}</T>
+                    </Pressable>
+                  </View>
+                );
+              })}
+            </View>
+          ))}
+        </View>
+      )}
+    </Screen>
+  );
+}
+
+function PrizeCard({ p, showMoney }: { p: PrizeCfg; showMoney: boolean }) {
+  return (
+    <View style={{ gap: 10, padding: 12, borderRadius: R.card, backgroundColor: p.on ? C.surf : 'transparent', borderWidth: 1.5, borderColor: p.custom ? C.teal : p.on ? C.surf : C.line, opacity: p.on ? 1 : 0.55 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <MiniTicket cells={miniCells(p.rule)} width={72} on={p.on ? C.pink : C.dim} />
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <T w={800} size={17} lh={1.2}>{p.label}</T>
+          <T size={15} color={C.muted} lh={1.2}>{ruleDesc(p.rule)}{p.custom ? ' · your prize' : ''}</T>
+        </View>
+        {p.custom && <IconBtn label="×" a11y={`Remove ${p.label}`} size={28} bg={C.surf2} color={C.muted} fontSize={17} onPress={() => removePrize(p.id)} />}
+        <Toggle small on={p.on} onChange={() => togglePrize(p.id)} label={p.label} />
+      </View>
+      {showMoney && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <StepBtn label="−" a11y={`${p.label}: ₹10 less`} onPress={() => stepPrizeAmt(p.id, -10)} />
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 44, borderRadius: R.small, backgroundColor: C.bg, paddingHorizontal: 10 }}>
+            <T w={800} size={18} color={C.mari}>₹</T>
+            <AmountInput id={p.id} amt={Number(p.amt) || 0} label={p.label} />
+          </View>
+          <StepBtn label="+" a11y={`${p.label}: ₹10 more`} onPress={() => stepPrizeAmt(p.id, 10)} />
+        </View>
+      )}
+    </View>
+  );
+}
+
+function StepBtn({ label, a11y, onPress }: { label: string; a11y: string; onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={a11y}
+      style={({ pressed }) => ({ width: 44, height: 44, borderRadius: R.small, backgroundColor: C.surf2, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.7 : 1 })}>
+      <T w={600} size={20} lh={1.1}>{label}</T>
+    </Pressable>
+  );
+}
+
+/** Editable amount. Keeps what is being typed locally so an empty box doesn't snap back to 0 mid-edit. */
+function AmountInput({ id, amt, label }: { id: string; amt: number; label: string }) {
+  const [text, setText] = useState(String(amt));
+  const [focused, setFocused] = useState(false);
+  useEffect(() => { if (!focused) setText(String(amt)); }, [amt, focused]);
+  return (
+    <TextInput
+      value={text} keyboardType="number-pad" inputMode="numeric" maxLength={6} selectTextOnFocus accessibilityLabel={`${label} amount in rupees`}
+      onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
+      onChangeText={(v) => { const clean = v.replace(/\D/g, ''); setText(clean); setPrizeAmt(id, Number(clean) || 0); }}
+      style={{ width: 80, height: 44, fontSize: 20, fontFamily: F.bold, color: C.cream, paddingLeft: 4, paddingVertical: 0, outlineStyle: 'none' } as any}
+    />
+  );
+}
