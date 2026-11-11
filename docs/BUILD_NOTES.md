@@ -13,7 +13,7 @@
 
 ## Hard rules
 - Never show another player's ticket or progress. Only the host draws. Only called numbers can be dabbed. No real-money features: prices/prizes are *recorded* only — show "Settled outside the app" where price appears; no payment buttons, no "mark paid".
-- **Minimum text 15px** for all Baloo text (bump the prototype's 12–14px text to 15); JetBrains Mono eyebrows/counters may be 12px. **Minimum tap target 44px** (use `hitSlop` when the visual is smaller).
+- **Design fidelity is exact** (owner's instruction, supersedes the earlier 15px rule): use the prototype's exact font sizes, weights, colours, spacing, radii and copy — including its 12–14px secondary text. **Minimum tap target 44px** still applies: keep the prototype's visual size and extend the touch area with `hitSlop`.
 - Do not add features that are not in the README.
 - README overrides prototype: sign-in is phone + OTP first (then Google, Apple); guests join from a link with just a name and skip the username step; host's own ticket is not a cost in host's net.
 

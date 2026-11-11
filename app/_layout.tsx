@@ -7,13 +7,14 @@ import { useFonts } from 'expo-font';
 import { Baloo2_500Medium, Baloo2_600SemiBold, Baloo2_800ExtraBold } from '@expo-google-fonts/baloo-2';
 import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
 import { C } from '@/theme/tokens';
-import { Btn, T, ToastHost } from '@/ui';
+import { Btn, T, ToastHost, toast } from '@/ui';
 import { initSession, session } from '@/state/session';
 
 /** On web each screen's code is fetched the first time it is opened — with no connection that fetch is what fails. */
-const looksOffline = (error: unknown) =>
-  /AsyncRequire|Loading (module|chunk)|Failed to fetch|NetworkError/i.test(`${(error as Error)?.name ?? ''} ${(error as Error)?.message ?? ''}`)
-  || (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.onLine === false);
+const codeDidNotLoad = (error: unknown) =>
+  /AsyncRequire|Loading (module|chunk)|Failed to fetch|NetworkError/i.test(`${(error as Error)?.name ?? ''} ${(error as Error)?.message ?? ''}`);
+const browserOffline = () => Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.onLine === false;
+const looksOffline = (error: unknown) => codeDidNotLoad(error) || browserOffline();
 
 /** Friendly fallback for a render crash — never a blank screen. "Try again" renders the route afresh. */
 function Crashed({ error, onRetry }: { error?: unknown; onRetry: () => void }) {
@@ -41,6 +42,12 @@ class CrashGuard extends React.Component<{ path: string; children: React.ReactNo
   lastPath = this.props.path;
   retry = () => {
     const path = this.lastPath;
+    if (Platform.OS === 'web' && codeDidNotLoad(this.state.error)) {
+      // A failed download of a screen's code is remembered by the bundler, so only a real page load can retry it.
+      if (browserOffline()) toast('Still offline — check your internet');
+      else window.location.assign(path);
+      return;
+    }
     this.setState((s) => ({ failed: false, error: null, attempt: s.attempt + 1 }), () => {
       // The remounted navigator starts at the entry route; put the person back where they were.
       setTimeout(() => { try { router.replace(path as never); } catch { /* the entry route is a fine fallback */ } }, 0);
