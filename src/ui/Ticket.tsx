@@ -1,5 +1,7 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
+
+const STRIPES = 'repeating-linear-gradient(45deg,#F0DCAE 0 3px,#F7EBD0 3px 6px)';
 import { C, R, TICKET_SHADOW } from '@/theme/tokens';
 import { T } from './Text';
 
@@ -35,7 +37,7 @@ export function TicketView({ ticket, header, right, dabbed, hint, onCell }: Tick
         {ticket.map((row, r) => (
           <View key={r} style={{ flexDirection: 'row', gap: 4 }}>
             {row.map((n, c) => {
-              if (!n) return <View key={c} style={{ flex: 1, aspectRatio: 0.82, borderRadius: R.grid, backgroundColor: '#EFE0BF', opacity: 0.75, experimental_backgroundImage: 'repeating-linear-gradient(45deg,#F0DCAE 0 3px,#F7EBD0 3px 6px)' } as any} />;
+              if (!n) return <View key={c} style={{ flex: 1, aspectRatio: 0.82, borderRadius: R.grid, backgroundColor: '#EFE0BF', opacity: 0.75, ...(Platform.OS === 'web' ? { backgroundImage: STRIPES } : { experimental_backgroundImage: STRIPES }) } as any} />;
               const m = dabbed?.has(n), h = !m && hint?.has(n);
               return (
                 <Pressable key={c} onPress={onCell ? () => onCell(n) : undefined} disabled={!onCell}

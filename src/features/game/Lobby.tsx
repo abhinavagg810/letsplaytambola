@@ -11,6 +11,8 @@ import { Avatar, BackBtn, Btn, Eyebrow, LiveDot, Screen, T, TicketView, copyText
 import { ContactsPicker } from '@/features/create/ContactsPicker';
 import { PeoplePicker } from '@/features/create/PeoplePicker';
 
+/** The three small invite pills share the row by content width, so “From contacts” never truncates on a 390px phone. */
+const PILL = { flexGrow: 1 } as const;
 const EMPTY: Social = { friends: [], groups: [], pending: [] };
 
 /** "0421" — a stable, friendly ticket number for this player (decorative only). */
@@ -101,7 +103,7 @@ export function Lobby({ game, user }: { game: GameView; user: User }) {
                   <View key={c.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, paddingHorizontal: 12, minHeight: 56, borderTopWidth: 1, borderTopColor: C.surf }}>
                     <Avatar name={c.name} color={AVATARS[(i + 2) % AVATARS.length]} size={36} />
                     <View style={{ flex: 1, minWidth: 0 }}>
-                      <T w={600} size={16} lh={1.2} numberOfLines={1}>{c.name}</T>
+                      <T w={600} size={16} lh={1.2} numberOfLines={2}>{c.name}</T>
                       <T size={15} color={C.muted} lh={1.2} numberOfLines={1}>{joined ? 'Joined the game' : c.sent ? 'Invite sent' : 'Not sent yet'}</T>
                     </View>
                     <Pressable onPress={joined ? undefined : () => sendTo(c)} disabled={joined} hitSlop={4}
@@ -116,9 +118,9 @@ export function Lobby({ game, user }: { game: GameView; user: User }) {
           )}
 
           <View style={{ flexDirection: 'row', gap: 6 }}>
-            <Btn flex label="From contacts" variant="outline" h={44} size={15} w={600} radius={999} px={4} onPress={() => setContactsOpen(true)} />
-            <Btn flex label="App friends" variant="outline" h={44} size={15} w={600} radius={999} px={4} onPress={() => setPeople(true)} />
-            <Btn flex label="Copy link" variant="outline" h={44} size={15} w={600} radius={999} px={4} onPress={() => copyText(link, 'Invite link copied')} />
+            <Btn label="From contacts" variant="outline" h={44} size={15} w={600} radius={999} px={6} style={PILL} onPress={() => setContactsOpen(true)} />
+            <Btn label="App friends" variant="outline" h={44} size={15} w={600} radius={999} px={6} style={PILL} onPress={() => setPeople(true)} />
+            <Btn label="Copy link" variant="outline" h={44} size={15} w={600} radius={999} px={6} style={PILL} onPress={() => copyText(link, 'Invite link copied')} />
           </View>
         </View>
       )}

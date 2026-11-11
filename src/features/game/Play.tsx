@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, View, useWindowDimensions } from 'react-native';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { backend } from '@/backend';
 import type { User } from '@/backend/types';
 import { hush } from '@/lib/speech';
@@ -39,6 +40,7 @@ export function Play({ game: live, user }: { game: GameView; user: User }) {
 
 function PlayBoard({ game, user, onResync }: { game: GameView; user: User; onResync: (g: GameView) => void }) {
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const twoCol = width >= TWO_COL;
   const code = game.id;
   const isHost = game.hostUid === user.uid;
@@ -126,7 +128,12 @@ function PlayBoard({ game, user, onResync }: { game: GameView; user: User; onRes
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
-      <Screen max={PLAY_MAX} px={14} gap={12} top={12}>
+      {!online && (
+        <View accessibilityRole="alert" style={{ paddingTop: insets.top + 8, paddingBottom: 8, paddingHorizontal: 14, backgroundColor: C.pink }}>
+          <T w={800} size={15} color={C.white} center lh={1.3}>You’re offline — we’ll catch you up when you’re back</T>
+        </View>
+      )}
+      <Screen max={PLAY_MAX} px={14} gap={12} top={online ? 12 : 12 - insets.top}>
         {/* Header */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <BackBtn onPress={() => router.replace('/')} />
@@ -141,12 +148,6 @@ function PlayBoard({ game, user, onResync }: { game: GameView; user: User; onRes
             <T w={600} size={15}>{muted ? 'Muted' : 'Voice'}</T>
           </Pressable>
         </View>
-
-        {!online && (
-          <View accessibilityRole="alert" style={{ paddingVertical: 10, paddingHorizontal: 14, borderRadius: R.btn, backgroundColor: C.surf2, borderWidth: 1.5, borderColor: C.pink }}>
-            <T w={600} size={15} color={C.cream} lh={1.35}>You’re offline — we’ll catch you up when you’re back</T>
-          </View>
-        )}
 
         <View style={twoCol ? { flexDirection: 'row', alignItems: 'flex-start', gap: 12 } : { gap: 12 }}>
           {/* Column 1: caller + my ticket */}

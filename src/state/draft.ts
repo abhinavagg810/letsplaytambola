@@ -56,7 +56,7 @@ export function setDraft(patch: Partial<Pick<Draft, 'name' | 'seats' | 'price' |
 export function addInvited(users: InvitedUser[]): void {
   draft.set((s) => {
     const invited = uniq([...s.invited, ...users]);
-    return { invited, seats: clampSeats(Math.max(s.seats, invited.length + (s.hostPlays ? 1 : 0))) };
+    return { invited, seats: clampSeats(Math.max(s.seats, needed({ ...s, invited }))) };
   });
 }
 export function removeInvited(uid: string): void {
@@ -66,7 +66,7 @@ export function removeInvited(uid: string): void {
 export function setInvited(users: InvitedUser[]): void {
   draft.set((s) => {
     const invited = uniq(users);
-    return { invited, seats: clampSeats(Math.max(s.seats, invited.length + (s.hostPlays ? 1 : 0))) };
+    return { invited, seats: clampSeats(Math.max(s.seats, needed({ ...s, invited }))) };
   });
 }
 /** Replace the picked phone contacts; seats grow to fit contacts + invitees + host (prototype `contactsDone`). */

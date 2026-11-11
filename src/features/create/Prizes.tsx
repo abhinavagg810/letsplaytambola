@@ -113,6 +113,9 @@ export function Prizes() {
   );
 }
 
+/** Brief rule under a prize name. Full House's library hint ("— add again for Second House") is dropped on the card. */
+const brief = (p: PrizeCfg) => (p.rule === 'full' ? ruleDesc(p.rule).split(' — ')[0] : ruleDesc(p.rule));
+
 function PrizeCard({ p, showMoney }: { p: PrizeCfg; showMoney: boolean }) {
   return (
     <View style={{ gap: 10, padding: 12, borderRadius: R.card, backgroundColor: p.on ? C.surf : 'transparent', borderWidth: 1.5, borderColor: p.custom ? C.teal : p.on ? C.surf : C.line, opacity: p.on ? 1 : 0.55 }}>
@@ -120,7 +123,7 @@ function PrizeCard({ p, showMoney }: { p: PrizeCfg; showMoney: boolean }) {
         <MiniTicket cells={miniCells(p.rule)} width={72} on={p.on ? C.pink : C.dim} />
         <View style={{ flex: 1, minWidth: 0 }}>
           <T w={800} size={17} lh={1.2}>{p.label}</T>
-          <T size={15} color={C.muted} lh={1.2}>{ruleDesc(p.rule)}{p.custom ? ' · your prize' : ''}</T>
+          <T size={15} color={C.muted} lh={1.2}>{brief(p)}{p.custom ? ' · your prize' : ''}</T>
         </View>
         {p.custom && <IconBtn label="×" a11y={`Remove ${p.label}`} size={28} bg={C.surf2} color={C.muted} fontSize={17} onPress={() => removePrize(p.id)} />}
         <Toggle small on={p.on} onChange={() => togglePrize(p.id)} label={p.label} />

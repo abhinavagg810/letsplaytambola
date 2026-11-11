@@ -12,6 +12,8 @@ import { useHomeData } from './useHomeData';
 import { LoadError, pullRefresh, signed } from './parts';
 import { toFriends } from './Home';
 
+const prettyPhone = (p: string | null) => (p ? p.replace(/^\+91(\d{5})(\d{5})$/, '+91 $1 $2') : '');
+
 function Stat({ value, label, color = C.cream }: { value: string; label: string; color?: string }) {
   return (
     <View accessible accessibilityLabel={`${label}: ${value}`} style={{ flex: 1, minWidth: 0, paddingVertical: 12, paddingHorizontal: 6, borderRadius: 18, backgroundColor: C.surf, alignItems: 'center' }}>
@@ -56,7 +58,7 @@ export function Profile() {
         <Avatar name={user.name} color={user.color} size={96} ring={C.mari} />
         <View style={{ alignItems: 'center', marginTop: 4 }}>
           <T w={800} size={28} center accessibilityRole="header">{user.name}</T>
-          <T size={15} color={C.muted} center>{user.isGuest ? 'Guest account' : user.email || user.phone || ''}</T>
+          <T size={15} color={C.muted} center>{user.isGuest ? 'Guest account' : user.email || prettyPhone(user.phone) || ''}</T>
         </View>
         <View><HandleCopy handle={user.username} /></View>
       </View>

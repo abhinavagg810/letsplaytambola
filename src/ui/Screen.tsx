@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, View, ViewStyle, StyleProp } from 'react-native';
+import { Platform, ScrollView, View, ViewStyle, StyleProp } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { C, CONTENT_MAX } from '@/theme/tokens';
 
@@ -14,7 +14,7 @@ export function Screen({ children, footer, max = CONTENT_MAX, px = 20, gap = 18,
   const inner: StyleProp<ViewStyle> = [{ width: '100%', maxWidth: max, alignSelf: 'center', paddingHorizontal: px, paddingTop: insets.top + top, paddingBottom: 24, gap, flexGrow: 1 }, style];
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
-      {!!glow && <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 420, experimental_backgroundImage: glow } as any} />}
+      {!!glow && <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 420, experimental_backgroundImage: glow, ...(Platform.OS === 'web' ? { backgroundImage: glow } : null) } as any} />}
       {scroll
         ? <ScrollView refreshControl={refreshControl as any} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={inner}>{children}</ScrollView>
         : <View style={[inner, { flex: 1 }]}>{children}</View>}
