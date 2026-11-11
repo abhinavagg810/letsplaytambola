@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+</helmet>
+<div style="display:inline-flex;flex-direction:column;align-items:flex-start;font-size:{{ fs }}px;line-height:1;font-family:'Baloo 2',system-ui,sans-serif;user-select:none">
+  <sc-if value="{{ full }}" hint-placeholder-val="{{ true }}">
+    <span style="position:relative;z-index:2;margin:0 0 -0.14em 0.08em;padding:0.1em 0.42em 0.02em;border-radius:999px;background:oklch(0.68 0.22 358);color:#fff;font-size:0.36em;font-weight:800;letter-spacing:0.01em;transform:rotate(-5deg);box-shadow:0 0.09em 0 oklch(0.45 0.18 358)">Let’s play</span>
+    <span style="display:flex;align-items:center;font-size:1em;font-weight:800;letter-spacing:-0.01em;color:{{ ink }};text-shadow:0 0.05em 0 {{ shadow }}">
+      <span>TAMB</span>
+      <span style="width:0.74em;height:0.74em;margin:0 0.02em;border-radius:50%;background:oklch(0.83 0.16 78);display:grid;place-items:center;transform:rotate(-12deg) translateY(-0.02em);box-shadow:0 0.05em 0 oklch(0.6 0.14 70),inset 0 -0.05em 0 rgba(0,0,0,.12);text-shadow:none;flex-shrink:0">
+        <span style="width:0.48em;height:0.48em;border-radius:50%;background:oklch(0.97 0.02 85);color:oklch(0.25 0.07 295);display:grid;place-items:center;font-size:0.3em;font-weight:800;line-height:1;padding-top:0.12em;box-sizing:border-box;width:1.6em;height:1.6em">90</span>
+      </span>
+      <span>LA</span>
+    </span>
+  </sc-if>
+  <sc-if value="{{ markOnly }}" hint-placeholder-val="{{ false }}">
+    <span style="width:1em;height:1em;border-radius:50%;background:oklch(0.68 0.22 358);display:grid;place-items:center;box-shadow:0 0 0 0.08em oklch(0.83 0.16 78);transform:rotate(-10deg)">
+      <span style="width:1.6em;height:1.6em;border-radius:50%;background:oklch(0.97 0.02 85);color:oklch(0.25 0.07 295);display:grid;place-items:center;font-size:0.38em;font-weight:800;line-height:1;padding-top:0.12em;box-sizing:border-box">90</span>
+    </span>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;360px&quot;,&quot;height&quot;:&quot;160px&quot;},&quot;size&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:64,&quot;min&quot;:16,&quot;max&quot;:200,&quot;tsType&quot;:&quot;number&quot;},&quot;tone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;markOnly&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const dark = this.props.tone === 'dark';
+    return {
+      fs: Number(this.props.size) || 64,
+      full: !this.props.markOnly, markOnly: !!this.props.markOnly,
+      ink: dark ? 'oklch(0.25 0.07 295)' : 'oklch(0.97 0.02 85)',
+      shadow: dark ? 'oklch(0.83 0.16 78 / .6)' : 'oklch(0.68 0.22 358 / .55)',
+    };
+  }
+}
+</script>
+</body>
+</html>

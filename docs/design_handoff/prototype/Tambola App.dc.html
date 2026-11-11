@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>body{margin:0;background:oklch(0.14 0.04 295)}a{color:oklch(0.83 0.16 78)}a:hover{color:oklch(0.97 0.02 85)}</style>
+</helmet>
+<div style="min-height:100vh;background:oklch(0.14 0.04 295);color:oklch(0.97 0.02 85);font-family:'Baloo 2',system-ui,sans-serif;padding:28px 24px 48px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:24px">
+  <div style="width:100%;max-width:860px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:4px;max-width:580px">
+      <dc-import name="Logo" size="56" hint-size="220px,76px"></dc-import>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:oklch(0.83 0.16 78);margin-top:6px">MOBILE APP PROTOTYPE</div>
+      <div style="font-size:34px;font-weight:800;line-height:1">Host and player, side by side</div>
+      <div style="font-size:16px;line-height:1.4;color:oklch(0.78 0.04 295);text-wrap:pretty">Sign in on both phones. On Priya’s, host a game and invite <b>@rahul</b> — it lands on Rahul’s Home. He taps Join and he’s in.</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a href="Tambola v3 Web.dc.html" style="height:40px;padding:0 16px;border-radius:999px;border:1.5px solid oklch(0.83 0.16 78);color:oklch(0.83 0.16 78);font-size:14px;font-weight:600;display:flex;align-items:center;text-decoration:none">Web version ↗</a>
+      <button onClick="{{ seed }}" style="height:40px;padding:0 16px;border-radius:999px;border:none;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">Load sample past games</button>
+      <button onClick="{{ clearDemo }}" style="height:40px;padding:0 16px;border-radius:999px;border:1.5px solid oklch(0.38 0.07 295);background:transparent;color:oklch(0.78 0.04 295);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">Clear demo data</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;padding:5px 12px;border-radius:999px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295)">HOST · PRIYA’S PHONE</div>
+      <div style="width:390px;height:820px;border-radius:50px;background:#0b0810;padding:10px;box-sizing:border-box;box-shadow:0 50px 100px -40px rgba(0,0,0,.9)">
+        <div style="width:100%;height:100%;border-radius:40px;overflow:hidden">
+          <dc-import name="TambolaPhone" seat="host" currency="{{ currency }}" style="width:100%;height:100%" hint-size="100%,100%"></dc-import>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;padding:5px 12px;border-radius:999px;background:oklch(0.8 0.13 180);color:oklch(0.25 0.07 295)">PLAYER · RAHUL’S PHONE</div>
+      <div style="width:390px;height:820px;border-radius:50px;background:#0b0810;padding:10px;box-sizing:border-box;box-shadow:0 50px 100px -40px rgba(0,0,0,.9)">
+        <div style="width:100%;height:100%;border-radius:40px;overflow:hidden">
+          <dc-import name="TambolaPhone" seat="player" silent="{{ true }}" currency="{{ currency }}" style="width:100%;height:100%" hint-size="100%,100%"></dc-import>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;currency&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;₹&quot;,&quot;$&quot;,&quot;£&quot;,&quot;€&quot;],&quot;default&quot;:&quot;₹&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  seed() {
+    const get = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
+    const set = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+    const AV = ['oklch(0.68 0.22 358)', 'oklch(0.83 0.16 78)', 'oklch(0.8 0.13 180)', 'oklch(0.75 0.14 260)', 'oklch(0.8 0.15 140)', 'oklch(0.75 0.15 30)'];
+    const accts = get('tambola:app:accounts', []);
+    const ensure = (username, name, email, seat, color) => {
+      let a = accts.find(x => x.username === username) || accts.find(x => x.name === name && x.email === email && (x.seat || 'solo') === seat);
+      if (!a) { a = { uid: 'u' + Math.random().toString(36).slice(2, 10), name, email, color, seat }; accts.push(a); }
+      a.username = username; return a;
+    };
+    const P = ensure('priya', 'Priya Sharma', 'priya.sharma@gmail.com', 'host', AV[0]);
+    const R = ensure('rahul', 'Rahul Verma', 'rahul.v@gmail.com', 'player', AV[1]);
+    const M = ensure('meera', 'Meera Iyer', 'meera.iyer@gmail.com', 'demo', AV[2]);
+    const N = ensure('nani', 'Kamla Sharma', '', 'demo', AV[3]);
+    const V = ensure('vikram', 'Vikram Rao', 'vik.rao@gmail.com', 'demo', AV[4]);
+    const K = ensure('kavya', 'Kavya Menon', 'kavya.m@gmail.com', 'demo', AV[5]);
+    set('tambola:app:accounts', accts);
+    const ticket = () => { const rows = [0, 1, 2].map(() => Array(9).fill(0)); const used = new Set(); rows.forEach(r => { const cols = [...Array(9).keys()].sort(() => Math.random() - .5).slice(0, 5).sort((a, b) => a - b); cols.forEach(c => { let n; do { const lo = c === 0 ? 1 : c * 10, hi = c === 8 ? 90 : c * 10 + 9; n = lo + Math.floor(Math.random() * (hi - lo + 1)); } while (used.has(n)); used.add(n); r[c] = n; }); }); for (let c = 0; c < 9; c++) { const v = rows.map(r => r[c]).filter(Boolean).sort((a, b) => a - b); let i = 0; rows.forEach(r => { if (r[c]) r[c] = v[i++]; }); } return rows; };
+    const pl = a => ({ uid: a.uid, name: a.name, color: a.color, ticket: ticket(), marks: [], paid: true });
+    const called = n => [...Array(90).keys()].map(i => i + 1).sort(() => Math.random() - .5).slice(0, n);
+    const pz = (amts) => [['early5', 'Early Five', 'early5'], ['top', 'Top Line', 'top'], ['middle', 'Middle Line', 'middle'], ['bottom', 'Bottom Line', 'bottom'], ['corners', 'Four Corners', 'corners'], ['full', 'Full House', 'full']].map(([id, label, rule], i) => ({ id, label, rule, amt: amts[i] })).filter(z => z.amt != null);
+    const cl = (map) => Object.fromEntries(Object.entries(map).map(([k, a]) => [k, { uid: a.uid, name: a.name }]));
+    const day = (m, d) => new Date(2026, m, d, 20, 30).getTime();
+    const games = [
+      { id: 'DW26A', name: 'Diwali Night', host: P, price: 100, who: [P, R, M, N, V], prizes: pz([50, 75, 75, 75, 75, 150]), when: day(10, 1), rounds: [
+        cl({ early5: R, top: M, middle: P, bottom: N, corners: V, full: R }),
+        cl({ early5: N, top: R, middle: V, bottom: M, corners: P, full: M })] },
+      { id: 'SUNFM', name: 'Sunday Family', host: P, price: 0, who: [P, R, N, K], prizes: pz([0, 0, 0, 0, null, 0]), when: day(9, 19), rounds: [cl({ early5: K, top: N, middle: R, bottom: P, full: N })] },
+      { id: 'KITTY', name: 'Kitty Party', host: M, price: 50, who: [M, P, R, K], prizes: pz([20, 40, 40, 40, null, 60]), when: day(9, 5), rounds: [cl({ early5: P, top: K, middle: M, bottom: R, full: P })] },
+      { id: 'GANES', name: 'Ganesh Chaturthi', host: R, price: 20, who: [R, P, V, N], prizes: pz([10, null, null, null, 20, 50]), when: day(7, 27), rounds: [cl({ early5: V, corners: R, full: N })] },
+    ];
+    const ids = games.map(x => x.id);
+    games.forEach(x => {
+      const uids = x.who.map(a => a.uid), last = x.rounds[x.rounds.length - 1];
+      const history = x.rounds.slice(0, -1).map((c, i) => ({ round: i + 1, claims: c, prizes: x.prizes, price: x.price, uids, endedAt: x.when + 3600e3 * (i + 1) }));
+      set('tambola:app:' + x.id, { id: x.id, name: x.name, hostUid: x.host.uid, hostName: x.host.name, hostColor: x.host.color, invited: [], maxPlayers: x.who.length, price: x.price, prizes: x.prizes, status: 'ended', called: called(58 + Math.floor(Math.random() * 15)), players: x.who.map(pl), claims: last, auto: 0, seq: 0, feed: [], round: x.rounds.length, history, createdAt: x.when, endedAt: x.when + 3600e3 * x.rounds.length });
+    });
+    set('tambola:app:index', [...get('tambola:app:index', []).filter(i => !ids.includes(i)), ...ids]);
+    const grp = (u, list) => { const k = 'tambola:app:groups:' + u.uid, ex = get(k, []); set(k, [...ex.filter(g => !list.some(n => n.name === g.name)), ...list]); };
+    grp(P, [{ id: 'gs1', name: 'Sharma Parivaar', uids: [R.uid, N.uid, V.uid] }, { id: 'gs2', name: 'Kitty gang', uids: [M.uid, K.uid] }]);
+    grp(R, [{ id: 'gs3', name: 'Family', uids: [P.uid, N.uid] }]);
+    ['tb:user:host', 'tb:user:player'].forEach(k => { const cur = get(k, null) || null; try { const u = JSON.parse(sessionStorage.getItem(k)); if (u) { const a = accts.find(x => x.uid === u.uid); if (a) sessionStorage.setItem(k, JSON.stringify(a)); } } catch (e) {} });
+    location.reload();
+  }
+  renderVals() {
+    return {
+      currency: this.props.currency ?? '₹',
+      seed: () => this.seed(),
+      clearDemo: () => {
+        Object.keys(localStorage).filter(k => k.startsWith('tambola:app:')).forEach(k => localStorage.removeItem(k));
+        ['tb:user:host', 'tb:user:player', 'tb:user:solo'].forEach(k => sessionStorage.removeItem(k));
+        location.reload();
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

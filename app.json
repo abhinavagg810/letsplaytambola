@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Letsplaytambola",
+    "slug": "letsplaytambola",
+    "scheme": "letsplaytambola",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#1B0F34",
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.letsplaytambola.app", "usesAppleSignIn": true,
+      "infoPlist": { "NSContactsUsageDescription": "Pick friends to invite to your Tambola game. We never message anyone without you." } },
+    "android": { "package": "com.letsplaytambola.app", "adaptiveIcon": { "foregroundImage": "./assets/icon.png", "backgroundColor": "#1B0F34" },
+      "permissions": ["READ_CONTACTS"] },
+    "web": { "bundler": "metro", "output": "single", "favicon": "./assets/icon.png" },
+    "plugins": ["expo-router", "expo-font", "expo-apple-authentication",
+      ["expo-contacts", { "contactsPermission": "Pick friends to invite to your Tambola game. We never message anyone without you." }],
+      ["expo-splash-screen", { "backgroundColor": "#1B0F34", "image": "./assets/icon.png", "imageWidth": 160 }]],
+    "experiments": { "typedRoutes": false }
+  }
+}
