@@ -95,7 +95,7 @@ export function NewGame() {
       <Card>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
           <T w={800} size={18} lh={1.6}>Who’s playing?</T>
-          <T size={13} color={C.muted} lh={1.6}>{inv.length ? `${inv.length} invited` : 'Optional'}</T>
+          <T size={13} color={C.muted}>{inv.length ? `${inv.length} invited` : 'Optional'}</T>
         </View>
 
         {inv.length > 0 && (

@@ -9,6 +9,7 @@ import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
 import { C } from '@/theme/tokens';
 import { Btn, T, ToastHost, toast } from '@/ui';
 import { initSession, session } from '@/state/session';
+import { checkInstallReferrer } from '@/lib/install';
 
 /** On web each screen's code is fetched the first time it is opened — with no connection that fetch is what fails. */
 const codeDidNotLoad = (error: unknown) =>
@@ -70,6 +71,8 @@ export default function RootLayout() {
   const ready = session.use((s) => s.ready);
   const path = usePathname();
   useEffect(() => { initSession(); }, []);
+  // Installed from an invite link (Android): open straight into that game.
+  useEffect(() => { if (fontsReady && ready) checkInstallReferrer().then((c) => { if (c) router.replace(`/g/${c}`); }); }, [fontsReady, ready]);
   if (!fontsReady || !ready) return <View style={{ flex: 1, backgroundColor: C.bg }} />;
   return (
     <SafeAreaProvider>
