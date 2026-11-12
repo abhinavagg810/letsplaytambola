@@ -6,6 +6,7 @@ import {
 } from './data';
 import { checkPattern } from './patterns';
 import { genTicket } from './ticket';
+import { assignPrizeAmounts } from './prizeMoney';
 import type {
   Actor, CreateGameInput, Ctx, EngineError, EngineErrorCode, EngineResult, GameAction, GameDoc, GameEventInput,
   GameState, GameView, MemberView, PlayerState, Prize, PublicPlayer, RuleId, VisitorView,
@@ -110,7 +111,7 @@ export function createGame(input: CreateGameInput, code: string, ctx: Ctx): Engi
     if (!isRuleId(r) || rules.includes(r)) return fail('invalid', COPY.badPrize);
     rules.push(r);
   }
-  const prizes: Prize[] = rules.map((rule) => ({ id: rule, rule, label: ruleName(rule), winnerPid: null, winnerName: null, wonAt: null }));
+  const prizes: Prize[] = rules.map((rule) => ({ id: rule, rule, label: ruleName(rule), winnerPid: null, winnerName: null, wonAt: null, amount: 0 }));
 
   const state: GameState = {
     doc: {
@@ -157,6 +158,8 @@ export function applyAction(state: GameState, action: GameAction, actor: Actor, 
       if (doc.status === 'done') return fail('state', COPY.joinDone(doc.hostName));
       if (doc.players.length >= MAX_PLAYERS) return fail('full', COPY.full);
       const p = addPlayer(next, name, ctx);
+      // A late joiner adds their ticket price to the prizes that are still open.
+      if (doc.status === 'live') assignPrizeAmounts(doc);
       pushEvent(doc, { kind: 'join', pid: p.pid, name: p.name }, ctx.now);
       return commit([p.pid], p.pid);
     }
@@ -166,6 +169,7 @@ export function applyAction(state: GameState, action: GameAction, actor: Actor, 
       if (doc.status !== 'lobby') return fail('state', doc.status === 'live' ? COPY.alreadyStarted : COPY.gameOver);
       if (doc.players.length === 0) return fail('state', COPY.noPlayers);
       doc.status = 'live';
+      assignPrizeAmounts(doc);
       pushEvent(doc, { kind: 'start' }, ctx.now);
       return commit();
     }
@@ -247,6 +251,7 @@ export function applyAction(state: GameState, action: GameAction, actor: Actor, 
         p.winnerPid = null;
         p.winnerName = null;
         p.wonAt = null;
+        p.amount = 0;
       }
       const touched: string[] = [];
       for (const p of doc.players) {

@@ -28,6 +28,8 @@ export interface Prize {
   winnerName: string | null;
   /** Epoch ms, or null while open. */
   wonAt: number | null;
+  /** Prize money in rupees, for information only (0 when the game has no ticket price or has not started). */
+  amount: number;
 }
 
 /** What a visitor sees of a prize before joining. */

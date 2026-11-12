@@ -1,6 +1,6 @@
 'use client';
 import { useRef, type JSX } from 'react';
-import type { MemberView } from '@/core';
+import { rupees, type MemberView } from '@/core';
 import { Button, Card, toast } from '@/components';
 import { useGame } from '@/lib/useGame';
 import { WinBanner } from './WinBanner';
@@ -57,7 +57,7 @@ export function Results({ game, act }: { game: MemberView; act: ReturnType<typeo
               <li key={p.id} className={styles.row}>
                 <span className={styles.prize}>{p.label}</span>
                 <span className={p.winnerName ? styles.won : styles.open}>
-                  {p.winnerName ? p.winnerName + (you.pid && p.winnerPid === you.pid ? ' (you)' : '') : 'Open'}
+                  {p.winnerName ? p.winnerName + (you.pid && p.winnerPid === you.pid ? ' (you)' : '') + (p.amount > 0 ? ' · ' + rupees(p.amount) : '') : 'Open'}
                 </span>
               </li>
             ))}

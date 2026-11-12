@@ -1,3 +1,4 @@
+import { rupees } from '@/core';
 import type { Prize, PublicPlayer } from '@/core';
 import { Avatar } from '@/components';
 import styles from './Live.module.css';
@@ -13,11 +14,11 @@ interface Props {
 }
 
 /**
- * "Playing · N": one row per person — avatar, name, whether they are the host or a player, and the prizes they have won.
+ * "Playing · N": one row per person — avatar, name, whether they are the host or a player, the prizes they have won and (when the game has a ticket price) the amount.
  * A host who only calls numbers (no ticket) is listed first. Never shows anyone's ticket or progress.
  */
 export function PlayersChips({ players, prizes, hostName, hostPid, youPid, youAreHost }: Props) {
-  const wonBy = (pid: string) => prizes.filter((p) => p.winnerPid === pid).map((p) => p.label);
+  const wonBy = (pid: string) => prizes.filter((p) => p.winnerPid === pid);
   return (
     <section className={styles.block}>
       <h2 className={styles.heading}>Playing · {players.length}</h2>
@@ -35,6 +36,7 @@ export function PlayersChips({ players, prizes, hostName, hostPid, youPid, youAr
         ) : null}
         {players.map((p) => {
           const won = wonBy(p.pid);
+          const total = won.reduce((a, w) => a + (w.amount || 0), 0);
           const role = p.pid === hostPid ? 'Host' : 'Player';
           return (
             <li key={p.pid} className={styles.row}>
@@ -46,7 +48,10 @@ export function PlayersChips({ players, prizes, hostName, hostPid, youPid, youAr
                 </span>
               </span>
               {won.length ? (
-                <span className={styles.won} aria-label={`Won ${won.join(', ')}`}>{won.join(', ')}</span>
+                <span className={styles.winnings}>
+                  {total > 0 ? <span className={styles.wonTotal}>{rupees(total)}</span> : null}
+                  <span className={total > 0 ? styles.wonPrizes : styles.won}>{won.map((w) => w.label).join(', ')}</span>
+                </span>
               ) : (
                 <span className={styles.open}>No wins yet</span>
               )}

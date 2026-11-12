@@ -22,7 +22,7 @@ describe('createGame', () => {
       seq: 0, events: [], version: 1, createdAt: 5000, updatedAt: 5000,
     });
     expect(doc.prizes).toEqual(CLASSIC.map((rule) => ({
-      id: rule, rule, label: RULES.find((x) => x.id === rule)!.name, winnerPid: null, winnerName: null, wonAt: null,
+      id: rule, rule, label: RULES.find((x) => x.id === rule)!.name, winnerPid: null, winnerName: null, wonAt: null, amount: 0,
     })));
     expect(doc.players).toHaveLength(1);
     expect(doc.players[0]).toMatchObject({ name: 'Priya', color: AVATAR_COLORS[0], joinedAt: 5000 });

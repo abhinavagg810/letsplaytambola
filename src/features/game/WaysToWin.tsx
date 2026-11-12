@@ -1,4 +1,4 @@
-import { ruleDesc } from '@/core';
+import { ruleDesc, rupees } from '@/core';
 import type { Prize } from '@/core';
 import styles from './Live.module.css';
 
@@ -12,7 +12,10 @@ export function WaysToWin({ prizes, youPid }: { prizes: readonly Prize[]; youPid
           <li key={p.id} className={styles.row}>
             <span className={styles.rowText}>
               <span className={styles.rowLabel}>{p.label}</span>
-              <span className={styles.rowRule}>{ruleDesc(p.rule)}</span>
+              <span className={styles.rowRule}>
+                {p.amount > 0 ? <strong className={styles.amount}>{rupees(p.amount)} · </strong> : null}
+                {ruleDesc(p.rule)}
+              </span>
             </span>
             <span className={p.winnerName ? styles.won : styles.open}>
               {p.winnerName ? p.winnerName + (youPid && p.winnerPid === youPid ? ' (you)' : '') : 'Open'}

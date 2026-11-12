@@ -214,6 +214,32 @@
   border-top: none;
 }
 
+.amount {
+  color: var(--marigold);
+  font-weight: 800;
+}
+
+.winnings {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 0;
+  line-height: 1.2;
+  text-align: right;
+}
+
+.wonTotal {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--marigold);
+}
+
+.wonPrizes {
+  font-size: 15px;
+  color: var(--text-muted);
+  overflow-wrap: break-word;
+}
+
 /* ── Win banner ──────────────────────────────────────────── */
 /* Fixed, so nothing on the page moves when it appears. */
 .bannerRegion {
