@@ -99,8 +99,8 @@ span.pill {
 }
 
 @media (hover: hover) {
-  button.outline:hover,
-  a.outline:hover {
+  button.outline:not(.selectedBorder):hover,
+  a.outline:not(.selectedBorder):hover {
     border-color: var(--text-muted);
   }
 }
