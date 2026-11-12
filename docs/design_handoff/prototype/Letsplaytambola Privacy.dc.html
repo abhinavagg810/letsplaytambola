@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Privacy Policy — Letsplaytambola</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>body{margin:0;background:oklch(0.21 0.07 295)}a{color:oklch(0.83 0.16 78)}a:hover{color:oklch(0.97 0.02 85)}html{scroll-behavior:smooth}</style>
+</helmet>
+<div style="min-height:100vh;background:oklch(0.21 0.07 295);color:oklch(0.97 0.02 85);font-family:'Baloo 2',system-ui,sans-serif">
+  <header style="position:sticky;top:0;z-index:10;background:oklch(0.21 0.07 295 / .9);backdrop-filter:blur(10px);border-bottom:1px solid oklch(0.3 0.07 295)">
+    <div style="max-width:1080px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <a href="Letsplaytambola Website.dc.html" style="text-decoration:none;display:flex"><dc-import name="Logo" size="32" hint-size="140px,46px"></dc-import></a>
+      <nav style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <a href="Letsplaytambola Terms.dc.html" style="color:oklch(0.78 0.04 295);text-decoration:none;font-size:16px;font-weight:600">Terms</a>
+        <a href="Letsplaytambola Privacy.dc.html" style="color:oklch(0.78 0.04 295);text-decoration:none;font-size:16px;font-weight:600">Privacy</a>
+        <a href="Tambola v3 Web.dc.html#signin" style="height:40px;padding:0 18px;border-radius:999px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);text-decoration:none;font-size:15px;font-weight:800;display:flex;align-items:center">Play now</a>
+      </nav>
+    </div>
+  </header>
+  <div style="max-width:1080px;margin:0 auto;padding:56px 24px 40px;display:flex;flex-direction:column;gap:10px">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:oklch(0.83 0.16 78)">LAST UPDATED · 11 NOVEMBER 2026</span>
+    <h1 style="margin:0;font-size:clamp(40px,6vw,64px);line-height:1;font-weight:800">Privacy Policy</h1>
+    <p style="margin:0;font-size:19px;line-height:1.5;color:oklch(0.82 0.03 295);max-width:720px;text-wrap:pretty">What we collect, why we collect it, and how you stay in control.</p>
+  </div>
+  <div style="max-width:1080px;margin:0 auto;padding:0 24px 80px;display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+    <nav style="flex:0 1 240px;min-width:200px;position:sticky;top:90px;display:flex;flex-direction:column;gap:2px;padding:14px;border-radius:20px;background:oklch(0.27 0.08 295)">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:oklch(0.78 0.04 295);padding:4px 8px 8px">ON THIS PAGE</span>
+      <sc-for list="{{ sections }}" as="s" hint-placeholder-count="8"><a href="{{ s.href }}" style="padding:6px 8px;border-radius:10px;color:oklch(0.9 0.02 85);text-decoration:none;font-size:15px;font-weight:600;line-height:1.25">{{ s.title }}</a></sc-for>
+    </nav>
+    <div style="flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:12px">
+      <div style="padding:16px 18px;border-radius:18px;background:oklch(0.83 0.16 78 / .14);border:1px solid oklch(0.83 0.16 78 / .4);font-size:16px;line-height:1.5"><b style="color:oklch(0.83 0.16 78)">In short:</b> {{ summary }}</div>
+      <sc-for list="{{ sections }}" as="s" hint-placeholder-count="8">
+        <section id="{{ s.id }}" style="scroll-margin-top:90px;display:flex;flex-direction:column;gap:10px;padding:24px 0;border-bottom:1px solid oklch(0.3 0.07 295)">
+          <h2 style="margin:0;font-size:28px;line-height:1.1;font-weight:800">{{ s.num }}. {{ s.title }}</h2>
+          <sc-for list="{{ s.paras }}" as="p" hint-placeholder-count="1"><p style="margin:0;font-size:17px;line-height:1.6;color:oklch(0.86 0.02 295);text-wrap:pretty">{{ p }}</p></sc-for>
+          <sc-if value="{{ s.hasBullets }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ s.bullets }}" as="b" hint-placeholder-count="0"><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.55;color:oklch(0.86 0.02 295)"><span style="width:8px;height:8px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-2px)"></span><span>{{ b }}</span></div></sc-for>
+            </div>
+          </sc-if>
+        </section>
+      </sc-for>
+      <p style="margin:16px 0 0;font-size:14px;line-height:1.5;color:oklch(0.62 0.05 295)">Draft prepared for launch planning — have it reviewed by a qualified lawyer before going live. Items in [brackets] need your details.</p>
+    </div>
+  </div>
+  <footer style="border-top:1px solid oklch(0.3 0.07 295);background:oklch(0.18 0.06 295)">
+    <div style="max-width:1080px;margin:0 auto;padding:28px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+      <dc-import name="Logo" size="28" hint-size="120px,40px"></dc-import>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:15px"><a href="Letsplaytambola Website.dc.html" style="color:oklch(0.78 0.04 295);text-decoration:none">Home</a><a href="Letsplaytambola Terms.dc.html" style="color:oklch(0.78 0.04 295);text-decoration:none">Terms</a><a href="Letsplaytambola Privacy.dc.html" style="color:oklch(0.78 0.04 295);text-decoration:none">Privacy</a></div>
+      <span style="font-size:14px;color:oklch(0.62 0.05 295)">For entertainment only — no real-money play.</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const S = [{"id":"intro","title":"Our approach","paras":["This Privacy Policy explains what personal data Letsplaytambola collects, why, and the choices you have. We follow India’s Digital Personal Data Protection Act, 2023 and collect only what we need to run a fun, safe game."]},{"id":"collect","title":"What we collect","bullets":["Account details: name, mobile number (verified by OTP), optional email and profile photo from Google or Apple sign-in, and your username.","Game data: games you host or join, tickets, numbers called, dabs, claims, prize names and amounts you record, results, reactions and the groups you create.","Contacts — only if you allow it: phone numbers on your device are turned into a one-way code (hash) on your phone and compared to find friends already on Letsplaytambola. We do not upload or keep your address book.","Device and usage data: app version, device type, language, crash reports and basic usage statistics.","Guests: the name entered to join a game."]},{"id":"use","title":"How we use it","bullets":["To create your account and let friends find and invite you.","To run games live — tickets, the shared board, the voice caller, claim checks and results.","To show your game history, groups and stats.","To send messages you ask for, like game invites, “your game is starting” alerts or our launch notification.","To keep the Service secure, prevent abuse and fix problems."]},{"id":"share","title":"Who can see your data","paras":["People in your games see your display name, username, photo, prizes you win and your reactions. Your ticket progress (such as “needs 6”) is shown only to you."],"bullets":["Trusted providers who host our servers, send OTPs or report crashes, under contracts that protect your data.","Authorities, only when the law requires it.","We never sell your personal data."]},{"id":"whatsapp","title":"WhatsApp and sharing","paras":["When you tap “Share on WhatsApp” or “Send on WhatsApp”, we open WhatsApp on your phone with a ready message and game link. You send it from your own account, under WhatsApp’s terms. We cannot read your WhatsApp chats."]},{"id":"retention","title":"How long we keep it","bullets":["Account and game history: while your account is active.","Guest data: up to 30 days after the game.","Contact matching codes: not kept after matching.","When you delete your account, we delete or anonymise your data within 30 days, unless the law requires us to keep something."]},{"id":"rights","title":"Your rights and choices","bullets":["See, correct or update your details from Profile at any time.","Turn off contacts access or notifications in your phone settings.","Ask for a summary of your data or for your account to be erased.","Nominate someone to act for you in case of death or incapacity, as allowed by Indian law.","Raise a complaint with our Grievance Officer, and if unresolved, with the Data Protection Board of India."]},{"id":"children","title":"Children","paras":["Accounts are for people aged 18 and over. Children may play only with a parent or guardian’s consent and supervision. We do not track children or send them targeted messages."]},{"id":"security","title":"Security","paras":["We use encryption in transit, strict access controls and hashing for contact matching. No system is perfect, so please keep your phone secure and tell us if anything looks wrong."]},{"id":"changes","title":"Changes to this policy","paras":["We will update this page when our practices change and let you know in the app about important changes."]},{"id":"contact","title":"Contact & Grievance Officer","paras":["Email: [hello@letsplaytambola.com]","Grievance Officer: [Name], [Company name], [Address], India — [grievance@letsplaytambola.com]. We acknowledge complaints within 48 hours and aim to resolve them within 30 days."]}];
+    return { summary: "We collect only what’s needed to run your games. We never sell your data, we never message your contacts without you, and your ticket progress is visible only to you.", sections: S.map((s, i) => ({ ...s, href: '#' + s.id, num: i + 1, paras: s.paras || [], bullets: s.bullets || [], hasBullets: !!(s.bullets && s.bullets.length) })) };
+  }
+}
+</script>
+</body>
+</html>

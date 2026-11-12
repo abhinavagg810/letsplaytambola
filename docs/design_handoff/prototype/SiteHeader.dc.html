@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<header style="background:oklch(0.21 0.07 295 / .9);backdrop-filter:blur(10px);border-bottom:1px solid oklch(0.3 0.07 295);font-family:'Baloo 2',system-ui,sans-serif;color:oklch(0.97 0.02 85)">
+  <div style="max-width:1160px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px">
+    <a href="Letsplaytambola Website.dc.html" style="text-decoration:none;display:flex"><dc-import name="Logo" size="30" hint-size="140px,44px"></dc-import></a>
+    <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+      <nav style="display:flex;align-items:center;gap:22px">
+        <a href="Letsplaytambola Website.dc.html#how" style="color:oklch(0.82 0.03 295);text-decoration:none;font-size:16px;font-weight:600">How it works</a>
+        <a href="Letsplaytambola Website.dc.html#features" style="color:oklch(0.82 0.03 295);text-decoration:none;font-size:16px;font-weight:600">Features</a>
+        <a href="Letsplaytambola Play.dc.html#join" style="height:44px;padding:0 18px;border-radius:999px;border:1.5px solid oklch(0.97 0.02 85);color:oklch(0.97 0.02 85);text-decoration:none;font-size:16px;font-weight:700;display:flex;align-items:center">Join a game</a>
+        <a href="Letsplaytambola Play.dc.html#host" style="height:44px;padding:0 20px;border-radius:999px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);text-decoration:none;font-size:16px;font-weight:800;display:flex;align-items:center">Host a game</a>
+      </nav>
+    </sc-if>
+    <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:8px">
+        <a href="Letsplaytambola Play.dc.html#host" style="height:44px;padding:0 16px;border-radius:999px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);text-decoration:none;font-size:16px;font-weight:800;display:flex;align-items:center">Host</a>
+        <button onClick="{{ toggle }}" style="height:44px;padding:0 16px;border-radius:999px;border:1.5px solid oklch(0.38 0.07 295);background:transparent;color:inherit;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer">{{ menuLabel }}</button>
+      </div>
+    </sc-if>
+  </div>
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <nav style="display:flex;flex-direction:column;padding:0 20px 12px">
+      <a href="Letsplaytambola Play.dc.html#join" onClick="{{ close }}" style="min-height:54px;display:flex;align-items:center;border-top:1px solid oklch(0.3 0.07 295);color:oklch(0.97 0.02 85);text-decoration:none;font-size:19px;font-weight:700">Join a game with a code</a>
+      <a href="Letsplaytambola Website.dc.html#how" onClick="{{ close }}" style="min-height:54px;display:flex;align-items:center;border-top:1px solid oklch(0.3 0.07 295);color:oklch(0.97 0.02 85);text-decoration:none;font-size:19px;font-weight:700">How it works</a>
+      <a href="Letsplaytambola Website.dc.html#features" onClick="{{ close }}" style="min-height:54px;display:flex;align-items:center;border-top:1px solid oklch(0.3 0.07 295);color:oklch(0.97 0.02 85);text-decoration:none;font-size:19px;font-weight:700">Features</a>
+    </nav>
+  </sc-if>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;80px&quot;}}">
+class Component extends DCLogic {
+  state = { w: window.innerWidth, open: false };
+  componentDidMount() { this.onR = () => this.setState({ w: window.innerWidth }); window.addEventListener('resize', this.onR); }
+  componentWillUnmount() { window.removeEventListener('resize', this.onR); }
+  renderVals() {
+    const wide = this.state.w >= 860;
+    return { wide, narrow: !wide, menuOpen: !wide && this.state.open, menuLabel: this.state.open ? 'Close' : 'Menu',
+      toggle: () => this.setState(s => ({ open: !s.open })), close: () => this.setState({ open: false }) };
+  }
+}
+</script>
+</body>
+</html>

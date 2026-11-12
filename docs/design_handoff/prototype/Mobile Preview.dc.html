@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Letsplaytambola — Mobile browser preview</title>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>body{margin:0;background:oklch(0.95 0.02 85)}a{color:oklch(0.45 0.14 295)}a:hover{color:oklch(0.3 0.1 295)}</style>
+</helmet>
+<div style="padding:56px 64px 80px;font-family:'Baloo 2',system-ui,sans-serif;color:oklch(0.25 0.07 295);display:flex;flex-direction:column;gap:72px;width:max-content">
+  <div style="display:flex;flex-direction:column;gap:6px;max-width:900px">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:.1em;color:oklch(0.55 0.14 358)">MOBILE BROWSER · LIVE PAGES</span>
+    <h1 style="margin:0;font-size:64px;line-height:1;font-weight:800">How it looks on a phone</h1>
+    <p style="margin:0;font-size:22px;line-height:1.4;color:oklch(0.4 0.04 295)">Every screen is the real, working page. Scroll and tap inside any phone.</p>
+  </div>
+
+  <sc-for list="{{ rows }}" as="row" hint-placeholder-count="2">
+    <section style="display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:40px;font-weight:800;line-height:1">{{ row.title }}</span><span style="font-size:20px;color:oklch(0.4 0.04 295)">{{ row.sub }}</span></div>
+      <div style="display:flex;gap:48px;align-items:flex-start">
+        <sc-for list="{{ row.screens }}" as="sc" hint-placeholder-count="4">
+          <div style="display:flex;flex-direction:column;gap:18px;width:402px">
+            <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+              <div style="height:100%;display:flex;flex-direction:column;background:oklch(0.21 0.07 295)">
+                <div style="height:54px;flex-shrink:0"></div>
+                <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+                  <iframe src="{{ sc.src }}" title="{{ sc.label }}" style="flex:1;width:100%;border:none;display:block;background:oklch(0.21 0.07 295)"></iframe>
+                </sc-if>
+                <div style="height:64px;flex-shrink:0;display:flex;align-items:flex-start;justify-content:center;padding-top:8px;box-sizing:border-box;background:oklch(0.18 0.06 295)">
+                  <span style="height:40px;width:300px;border-radius:999px;background:oklch(0.3 0.06 295);display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;font-size:15px;color:oklch(0.92 0.02 295)">{{ sc.url }}</span>
+                </div>
+              </div>
+            </x-import>
+            <div style="display:flex;gap:12px;align-items:baseline">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:16px;color:oklch(0.55 0.14 358)">{{ sc.n }}</span>
+              <span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:24px;font-weight:800;line-height:1.1">{{ sc.label }}</span><span style="font-size:17px;line-height:1.35;color:oklch(0.4 0.04 295)">{{ sc.note }}</span></span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: false };
+  genTicket() {
+    for (;;) {
+      const counts = Array(9).fill(1); let extra = 6;
+      while (extra) { const c = Math.floor(Math.random() * 9); if (counts[c] < 3) { counts[c]++; extra--; } }
+      const rows = [0, 0, 0], g = [0, 1, 2].map(() => Array(9).fill(0));
+      const order = [...Array(9).keys()].sort((a, b) => counts[b] - counts[a] || Math.random() - 0.5);
+      let fail = false;
+      for (const c of order) {
+        const avail = [0, 1, 2].filter(r => rows[r] < 5).sort((a, b) => rows[a] - rows[b] || Math.random() - 0.5);
+        if (avail.length < counts[c]) { fail = true; break; }
+        avail.slice(0, counts[c]).forEach(r => { g[r][c] = 1; rows[r]++; });
+      }
+      if (fail || !rows.every(x => x === 5)) continue;
+      for (let c = 0; c < 9; c++) {
+        const lo = c === 0 ? 1 : c * 10, hi = c === 8 ? 90 : c * 10 + 9, pool = [];
+        for (let n = lo; n <= hi; n++) pool.push(n);
+        const pick = []; while (pick.length < counts[c]) pick.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+        pick.sort((a, b) => a - b);
+        let i = 0; for (let r = 0; r < 3; r++) if (g[r][c]) g[r][c] = pick[i++];
+      }
+      return g;
+    }
+  }
+  componentDidMount() {
+    const AV = ['oklch(0.68 0.22 358)', 'oklch(0.83 0.16 78)', 'oklch(0.8 0.13 180)', 'oklch(0.75 0.14 260)'];
+    const prizes = [['early5', 'Early Five'], ['top', 'Top Line'], ['middle', 'Middle Line'], ['bottom', 'Bottom Line'], ['corners', 'Four Corners'], ['full', 'Full House']].map(([id, label]) => ({ id, label, rule: id, winner: null }));
+    const ppl = (n) => [['demo-host', 'Priya'], ['demo-meera', 'Meera'], ['demo-sapna', 'Sapna'], ['demo-kamla', 'Kamla Mausi']].slice(0, n).map(([pid, name], i) => ({ pid, name, color: AV[i], ticket: this.genTicket(), marks: [] }));
+    const base = { hostPid: 'demo-host', hostName: 'Priya', price: 100, auto: 0, seq: 1, feed: [], prizes };
+    localStorage.setItem('lpt:g:DEMO1', JSON.stringify({ ...base, id: 'DEMO1', name: 'Diwali Night', status: 'lobby', called: [], players: ppl(3) }));
+    const live = { ...base, id: 'DEMO2', name: 'Kitty Party', status: 'live', players: ppl(4), prizes: prizes.map(p => p.id === 'early5' ? { ...p, winner: 'Sapna' } : p) };
+    const meera = live.players[1], tn = meera.ticket.flat().filter(Boolean);
+    const pool = []; for (let n = 1; n <= 90; n++) if (!tn.includes(n)) pool.push(n);
+    pool.sort(() => Math.random() - 0.5);
+    live.called = [...tn.slice(0, 7), ...pool.slice(0, 17)].sort(() => Math.random() - 0.5);
+    meera.marks = tn.slice(0, 6);
+    localStorage.setItem('lpt:g:DEMO2', JSON.stringify(live));
+    this.setState({ ready: true });
+  }
+  renderVals() {
+    const P = 'Letsplaytambola Play.dc.html?mute=1&', W = 'Letsplaytambola Website.dc.html';
+    const S = (n, label, note, src, url) => ({ n, label, note, src, url });
+    return {
+      ready: this.state.ready,
+      rows: [
+        { title: 'Host a game', sub: 'Website → set up → share the link → call numbers',
+          screens: [
+            S('01', 'Website', 'Big “Host a game free” button, plus a box for anyone who has a code.', W, 'letsplaytambola.com'),
+            S('02', 'Set up', 'Your name, game name, optional ticket price. One button to create.', P + 'pid=demo-new&name=Priya#host', 'letsplaytambola.com/host'),
+            S('03', 'Ways to win', 'Pick a ready-made set or tap any of the 26 patterns.', P + 'pid=demo-new#host/prizes', 'letsplaytambola.com/host'),
+            S('04', 'Share the link', 'One tap to WhatsApp. See people join live, then start.', P + 'pid=demo-host#g=DEMO1', 'letsplaytambola.com/g/DEMO1'),
+            S('05', 'Call numbers', 'Call one at a time or switch on auto-call. Host plays too.', P + 'pid=demo-host#g=DEMO2', 'letsplaytambola.com/g/DEMO2'),
+          ] },
+        { title: 'Player opens the link', sub: 'Tap link in WhatsApp → type name → play',
+          screens: [
+            S('06', 'Invite opens', 'Shows who invited you and the game. Type your name — that’s it.', P + 'pid=demo-guest&name=#g=DEMO1', 'letsplaytambola.com/g/DEMO1'),
+            S('07', 'You’re in', 'Ticket dealt straight away while waiting for the host.', P + 'pid=demo-meera#g=DEMO1', 'letsplaytambola.com/g/DEMO1'),
+            S('08', 'Playing', 'Tap called numbers on your ticket. Tap Claim when you have a pattern.', P + 'pid=demo-meera#g=DEMO2', 'letsplaytambola.com/g/DEMO2'),
+          ] },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

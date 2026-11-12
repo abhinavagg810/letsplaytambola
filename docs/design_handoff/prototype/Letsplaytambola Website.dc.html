@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Letsplaytambola — Housie night, sorted.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:oklch(0.21 0.07 295)}
+a{color:oklch(0.83 0.16 78)}a:hover{color:oklch(0.97 0.02 85)}
+input::placeholder{color:oklch(0.62 0.05 295)}
+@keyframes lp-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes lp-float{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-10px) rotate(-2deg)}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:oklch(0.21 0.07 295);color:oklch(0.97 0.02 85);font-family:'Baloo 2',system-ui,sans-serif;overflow-x:hidden">
+
+  <dc-import name="SiteHeader" style="position:sticky;top:0;z-index:15" hint-size="100%,64px"></dc-import>
+
+  <section style="background-image:radial-gradient(ellipse at 10% 0%,oklch(0.32 0.12 340 / .55),transparent 55%),radial-gradient(ellipse at 100% 80%,oklch(0.3 0.1 250 / .45),transparent 50%)">
+    <div style="max-width:1160px;margin:0 auto;padding:72px 24px 88px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:56px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div style="align-self:flex-start;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;padding:6px 12px;border-radius:999px;background:oklch(0.27 0.08 295);color:oklch(0.83 0.16 78)">FREE · NO SIGN-UP · NO DOWNLOAD</div>
+        <h1 style="margin:0;font-size:clamp(48px,7vw,84px);line-height:.92;font-weight:800;letter-spacing:-0.02em;text-wrap:balance">Housie night, <span style="color:oklch(0.83 0.16 78)">sorted.</span></h1>
+        <p style="margin:0;font-size:21px;line-height:1.45;color:oklch(0.82 0.03 295);max-width:500px;text-wrap:pretty">Host a game, share one link on WhatsApp, and everyone plays by just typing their name. Our caller does the shouting — a rhyme for every number.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="Letsplaytambola Play.dc.html#host" style="height:60px;padding:0 30px;border-radius:18px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);text-decoration:none;font-size:21px;font-weight:800;display:flex;align-items:center;box-shadow:inset 0 -5px 0 rgba(0,0,0,.18)">Host a game free</a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;max-width:460px">
+          <span style="font-size:16px;font-weight:700;color:oklch(0.82 0.03 295)">Got a game code?</span>
+          <div style="display:flex;gap:8px">
+            <input value="{{ code }}" onChange="{{ onCode }}" placeholder="e.g. K7RQ2" style="flex:1;min-width:0;height:56px;box-sizing:border-box;padding:0 16px;border-radius:16px;border:1.5px solid oklch(0.38 0.07 295);background:oklch(0.27 0.08 295);color:oklch(0.97 0.02 85);font-family:'JetBrains Mono',monospace;font-size:20px;letter-spacing:.14em;text-transform:uppercase">
+            <button onClick="{{ joinCode }}" style="height:56px;padding:0 22px;border-radius:16px;border:none;background:oklch(0.97 0.02 85);color:oklch(0.25 0.07 295);font-family:inherit;font-size:18px;font-weight:800;cursor:pointer">Join</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;color:oklch(0.78 0.04 295);font-size:15px">
+          <div style="display:flex;padding-left:10px">
+            <div style="width:34px;height:34px;margin-left:-10px;border-radius:50%;background:oklch(0.68 0.22 358);display:grid;place-items:center;font-weight:800;color:oklch(0.25 0.07 295);box-shadow:0 0 0 3px oklch(0.21 0.07 295)">P</div>
+            <div style="width:34px;height:34px;margin-left:-10px;border-radius:50%;background:oklch(0.83 0.16 78);display:grid;place-items:center;font-weight:800;color:oklch(0.25 0.07 295);box-shadow:0 0 0 3px oklch(0.21 0.07 295)">M</div>
+            <div style="width:34px;height:34px;margin-left:-10px;border-radius:50%;background:oklch(0.8 0.13 180);display:grid;place-items:center;font-weight:800;color:oklch(0.25 0.07 295);box-shadow:0 0 0 3px oklch(0.21 0.07 295)">S</div>
+            <div style="width:34px;height:34px;margin-left:-10px;border-radius:50%;background:oklch(0.75 0.14 260);display:grid;place-items:center;font-weight:800;color:oklch(0.25 0.07 295);box-shadow:0 0 0 3px oklch(0.21 0.07 295)">K</div>
+          </div>
+          Made for your kitty, your family group, your Diwali night.
+        </div>
+      </div>
+
+      <div style="position:relative;display:flex;justify-content:center;padding:20px 0">
+        <div style="width:min(100%,440px);display:flex;flex-direction:column;gap:16px">
+          <div style="border-radius:28px;background:oklch(0.27 0.08 295);overflow:hidden;box-shadow:0 40px 80px -30px rgba(0,0,0,.7)">
+            <div style="height:12px;background:radial-gradient(circle,oklch(0.83 0.16 78) 3px,transparent 3.5px) 0 0/18px 12px repeat-x"></div>
+            <div style="padding:22px;display:flex;gap:20px;align-items:center">
+              <div style="width:124px;height:124px;border-radius:50%;background:oklch(0.68 0.22 358);display:grid;place-items:center;flex-shrink:0;box-shadow:0 0 0 6px oklch(0.83 0.16 78),0 0 60px oklch(0.68 0.22 358 / .7);animation:lp-float 4s ease-in-out infinite">
+                <div style="width:82px;height:82px;border-radius:50%;background:oklch(0.97 0.02 85);color:oklch(0.25 0.07 295);display:grid;place-items:center;font-size:46px;font-weight:800;line-height:1;padding-top:6px;box-sizing:border-box">47</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;line-height:1.05">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:oklch(0.83 0.16 78)">NUMBER 23 · PRIYA CALLING</span>
+                <span style="font-size:30px;font-weight:800">Year of Independence</span>
+                <span style="font-size:15px;color:oklch(0.78 0.04 295)">“Four and seven, forty-seven!”</span>
+              </div>
+            </div>
+          </div>
+          <div style="background:oklch(0.96 0.03 85);color:oklch(0.25 0.07 295);border-radius:18px;overflow:hidden;box-shadow:0 30px 60px -24px rgba(0,0,0,.8);transform:rotate(-2deg)">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:oklch(0.68 0.22 358);color:#fff"><span style="font-size:19px;font-weight:800">Sapna’s ticket</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px">9/15 · NEEDS 6</span></div>
+            <div style="padding:10px"><div style="display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:2px;background:oklch(0.25 0.07 295 / .2);border-radius:8px;overflow:hidden">
+              <sc-for list="{{ ticket }}" as="t" hint-placeholder-count="27"><div style="aspect-ratio:1/1.12;display:grid;place-items:center;background:{{ t.bg }}"><span style="width:84%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-size:clamp(14px,2.4vw,20px);font-weight:800;line-height:1;padding-top:2px;box-sizing:border-box;background:{{ t.dab }};color:{{ t.fg }};transform:rotate({{ t.rot }}deg)">{{ t.n }}</span></div></sc-for>
+            </div></div>
+          </div>
+          <div style="align-self:flex-end;display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:18px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);transform:rotate(2deg);box-shadow:0 20px 40px -20px rgba(0,0,0,.7)">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em">CLAIM VERIFIED</span><span style="font-size:20px;font-weight:800">Meera won Top Line!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:1160px;margin:-40px auto 0;padding:0 24px 40px;position:relative;z-index:2">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px">
+      <sc-for list="{{ usps }}" as="u" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:8px;padding:20px 22px;border-radius:22px;background:oklch(0.27 0.08 295);border:1px solid oklch(0.38 0.07 295);box-shadow:0 24px 50px -30px rgba(0,0,0,.8)">
+          <span style="display:block;font-size:44px;font-weight:800;line-height:1.2;padding-top:4px;color:{{ u.color }}">{{ u.big }}</span>
+          <span style="font-size:18px;font-weight:800;line-height:1.15">{{ u.title }}</span>
+          <span style="font-size:15px;line-height:1.4;color:oklch(0.82 0.03 295)">{{ u.body }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <div style="background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);overflow:hidden;padding:14px 0">
+    {{ marquee }}
+  </div>
+
+  <section id="how" style="max-width:1160px;margin:0 auto;padding:96px 24px 40px;display:flex;flex-direction:column;gap:40px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:640px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:oklch(0.83 0.16 78)">HOW IT WORKS</span>
+      <h2 style="margin:0;font-size:clamp(36px,5vw,56px);line-height:1;font-weight:800;text-wrap:balance">Three taps from chai to “Full House!”</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px">
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:14px;padding:26px;border-radius:26px;background:oklch(0.27 0.08 295);border:1px solid oklch(0.38 0.07 295)">
+          <div style="width:58px;height:58px;border-radius:50%;background:{{ s.color }};display:grid;place-items:center;transform:rotate(-8deg)"><div style="width:38px;height:38px;border-radius:50%;background:oklch(0.97 0.02 85);color:oklch(0.25 0.07 295);display:grid;place-items:center;font-weight:800;font-size:20px;line-height:1;padding-top:3px;box-sizing:border-box">{{ s.n }}</div></div>
+          <div style="font-size:26px;font-weight:800;line-height:1.05">{{ s.title }}</div>
+          <div style="font-size:17px;line-height:1.45;color:oklch(0.82 0.03 295);text-wrap:pretty">{{ s.body }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="features" style="max-width:1160px;margin:0 auto;padding:72px 24px 40px;display:flex;flex-direction:column;gap:88px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:700px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:oklch(0.83 0.16 78)">WHAT MAKES IT DIFFERENT</span>
+      <h2 style="margin:0;font-size:clamp(36px,5vw,56px);line-height:1;font-weight:800;text-wrap:balance">All the fun of paper tickets. None of the arguments.</h2>
+    </div>
+    
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:center">
+      <div style="flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:14px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:oklch(0.83 0.16 78)">THE CALLER</span>
+        <h3 style="margin:0;font-size:clamp(30px,4vw,44px);line-height:1;font-weight:800;text-wrap:balance">A rhyme for every single number</h3>
+        <p style="margin:0;font-size:18px;line-height:1.5;color:oklch(0.82 0.03 295);text-wrap:pretty">Our playful caller announces all 90 numbers with their own callout — the classics and desi favourites — then reads the digits clearly so no one mishears.</p>
+        <div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>“Two fat ladies, 88!” · “Quit India movement, 42!”</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Shake-the-bag animation before every number</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Tap Next, or switch on auto-call every 5, 8 or 12 seconds</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Mute anytime</span></div></div>
+      </div>
+      <div style="flex:1 1 380px;min-width:0;display:flex;justify-content:center"><div style="width:min(100%,420px);border-radius:26px;background:oklch(0.27 0.08 295);border:1px solid oklch(0.38 0.07 295);padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 40px 80px -40px rgba(0,0,0,.8)"><div style="height:10px;margin:-18px -18px 6px;background:radial-gradient(circle,oklch(0.83 0.16 78) 2.5px,transparent 3px) 0 0/16px 10px repeat-x"></div><div style="display:flex;gap:16px;align-items:center"><div style="width:96px;height:96px;border-radius:50%;background:oklch(0.68 0.22 358);display:grid;place-items:center;flex-shrink:0;box-shadow:0 0 0 5px oklch(0.83 0.16 78),0 0 40px oklch(0.68 0.22 358 / .6)"><div style="width:64px;height:64px;border-radius:50%;background:oklch(0.97 0.02 85);color:oklch(0.25 0.07 295);display:grid;place-items:center;font-size:36px;font-weight:800;line-height:1;padding-top:5px;box-sizing:border-box">88</div></div><div style="display:flex;flex-direction:column;line-height:1.05;gap:4px"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:oklch(0.83 0.16 78)">NUMBER 31</span><span style="font-size:26px;font-weight:800">Two fat ladies</span><span style="font-size:14px;color:oklch(0.82 0.03 295)">“Eight and eight, eighty-eight!”</span></div></div><div style="display:flex;gap:6px"><div style="flex:1;height:48px;border-radius:14px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);display:grid;place-items:center;font-size:18px;font-weight:800">Next number</div><div style="width:64px;height:48px;border-radius:14px;border:1.5px solid oklch(0.8 0.13 180);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:oklch(0.82 0.03 295)">AUTO</span><span style="font-size:15px;font-weight:700">8s</span></div></div></div></div>
+    </div>
+    
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:center">
+      <div style="flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:14px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:oklch(0.83 0.16 78)">SHARED LIVE BOARD</span>
+        <h3 style="margin:0;font-size:clamp(30px,4vw,44px);line-height:1;font-weight:800;text-wrap:balance">One board, on every phone, in real time</h3>
+        <p style="margin:0;font-size:18px;line-height:1.5;color:oklch(0.82 0.03 295);text-wrap:pretty">The moment the host calls a number it lights up on everyone’s 1–90 board — in the same room or across cities. Missed a call? Just look at the board.</p>
+        <div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Latest number glows pink, called numbers turn gold</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Last 5 numbers always shown under the caller</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Same board for host and every player — nothing to ask twice</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Live players list and prizes &amp; winners beside it</span></div></div>
+      </div>
+      <div style="flex:1 1 380px;min-width:0;display:flex;justify-content:center">
+        <div style="width:min(100%,440px);border-radius:26px;background:oklch(0.27 0.08 295);border:1px solid oklch(0.38 0.07 295);padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 40px 80px -40px rgba(0,0,0,.8)">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:18px;font-weight:800">Board</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:oklch(0.82 0.03 295)">31 / 90 CALLED · 6 PLAYING</span></div>
+          <div style="display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px">
+            <sc-for list="{{ board }}" as="c" hint-placeholder-count="90"><div style="aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-size:clamp(10px,1.4vw,13px);font-weight:800;line-height:1;padding-top:1px;box-sizing:border-box;background:{{ c.bg }};color:{{ c.fg }};box-shadow:{{ c.ring }}">{{ c.n }}</div></sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;flex-direction:row-reverse;gap:40px;align-items:center">
+      <div style="flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:14px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:oklch(0.83 0.16 78)">FAIR PLAY</span>
+        <h3 style="margin:0;font-size:clamp(30px,4vw,44px);line-height:1;font-weight:800;text-wrap:balance">Every claim checked in a second</h3>
+        <p style="margin:0;font-size:18px;line-height:1.5;color:oklch(0.82 0.03 295);text-wrap:pretty">No more counting over someone’s shoulder. Tap Claim and the app verifies it against the numbers actually called — then celebrates the winner on every phone.</p>
+        <div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Instant “Claim verified” with confetti for everyone</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Wrong claims get a friendly “Bogey!”</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>You can only dab numbers that have been called</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Prizes & winners list always visible</span></div></div>
+      </div>
+      <div style="flex:1 1 380px;min-width:0;display:flex;justify-content:center"><div style="width:min(100%,420px);border-radius:26px;background:oklch(0.27 0.08 295);border:1px solid oklch(0.38 0.07 295);padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 40px 80px -40px rgba(0,0,0,.8)"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:18px;font-weight:800">Prizes &amp; winners</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:oklch(0.82 0.03 295)">3 OF 6 WON</span></div><div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:oklch(0.21 0.07 295)"><div style="flex:1;display:flex;flex-direction:column;line-height:1.15"><span style="font-size:16px;font-weight:800">Early Five</span><span style="font-size:12px;color:oklch(0.82 0.03 295)">₹50 · Any 5 numbers</span></div><div style="display:flex;align-items:center;gap:6px"><div style="width:28px;height:28px;border-radius:50%;background:oklch(0.8 0.13 180);color:oklch(0.25 0.07 295);display:grid;place-items:center;font-weight:800;font-size:13px;line-height:1;padding-top:2px;box-sizing:border-box">M</div><span style="font-size:15px;font-weight:800">Meera</span></div></div><div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:oklch(0.21 0.07 295)"><div style="flex:1;display:flex;flex-direction:column;line-height:1.15"><span style="font-size:16px;font-weight:800">Top Line</span><span style="font-size:12px;color:oklch(0.82 0.03 295)">₹75 · All 5 of the top line</span></div><div style="display:flex;align-items:center;gap:6px"><div style="width:28px;height:28px;border-radius:50%;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);display:grid;place-items:center;font-weight:800;font-size:13px;line-height:1;padding-top:2px;box-sizing:border-box">S</div><span style="font-size:15px;font-weight:800">You!</span></div></div><div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:oklch(0.21 0.07 295)"><div style="flex:1;display:flex;flex-direction:column;line-height:1.15"><span style="font-size:16px;font-weight:800">Pyramid</span><span style="font-size:12px;color:oklch(0.82 0.03 295)">₹75 · 1 top, 2 middle, 3 bottom</span></div><span style="padding:6px 16px;border-radius:999px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);font-size:15px;font-weight:800">Claim</span></div><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295)"><div style="flex:1;display:flex;flex-direction:column;line-height:1.1"><span style="font-family:'JetBrains Mono',monospace;font-size:10px">CLAIM VERIFIED</span><span style="font-size:19px;font-weight:800">You won Top Line!</span></div><span style="font-size:22px;font-weight:800">₹75</span></div></div></div>
+    </div>
+    
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:center">
+      <div style="flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:14px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:oklch(0.83 0.16 78)">JOINING</span>
+        <h3 style="margin:0;font-size:clamp(30px,4vw,44px);line-height:1;font-weight:800;text-wrap:balance">One link. Type your name. You’re in.</h3>
+        <p style="margin:0;font-size:18px;line-height:1.5;color:oklch(0.82 0.03 295);text-wrap:pretty">No accounts, no passwords, no OTPs. Players open the link on any phone, type their name and get a ticket — that’s it. Easy for Nani and the grandkids alike.</p>
+        <div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>No sign-up for the host or the players</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Works in any phone browser — nothing to install</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>In the same room? Read out the 5-letter code</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Late? You can still join and grab a ticket</span></div></div>
+      </div>
+      <div style="flex:1 1 380px;min-width:0;display:flex;justify-content:center"><div style="width:min(100%,400px);border-radius:26px;background:oklch(0.27 0.08 295);border:1px solid oklch(0.38 0.07 295);padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 40px 80px -40px rgba(0,0,0,.8)"><span style="font-size:16px;color:oklch(0.82 0.03 295)">Priya invited you to</span><span style="font-size:34px;line-height:1;font-weight:800;color:oklch(0.83 0.16 78)">Diwali Night</span><span style="font-size:18px;font-weight:800;margin-top:6px">What should we call you?</span><div style="height:56px;border-radius:14px;border:1.5px solid oklch(0.83 0.16 78);background:oklch(0.21 0.07 295);display:flex;align-items:center;padding:0 16px;font-size:20px">Kamla Mausi</div><div style="height:56px;border-radius:16px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);display:grid;place-items:center;font-size:20px;font-weight:800">Join game</div><span style="font-size:14px;color:oklch(0.78 0.04 295);text-align:center">No sign-up. No password. No OTP.</span></div></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;flex-direction:row-reverse;gap:40px;align-items:center">
+      <div style="flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:14px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:oklch(0.83 0.16 78)">NEXT ROUND</span>
+        <h3 style="margin:0;font-size:clamp(30px,4vw,44px);line-height:1;font-weight:800;text-wrap:balance">Same group, next round in one tap</h3>
+        <p style="margin:0;font-size:18px;line-height:1.5;color:oklch(0.82 0.03 295);text-wrap:pretty">When the game ends everyone sees the winners. The host taps Play again and every player on the link gets a fresh ticket — no new link to share.</p>
+        <div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Winners list after every round</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Fresh tickets for everyone, automatically</span></div><div style="display:flex;gap:10px;align-items:baseline;font-size:17px;line-height:1.4"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.83 0.16 78);flex-shrink:0;transform:translateY(-1px)"></span><span>Money stays offline — the app only keeps score</span></div></div>
+      </div>
+      <div style="flex:1 1 380px;min-width:0;display:flex;justify-content:center"><div style="width:min(100%,420px);border-radius:26px;background:oklch(0.27 0.08 295);border:1px solid oklch(0.38 0.07 295);padding:20px;display:flex;flex-direction:column;gap:10px;box-shadow:0 40px 80px -40px rgba(0,0,0,.8)"><span style="font-size:30px;line-height:1;font-weight:800;color:oklch(0.83 0.16 78)">That’s the game!</span><div style="display:flex;justify-content:space-between;padding:10px 12px;border-radius:12px;background:oklch(0.21 0.07 295);font-size:17px"><span style="font-weight:600">Early Five</span><span style="font-weight:800;color:oklch(0.83 0.16 78)">Meera</span></div><div style="display:flex;justify-content:space-between;padding:10px 12px;border-radius:12px;background:oklch(0.21 0.07 295);font-size:17px"><span style="font-weight:600">Top Line</span><span style="font-weight:800;color:oklch(0.83 0.16 78)">Sapna</span></div><div style="display:flex;justify-content:space-between;padding:10px 12px;border-radius:12px;background:oklch(0.21 0.07 295);font-size:17px"><span style="font-weight:600">Four Corners</span><span style="font-weight:800;color:oklch(0.83 0.16 78)">Kamla</span></div><div style="display:flex;justify-content:space-between;padding:10px 12px;border-radius:12px;background:oklch(0.21 0.07 295);font-size:17px"><span style="font-weight:600">Full House</span><span style="font-weight:800;color:oklch(0.83 0.16 78)">Rahul</span></div><div style="height:54px;border-radius:16px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);display:grid;place-items:center;font-size:18px;font-weight:800;margin-top:4px">Play again with same people</div></div></div>
+    </div>
+  </section>
+
+  <section style="max-width:960px;margin:0 auto;padding:56px 24px 24px;display:flex;flex-direction:column;gap:22px">
+    <h2 style="margin:0;font-size:clamp(32px,4.5vw,48px);line-height:1;font-weight:800;text-wrap:balance">Paper tickets vs Letsplaytambola</h2>
+    <div style="border-radius:24px;overflow:hidden;border:1px solid oklch(0.38 0.07 295)">
+      <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr);background:oklch(0.18 0.06 295);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:oklch(0.82 0.03 295)"><span style="padding:14px 18px">WHAT YOU NEED</span><span style="padding:14px 10px;text-align:center">PAPER + WHATSAPP</span><span style="padding:14px 10px;text-align:center;color:oklch(0.83 0.16 78)">LETSPLAYTAMBOLA</span></div>
+      <sc-for list="{{ compare }}" as="cp" hint-placeholder-count="7">
+        <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr);align-items:center;border-top:1px solid oklch(0.38 0.07 295);background:oklch(0.27 0.08 295)"><span style="padding:14px 18px;font-size:17px;font-weight:600">{{ cp.label }}</span><span style="padding:14px 10px;text-align:center;font-size:15px;color:oklch(0.82 0.03 295)">{{ cp.paper }}</span><span style="padding:14px 10px;text-align:center;font-size:15px;font-weight:800;color:oklch(0.8 0.13 180)">{{ cp.us }}</span></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="max-width:1160px;margin:0 auto;padding:56px 24px">
+    <div style="border-radius:32px;background:oklch(0.27 0.08 295);border:1px solid oklch(0.38 0.07 295);padding:36px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:32px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:oklch(0.8 0.13 180)">26 WAYS TO WIN</span>
+        <h3 style="margin:0;font-size:40px;line-height:1;font-weight:800;text-wrap:balance">Your kitty, your rules.</h3>
+        <p style="margin:0;font-size:17px;line-height:1.45;color:oklch(0.82 0.03 295);text-wrap:pretty">From Early Five and Laddoo to Pyramid, Breakfast-Lunch-Dinner and Second House — pick with one tap. Every rule is explained on screen, and every claim is checked instantly.</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <sc-for list="{{ patterns }}" as="p" hint-placeholder-count="12"><span style="padding:7px 14px;border-radius:999px;border:1.5px solid {{ p.border }};color:{{ p.fg }};font-size:15px;font-weight:700">{{ p.label }}</span></sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="app" style="background-image:radial-gradient(ellipse at 50% 0%,oklch(0.4 0.14 75 / .35),transparent 60%)">
+    <div style="max-width:1160px;margin:0 auto;padding:96px 24px;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;padding:6px 12px;border-radius:999px;background:oklch(0.68 0.22 358);color:#fff">COMING SOON</div>
+      <h2 style="margin:0;font-size:clamp(40px,6vw,68px);line-height:.95;font-weight:800;text-wrap:balance;max-width:760px">The app is on its way to your phone.</h2>
+      <p style="margin:0;font-size:19px;line-height:1.45;color:oklch(0.82 0.03 295);max-width:560px;text-wrap:pretty">Number alerts and a home-screen icon for your Tambola nights. Until then, everything works right here in your browser.</p>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+        <div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 22px 0 16px;border-radius:16px;background:#000;border:1.5px solid oklch(0.38 0.07 295);opacity:.92">
+          <div style="width:34px;height:34px;border-radius:9px;background:oklch(0.68 0.16 150);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:#fff">AND</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.05"><span style="font-size:12px;color:oklch(0.78 0.04 295)">Coming soon on</span><span style="font-size:21px;font-weight:800;color:#fff">Google Play</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;height:64px;padding:0 22px 0 16px;border-radius:16px;background:#000;border:1.5px solid oklch(0.38 0.07 295);opacity:.92">
+          <div style="width:34px;height:34px;border-radius:9px;background:oklch(0.97 0.02 85);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:#000">iOS</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.05"><span style="font-size:12px;color:oklch(0.78 0.04 295)">Coming soon on the</span><span style="font-size:21px;font-weight:800;color:#fff">App Store</span></div>
+        </div>
+      </div>
+      <sc-if value="{{ notDone }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:520px;margin-top:10px">
+          <span style="font-size:17px;font-weight:700">Get a WhatsApp message the day it launches</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="flex:1 1 240px;display:flex;align-items:center;height:56px;border-radius:16px;background:oklch(0.27 0.08 295);border:1.5px solid oklch(0.38 0.07 295);padding:0 16px;box-sizing:border-box;gap:8px"><span style="font-size:18px;font-weight:800;color:oklch(0.78 0.04 295)">+91</span><input value="{{ phone }}" onChange="{{ onPhone }}" inputmode="numeric" placeholder="Mobile number" style="flex:1;min-width:0;font-family:inherit;font-size:19px;font-weight:600;background:transparent;border:none;outline:none;color:oklch(0.97 0.02 85)"></div>
+            <button onClick="{{ notify }}" style="flex:0 0 auto;height:56px;padding:0 24px;border-radius:16px;border:none;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);font-family:inherit;font-size:18px;font-weight:800;cursor:pointer">Notify me</button>
+          </div>
+          <span style="font-size:14px;color:{{ hintColor }}">{{ hint }}</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ done }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:10px;padding:16px 22px;border-radius:18px;background:oklch(0.8 0.13 180);color:oklch(0.25 0.07 295);font-size:19px;font-weight:800">You’re on the list! We’ll WhatsApp you at +91 {{ phone }}.</div>
+      </sc-if>
+    </div>
+  </section>
+
+  <section id="faq" style="max-width:860px;margin:0 auto;padding:40px 24px 96px;display:flex;flex-direction:column;gap:22px">
+    <h2 style="margin:0;font-size:clamp(32px,4.5vw,48px);line-height:1;font-weight:800">Questions, answered</h2>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{ faqs }}" as="q" hint-placeholder-count="5">
+        <div style="border-radius:20px;background:oklch(0.27 0.08 295);overflow:hidden">
+          <button onClick="{{ q.toggle }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 22px;border:none;background:transparent;color:inherit;font-family:inherit;font-size:19px;font-weight:700;text-align:left;cursor:pointer">{{ q.q }}<span style="font-size:24px;color:oklch(0.83 0.16 78);flex-shrink:0">{{ q.sign }}</span></button>
+          <sc-if value="{{ q.open }}" hint-placeholder-val="{{ false }}"><div style="padding:0 22px 20px;font-size:17px;line-height:1.5;color:oklch(0.82 0.03 295);text-wrap:pretty">{{ q.a }}</div></sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="max-width:1160px;margin:0 auto;padding:0 24px 80px">
+    <div style="border-radius:32px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);padding:44px 36px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:6px;max-width:600px"><div style="font-size:clamp(32px,4.5vw,48px);line-height:1;font-weight:800">Tonight’s game is one link away.</div><div style="font-size:18px">Free to host. No sign-up to play. Works on any phone.</div></div>
+      <a href="Letsplaytambola Play.dc.html#host" style="height:60px;padding:0 30px;border-radius:18px;background:oklch(0.25 0.07 295);color:oklch(0.97 0.02 85);text-decoration:none;font-size:20px;font-weight:800;display:flex;align-items:center">Host a game free</a>
+    </div>
+  </section>
+
+  <dc-import name="SiteFooter" hint-size="100%,120px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { phone: '', done: false, err: '', open: 0, code: '' };
+  renderVals() {
+    const s = this.state, mari = 'oklch(0.83 0.16 78)', pink = 'oklch(0.68 0.22 358)', teal = 'oklch(0.8 0.13 180)', ink = 'oklch(0.25 0.07 295)', surf = 'oklch(0.27 0.08 295)', cream = 'oklch(0.97 0.02 85)';
+    const T = [4, 0, 23, 0, 45, 0, 61, 0, 82, 0, 12, 0, 37, 0, 55, 0, 74, 88, 8, 0, 29, 0, 47, 0, 66, 79, 0], dab = [4, 23, 12, 55, 74, 8, 29, 66, 79];
+    const calls = ['7 · Lucky seven', '11 · Legs eleven', '22 · Two little ducks', '42 · Quit India movement', '47 · Year of Independence', '66 · Clickety click', '80 · Gandhi’s breakfast', '88 · Two fat ladies', '90 · Top of the house', '1 · Kelly’s eye', '50 · Half a century', '16 · Sweet sixteen'];
+    const row = [...calls, ...calls];
+    const faqs = [
+      ['Do we need to sign up?', 'No. The host types a name and gets a link. Players open the link, type their name and get a ticket. Nobody creates an account.'],
+      ['Do players need to download anything?', 'No. Everything works in the phone’s browser. The Android and iOS apps are coming soon for extras like number alerts.'],
+      ['Is it really free?', 'Yes — hosting and playing are free.'],
+      ['Can we play for money?', 'The app never handles money. You can note a ticket price and prize amounts to keep track, and settle with each other in cash or UPI, just like a paper game.'],
+      ['How many people can play?', 'From 2 to 30 players per game, each with their own ticket. Host from one phone, call numbers yourself or let auto-call do it.'],
+      ['What if someone claims wrongly?', 'Every claim is checked against the numbers actually called. A wrong claim shows “Bogey!” to everyone — no arguments.'],
+    ];
+    const calledSet = [88, 7, 23, 41, 66, 12, 90, 3, 55, 47, 18, 72, 29, 61, 84, 9, 36, 50, 77, 14, 2, 68, 33, 45, 81, 26, 59, 70, 11, 38, 64];
+    return {
+      board: Array.from({ length: 90 }, (_, i) => { const n = i + 1, c = calledSet.includes(n), l = n === 88; return { n, bg: l ? pink : c ? mari : 'transparent', fg: l ? '#fff' : c ? ink : 'oklch(0.6 0.05 295)', ring: l ? '0 0 0 2px ' + cream + ', 0 0 14px ' + pink : c ? 'none' : 'inset 0 0 0 1px oklch(0.38 0.07 295)' }; }),
+      usps: [
+        { big: '1', title: 'Shared live board', body: 'Every number lights up on everyone’s phone the instant it’s called.', color: mari },
+        { big: '0', title: 'Sign-ups needed', body: 'Tap the link, type your name, play. Right in the browser.', color: mari },
+        { big: '90', title: 'Unique rhymes', body: 'A playful voice calls every number with its own callout.', color: pink },
+        { big: '26', title: 'Ways to win', body: 'Laddoo, Pyramid, Breakfast-Lunch-Dinner and more — rules explained.', color: teal },
+        { big: '1 tap', title: 'Claims checked', body: 'Verified instantly against called numbers. No bogey fights.', color: mari },
+      ],
+      compare: [['Printing & cutting tickets', 'Every game', 'Never'], ['Seeing what’s been called', 'Ask the host', 'Live board for all'], ['Shouting numbers', 'Host’s voice', 'Rhyming caller'], ['Checking claims', 'By hand', 'Instant'], ['Remote family can play', 'Hard', 'One link'], ['Custom kitty rules', 'Explain each time', '26 built in'], ['Joining', 'Add to group, explain', 'Tap link, type name'], ['Next round', 'Start over', 'One tap']].map(([label, paper, us]) => ({ label, paper, us })),
+      ticket: T.map(n => { const d = dab.includes(n); return { n: n || '', bg: n ? 'oklch(0.96 0.03 85)' : 'repeating-linear-gradient(45deg,oklch(0.9 0.06 80) 0 4px,oklch(0.95 0.03 85) 4px 8px)', dab: d ? 'oklch(0.68 0.22 358 / .92)' : 'transparent', fg: d ? '#fff' : ink, rot: d ? ((n * 37) % 24) - 12 : 0 }; }),
+      marquee: React.createElement('div', { style: { display: 'flex', width: 'max-content', animation: 'lp-marquee 40s linear infinite' } }, row.map((c, i) => React.createElement('span', { key: i, style: { display: 'flex', alignItems: 'center', gap: 14, padding: '0 22px', fontFamily: "'Baloo 2',sans-serif", fontSize: 20, fontWeight: 800, whiteSpace: 'nowrap' } }, c, React.createElement('span', { style: { width: 8, height: 8, borderRadius: '50%', background: pink } })))),
+      steps: [
+        { n: '1', color: pink, title: 'Host a game', body: 'Type your name, name the game and pick ways to win. You get a link and a 5-letter code.' },
+        { n: '2', color: mari, title: 'Share on WhatsApp', body: 'Drop the link in the family group. Friends open it, type their name and get a ticket.' },
+        { n: '3', color: teal, title: 'Play together', body: 'Call numbers or switch on auto-call. Everyone dabs their own ticket and claims prizes instantly.' },
+      ],
+      features: [
+        { title: 'A rhyme for every number', body: 'A playful voice calls all 90 with its own callout — “Two fat ladies, 88!” Mute anytime.', bg: pink, fg: '#fff' },
+        { title: 'Claims checked instantly', body: 'Tap Claim and it’s verified against the called numbers. Winners celebrated, bogeys caught.', bg: mari, fg: ink },
+        { title: 'Invite from contacts', body: 'No usernames to type. Choose people from your phone and send the invite on WhatsApp.', bg: teal, fg: ink },
+        { title: 'Replay with your group', body: 'Save your kitty or family as a group and start the next game with everyone in one tap.', bg: surf, fg: cream },
+        { title: 'Big, clear and simple', body: 'Large numbers, big buttons and plain words — easy for Nani and the grandkids alike.', bg: surf, fg: cream },
+        { title: 'Winners & settle-up', body: 'See who won what, round by round, with prize amounts tallied for you. Money stays offline.', bg: surf, fg: cream },
+      ],
+      patterns: ['Early Five', 'Laddoo', 'Temperature', 'Top Line', 'Middle Line', 'Bottom Line', 'Four Corners', 'Star', 'Pyramid', 'Breakfast', 'Lunch', 'Dinner', 'Devrani', 'Jethani', 'Railway Lines', 'Full House', 'Second House'].map((label, i) => ({ label, border: i % 3 === 0 ? pink : i % 3 === 1 ? mari : teal, fg: cream })),
+      code: s.code, onCode: e => this.setState({ code: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) }),
+      joinCode: () => { location.href = 'Letsplaytambola Play.dc.html' + (s.code ? '#g=' + s.code : '#join'); },
+      phone: s.phone, onPhone: e => this.setState({ phone: e.target.value.replace(/\D/g, '').slice(0, 10), err: '' }),
+      notify: () => { if (s.phone.length !== 10) return this.setState({ err: 'Please enter a 10-digit mobile number' }); this.setState({ done: true }); },
+      done: s.done, notDone: !s.done, hint: s.err || 'One message at launch. No spam, ever.', hintColor: s.err ? 'oklch(0.85 0.12 358)' : 'oklch(0.62 0.05 295)',
+      faqs: faqs.map(([q, a], i) => ({ q, a, open: s.open === i, sign: s.open === i ? '−' : '+', toggle: () => this.setState({ open: s.open === i ? -1 : i }) })),
+    };
+  }
+}
+</script>
+</body>
+</html>

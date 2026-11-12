@@ -1,32 +1,53 @@
-# Build notes for contributors (read before writing a screen)
+# Build notes — Letsplaytambola v2 (responsive website, no sign-up)
 
-**Product**: Letsplaytambola — host/play Tambola (Housie) with family & friends in India. Audience: women 30–70. Simplicity, big tap targets, clear copy.
+Read before writing anything. v1 (Expo app with accounts) lives on the git branch `v1-expo-app`; `main` is v2 only.
 
 ## Sources of truth
-1. `docs/design_handoff/README.md` — PRD + design spec. **Wins on conflicts.**
-2. `docs/design_handoff/prototype/TambolaPhone.dc.html` — hi-fi prototype. Script (logic + all copy strings) is lines 814–1432.
-   `docs/design_handoff/prototype/markup-condensed.txt` is the same file's markup (lines 1–813) with colours replaced by token names
-   (BG, SURF, SURF2, LINE, CREAM, MUTED, MARI, PINK, TEAL, INK, PAPER, WA) — read the section for your screen and match it closely
-   (sizes, spacing, radii, copy). Section starts: login 48, invite 68, home 93, username 162, games 178, friends 193, profile 257,
-   create 279, prizes 339, lobby 415, play 468, results 565, settle 598, tab bar 627, sign-in sheet 638, reset sheet 659,
-   lobby invite sheet 671, add-friend sheet 688, people picker 707, contacts picker 743, toast 778.
+1. `docs/design_handoff/README.md` — **wins on conflicts** (routes, screens, rules, tokens, responsive rules, copy).
+2. `docs/design_handoff/prototype/*.dc.html` — hi-fi references. Match layout, colours, type and copy closely. `Letsplaytambola Play.dc.html` holds the exact game logic in its `<script>`; `Letsplaytambola Website.dc.html` is the marketing page; `SiteHeader`/`SiteFooter`/`Logo` are shared pieces; `Mobile Preview.dc.html` shows 8 phone screens.
+   To render a prototype in the sandbox: serve `docs/design_handoff/prototype/` over a local static HTTP server (not file:// — nested `<dc-import>` components load over XHR) and open it with Playwright, routing `unpkg.com/react*` and `fonts.googleapis.com` to local files — a working helper to copy/adapt is `/tmp/claude-0/-home-user-letsplaytambola/31430357-1729-5b0f-a95f-e62c081b0278/scratchpad/proto.js` (its font paths point at an old folder: take the TTFs from `node_modules/next/dist/compiled/@vercel/og` or download via `npm i @fontsource/baloo-2 @fontsource/jetbrains-mono` into a scratch folder — do not add them to the app).
+3. Seed data: `docs/design_handoff/data/*.json`.
 
 ## Hard rules
-- Never show another player's ticket or progress. Only the host draws. Only called numbers can be dabbed. No real-money features: prices/prizes are *recorded* only — show "Settled outside the app" where price appears; no payment buttons, no "mark paid".
-- **Design fidelity is exact** (owner's instruction, supersedes the earlier 15px rule): use the prototype's exact font sizes, weights, colours, spacing, radii and copy — including its 12–14px secondary text. **Minimum tap target 44px** still applies: keep the prototype's visual size and extend the touch area with `hitSlop`.
-- Do not add features that are not in the README.
-- README overrides prototype: sign-in is phone + OTP first (then Google, Apple); guests join from a link with just a name and skip the username step; host's own ticket is not a cost in host's net.
+- **No authentication, no accounts.** Never say "account", "log in" or "sign up" except to say it isn't needed.
+- Never send another player's ticket or dabs to a browser. Only the host can start, draw, toggle auto-call, start a new round. Only called numbers can be dabbed. Claims are validated on the server. Draws happen on the server.
+- No real money. The optional ticket price is information only: "Collected outside the app".
+- Minimum text 15px (JetBrains Mono labels 12px as specified), inputs ≥ 16px (iOS zoom), tap targets ≥ 44px, main buttons 60–64px.
+- Out of scope: accounts, friends, groups, contacts, history, payments/settle-up, native apps, chat, reactions, auto-mark. Do not add features that are not in the README.
 
-## Stack & conventions
-- Expo SDK 58, React Native 0.88, React 19, Expo Router, TypeScript strict. One codebase for iOS, Android and web (React Native Web) — everything must work on web too. No extra dependencies without a strong reason (not installed: reanimated, gesture-handler, zustand, any icon library). Animations use React Native's built-in `Animated`. `boxShadow` string styles work on all platforms in this RN version.
-- Path aliases: `@/…` → `src/…`, `@core/…` → `packages/game-core/src/…` (import core files WITH the `.ts` extension, e.g. `import { RULES } from '@core/data.ts'`).
-- Theme: `src/theme/tokens.ts` (`C` colours, `F` fonts, `R` radii, `MOTION`, `CONTENT_MAX`, `PLAY_MAX`, `WIDE`). Never hard-code brand colours.
-- UI kit: `import { … } from '@/ui'` — `T` (text; props size, w 500|600|800, color, mono, center, lh), `Eyebrow`, `Btn` (variants primary|teal|cream|whatsapp|black|outline|ghost|ink|dashed; h; lip), `LinkBtn`, `IconBtn`, `BackBtn`, `Avatar`, `Faces`, `initial()`, `first()`, `Toggle`, `Stepper`, `Input`, `Chip`, `Card`, `Row`, `Empty`, `LiveDot`, `CardIn`, `Sheet` (bottom sheet; `height` fraction; `light`), `toast(msg)`, `Logo`, `MiniTicket`, `TicketView`, `Screen` (scroll container with `footer` for sticky CTAs), `HandleCopy`, `copyText`. Read these files first; extend the kit rather than duplicating styles (small additive changes are fine).
-- Data: only through `backend` from `@/backend` (interface in `src/backend/types.ts`). Game mutations: `backend.act(code, action)` → on `{ok:false,error}` call `toast(error)`. Game rules live in `packages/game-core` (`data.ts`, `ticket.ts`, `patterns.ts`, `autosplit.ts`, `engine.ts`, `stats.ts`) — never re-implement rules in UI code.
-- State: `src/state/session.ts` (`useUser()`, `session`, `refreshUser()`, `setPendingCode(code|null)` — the invite code survives reloads: sessionStorage on web, AsyncStorage on native), `src/state/settings.ts` (`settings`, `setSetting` — `muted`, `autoDab`), `src/state/invites.ts`, tiny store helper `src/lib/store.ts`.
-- Helpers: `src/lib/links.ts` (`gameLink`, `parseCode`, `openWhatsApp(text, phone?)`, `shareSheet`), `src/lib/speech.ts` (`say`, `hush`), `src/lib/ads.tsx` (`<AdSlot placement>` — renders nothing for now; place only where docs/ADS.md says).
-- Routes (Expo Router, `app/`): `/sign-in`, `/username`, `/(tabs)` (index, games, friends, profile), `/new`, `/prizes`, `/g/[code]` (invite landing → lobby → play → results, chosen in `app/g/[code]/index.tsx`), `/g/[code]/settle`, `/privacy`, `/terms` (public, text in `src/features/legal/` — a draft pending legal review). Route files stay thin; screens live in `src/features/*`.
-- Live game view: `useGame(code, uid)` (`src/features/game/useGame.ts`) subscribes and also refetches when the app returns to the foreground, the tab becomes visible or the browser comes back online; call `resyncGame(code)` to force a fresh copy. A render crash is caught by the boundary in `app/_layout.tsx` ("Something went wrong" / "You’re offline" + "Try again").
-- Money: `formatINR` from `@core/stats.ts`. Accessibility: `accessibilityLabel`/`accessibilityRole` on every pressable.
-- Do not run git commands. Do not edit files outside your assignment except small additive changes to `src/ui/*` (tell the lead).
-- Finish by running `npx tsc --noEmit -p .` and fixing every error in your files.
+## Stack
+- **Next.js 16 (App Router) + React 19 + TypeScript**, deployed on Vercel. ⚠ Next 16 differs from older versions — read `AGENTS.md` and the relevant guide under `node_modules/next/dist/docs/` before using an API (params are async, etc.).
+- Styling: plain CSS. Tokens as CSS variables in `src/app/globals.css` using the README's **OKLCH source values** (exact colours). Components use CSS Modules (needed for media queries / :hover / keyframes); small one-off styles may be inline. No Tailwind, no UI library, no icon library.
+- Fonts: Baloo 2 (500/600/800) and JetBrains Mono (500) via `next/font/google` → CSS variables `--font-baloo`, `--font-mono`. (If the sandbox cannot reach Google Fonts at build time, use `next/font/local` with files from `@fontsource/*` copied into `src/fonts/` — builds must work offline and on Vercel.)
+- Tests: Vitest (`npm test`). E2E checks with Playwright, which is installed globally in the sandbox (`require('playwright')`; `chromium.launch()`; do NOT install it or add it to package.json).
+
+## Architecture (decided)
+```
+src/
+  app/                    routes: / , /host , /host/prizes , /join , /g/[code] , /privacy , /terms , not-found
+    api/games/route.ts            POST create
+    api/games/[code]/route.ts     GET  view for this device
+    api/games/[code]/act/route.ts POST one action
+    api/notify/route.ts           POST "notify me" number
+  components/             design system (Button, Pill, Input, Toggle, Card, Sheet, Toast, Ticket, Board, Ball, Avatar, Logo, SiteHeader, SiteFooter)
+  features/               website/, host/, join/, game/ (Join, Lobby, Live, Results, ClaimSheet, WinBanner, voice)
+  lib/                    client helpers: device token, api client, useGame hook, share links, speech
+  server/                 store adapters (memory | supabase), realtime ping, rate limit, request helpers
+  core/                   pure game logic shared by server and client: data, ticket, patterns, engine, types (+ tests)
+supabase/migrations/      SQL schema
+```
+- **Identity:** a random device token (UUID) created on first visit, kept in `localStorage`, sent as the `x-device-token` header. The server stores only its SHA-256 hash. Host = the token that created the game. Players get a public `pid` (short random id) — tokens never appear in any response.
+- **All reads and writes go through the Next.js API routes** (server-side, Supabase *service role* key). Browsers never talk to the database directly, so every table has RLS enabled with **no policies** (anon can read/write nothing). This is how ticket privacy and host-only actions are enforced; the same pure engine in `src/core` decides every rule.
+- **Store adapter** (`src/server/store`): `memory` (default when Supabase env vars are absent — a process-global Map, so `npm run dev` gives a real multi-device game on the local network with zero setup) and `supabase` (production; needed on Vercel because serverless instances don't share memory). Optimistic concurrency by `version`: load → engine → compare-and-swap commit → retry on conflict (first valid claim wins).
+- **Realtime:** after each commit the server sends a tiny "changed" ping `{v}` on Supabase Realtime Broadcast channel `g:CODE`; browsers (anon key) refetch their view on ping. Polling is always on as a fallback (fast when no realtime, slow when realtime is connected), plus refetch on focus/online/visibility. The ping carries no game data.
+- **View per device:** `GET /api/games/CODE` returns the public game + `you: { role: 'host'|'player'|'visitor', pid?, ticket?, marks? }`. Visitors get the invite info only (host name, game name, player count, ways to win, price).
+- **Auto-call** runs as a timer in the host's browser that calls the draw action (6s default; 4/6/8/10). If the host leaves, calling pauses and resumes when they return.
+- **Expiry:** games are unusable 24h after last activity (treated as not found) and purged by a SQL function.
+- Env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (server only), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (realtime ping only), `NEXT_PUBLIC_SITE_URL` (share links; default from the request origin).
+
+## Conventions
+- Server Components by default; `'use client'` only where needed. Game screens are client components fed by `useGame(code)`.
+- Never import `src/server/*` from client code. `src/core/*` is pure TS (no Node/DOM APIs; `rng` and `now` are passed in).
+- Accessibility: real `<button>`/`<a>`/`<input>` elements with labels; visible focus rings; `aria-live` for toasts and the win banner; respects `prefers-reduced-motion`.
+- Do not run git commands (the lead commits). Stay inside the files assigned to you; shared files need additive, compatible edits only — re-read a file right before editing it.
+- Finish with `npx tsc --noEmit`, `npm run lint`, `npm test`, `npm run build` all passing for your part.

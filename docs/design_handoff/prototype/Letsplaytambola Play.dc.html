@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Letsplaytambola — Host or join a game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:oklch(0.21 0.07 295)}
+a{color:oklch(0.83 0.16 78)}a:hover{color:oklch(0.9 0.12 85)}
+input::placeholder{color:oklch(0.6 0.04 295)}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;background:oklch(0.21 0.07 295);background-image:radial-gradient(ellipse at 0% 0%,oklch(0.3 0.11 340 / .45),transparent 45%);color:oklch(0.97 0.02 85);font-family:'Baloo 2',system-ui,sans-serif;position:relative">
+  <dc-import name="SiteHeader" style="position:sticky;top:0;z-index:15" hint-size="100%,64px"></dc-import>
+  <main style="flex:1;width:100%;box-sizing:border-box">
+
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="max-width:1160px;margin:0 auto;padding:48px 20px 72px;box-sizing:border-box;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:20px;align-items:stretch">
+        <div style="display:flex;flex-direction:column;gap:16px;padding:28px;border-radius:28px;background:oklch(0.27 0.08 295);border:1px solid oklch(0.38 0.07 295)">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:oklch(0.83 0.16 78)">HAVE A CODE?</span>
+          <h1 style="margin:0;font-size:clamp(34px,6vw,48px);line-height:1;font-weight:800">Join a game</h1>
+          <p style="margin:0;font-size:18px;line-height:1.45;color:oklch(0.82 0.03 295)">Type the 5-letter code from your host. Or just tap the link they sent you.</p>
+          <input value="{{ joinCode }}" onChange="{{ onJoinCode }}" placeholder="e.g. K7RQ2" style="height:62px;box-sizing:border-box;padding:0 18px;border-radius:16px;border:1.5px solid oklch(0.38 0.07 295);background:oklch(0.21 0.07 295);color:inherit;font-family:'JetBrains Mono',monospace;font-size:24px;letter-spacing:.16em;text-transform:uppercase">
+          <button onClick="{{ joinByCode }}" style="height:60px;border-radius:18px;border:none;background:oklch(0.97 0.02 85);color:oklch(0.25 0.07 295);font-family:inherit;font-size:20px;font-weight:800;cursor:pointer">Find my game</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;padding:28px;border-radius:28px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295)">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em">FREE · NO SIGN-UP</span>
+          <h2 style="margin:0;font-size:clamp(34px,6vw,48px);line-height:1;font-weight:800">Host your own</h2>
+          <p style="margin:0;font-size:18px;line-height:1.45">Type your name, pick ways to win, share the link on WhatsApp. Everyone else just types their name.</p>
+          <button onClick="{{ goCreate }}" style="margin-top:auto;height:60px;border-radius:18px;border:none;background:oklch(0.25 0.07 295);color:oklch(0.97 0.02 85);font-family:inherit;font-size:20px;font-weight:800;cursor:pointer">Host a game</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isSetup }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:560px;margin:0 auto;padding:20px 20px 0;box-sizing:border-box;display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><button onClick="{{ goHome }}" style="width:44px;height:44px;border-radius:50%;border:none;background:oklch(0.27 0.08 295);color:inherit;font-size:20px;cursor:pointer;font-family:inherit">←</button><span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;color:oklch(0.78 0.04 295)">NEW GAME</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><h1 style="margin:0;font-size:clamp(34px,8vw,48px);line-height:1;font-weight:800">Host a game</h1><span style="font-size:18px;line-height:1.4;color:oklch(0.82 0.03 295)">Takes a minute. No sign-up for you or your players.</span></div>
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:18px;font-weight:800">Your name</span>
+          <input value="{{ name }}" onChange="{{ onName }}" placeholder="e.g. Priya" style="height:60px;box-sizing:border-box;padding:0 18px;border-radius:16px;border:1.5px solid oklch(0.38 0.07 295);background:oklch(0.27 0.08 295);color:inherit;font-family:inherit;font-size:22px;font-weight:600;outline:none">
+          <span style="font-size:15px;color:oklch(0.78 0.04 295)">Players will see “{{ nameShown }} invited you”.</span></label>
+        <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:18px;font-weight:800">Game name</span>
+          <input value="{{ gname }}" onChange="{{ onGname }}" placeholder="e.g. Diwali Night" style="height:60px;box-sizing:border-box;padding:0 18px;border-radius:16px;border:1.5px solid oklch(0.38 0.07 295);background:oklch(0.27 0.08 295);color:inherit;font-family:inherit;font-size:24px;font-weight:800;outline:none">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <sc-for list="{{ nameIdeas }}" as="ni" hint-placeholder-count="4"><button onClick="{{ ni.onClick }}" style="height:40px;padding:0 14px;border-radius:999px;border:1.5px solid {{ ni.border }};background:transparent;color:inherit;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer">{{ ni.label }}</button></sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;border-radius:20px;background:oklch(0.27 0.08 295);overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 12px 12px 16px">
+            <div style="display:flex;flex-direction:column;line-height:1.2;min-width:0"><span style="font-size:18px;font-weight:700">Ticket price <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;color:oklch(0.78 0.04 295)">OPTIONAL</span></span><span style="font-size:14px;color:oklch(0.78 0.04 295)">Collected outside the app</span></div>
+            <div style="display:flex;align-items:center;background:oklch(0.21 0.07 295);border-radius:12px;padding:0 12px;width:120px;height:50px;box-sizing:border-box;flex-shrink:0"><span style="font-weight:800;font-size:20px;color:oklch(0.83 0.16 78)">₹</span><input inputmode="numeric" value="{{ price }}" onChange="{{ onPrice }}" placeholder="0" style="width:100%;min-width:0;font-family:inherit;font-size:22px;font-weight:800;background:transparent;border:none;outline:none;color:oklch(0.97 0.02 85);text-align:right"></div>
+          </div>
+          <button onClick="{{ toggleHostPlays }}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border:none;border-top:1px solid oklch(0.33 0.08 295);background:transparent;color:inherit;font-family:inherit;text-align:left;cursor:pointer">
+            <div style="display:flex;flex-direction:column;line-height:1.2;min-width:0"><span style="font-size:18px;font-weight:700">Deal me a ticket</span><span style="font-size:14px;color:oklch(0.78 0.04 295)">Play while you call numbers</span></div>
+            <span style="width:52px;height:30px;flex-shrink:0;border-radius:999px;background:{{ hpTrack }};display:flex;align-items:center;padding:3px;box-sizing:border-box;justify-content:{{ hpJustify }}"><span style="width:24px;height:24px;border-radius:50%;background:#fff"></span></span>
+          </button>
+          <button onClick="{{ toPrizes }}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border:none;border-top:1px solid oklch(0.33 0.08 295);background:transparent;color:inherit;font-family:inherit;text-align:left;cursor:pointer">
+            <div style="display:flex;flex-direction:column;line-height:1.2;min-width:0"><span style="font-size:18px;font-weight:700">Ways to win</span><span style="font-size:14px;color:oklch(0.78 0.04 295)">{{ prizeSummary }}</span></div>
+            <span style="font-size:16px;font-weight:800;color:oklch(0.83 0.16 78);white-space:nowrap">Change →</span>
+          </button>
+        </div>
+        <div style="position:sticky;bottom:0;margin:0 -20px;padding:14px 20px 22px;background:linear-gradient(oklch(0.21 0.07 295 / 0),oklch(0.21 0.07 295) 30%)">
+          <button onClick="{{ createGame }}" style="width:100%;height:62px;border-radius:18px;border:none;background:{{ createBg }};color:oklch(0.25 0.07 295);font-family:inherit;font-size:21px;font-weight:800;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)">Create game &amp; get link</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isPrizes }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:560px;margin:0 auto;padding:20px 20px 0;box-sizing:border-box;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><button onClick="{{ toSetup }}" style="width:44px;height:44px;border-radius:50%;border:none;background:oklch(0.27 0.08 295);color:inherit;font-size:20px;cursor:pointer;font-family:inherit">←</button><span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;color:oklch(0.78 0.04 295)">WAYS TO WIN</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><h1 style="margin:0;font-size:clamp(32px,8vw,44px);line-height:1;font-weight:800">How can people win?</h1><span style="font-size:18px;line-height:1.4;color:oklch(0.82 0.03 295)">Pick a ready-made set, or tap any pattern to add or remove it.</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <sc-for list="{{ presets }}" as="p" hint-placeholder-count="3">
+            <button onClick="{{ p.onClick }}" style="height:46px;padding:0 18px;border-radius:999px;border:1.5px solid {{ p.border }};background:{{ p.bg }};color:{{ p.fg }};font-family:inherit;font-size:17px;font-weight:700;cursor:pointer">{{ p.label }}</button>
+          </sc-for>
+        </div>
+        <sc-for list="{{ groups }}" as="gr" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:oklch(0.78 0.04 295)">{{ gr.name }}</span>
+            <div style="display:flex;flex-direction:column;border-radius:18px;background:oklch(0.27 0.08 295);overflow:hidden">
+              <sc-for list="{{ gr.items }}" as="it" hint-placeholder-count="3">
+                <button onClick="{{ it.onClick }}" style="display:flex;align-items:center;gap:14px;min-height:60px;padding:10px 16px;border:none;border-top:1px solid oklch(0.33 0.08 295);background:transparent;color:inherit;font-family:inherit;text-align:left;cursor:pointer">
+                  <span style="flex:1;display:flex;flex-direction:column;line-height:1.2;min-width:0"><span style="font-size:18px;font-weight:800">{{ it.label }}</span><span style="font-size:15px;color:oklch(0.78 0.04 295)">{{ it.rule }}</span></span>
+                  <span style="width:30px;height:30px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;border:2px solid {{ it.border }};background:{{ it.boxBg }};color:oklch(0.25 0.07 295);font-weight:800;font-size:16px;box-sizing:border-box">{{ it.tick }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <div style="position:sticky;bottom:0;margin:0 -20px;padding:14px 20px 22px;background:linear-gradient(oklch(0.21 0.07 295 / 0),oklch(0.21 0.07 295) 30%)">
+          <button onClick="{{ toSetup }}" style="width:100%;height:62px;border-radius:18px;border:none;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);font-family:inherit;font-size:21px;font-weight:800;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)">Done · {{ selCount }} picked</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isJoin }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:560px;margin:0 auto;padding:40px 20px 72px;box-sizing:border-box;display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;flex-direction:column;gap:6px;padding:26px;border-radius:26px;background:oklch(0.27 0.08 295);border:1px solid oklch(0.38 0.07 295)">
+          <span style="font-size:18px;color:oklch(0.82 0.03 295)">{{ hostName }} invited you to</span>
+          <span style="font-size:clamp(36px,8vw,48px);line-height:1;font-weight:800;color:oklch(0.83 0.16 78)">{{ gameName }}</span>
+          <span style="font-size:16px;color:oklch(0.78 0.04 295)">{{ joinMeta }}</span>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:19px;font-weight:800">What should we call you?</span>
+          <input value="{{ name }}" onChange="{{ onName }}" placeholder="Your name" style="height:62px;box-sizing:border-box;padding:0 18px;border-radius:16px;border:1.5px solid oklch(0.38 0.07 295);background:oklch(0.27 0.08 295);color:inherit;font-family:inherit;font-size:22px"></label>
+        <button onClick="{{ joinGame }}" style="height:64px;border-radius:18px;border:none;background:{{ joinBg }};color:oklch(0.25 0.07 295);font-family:inherit;font-size:21px;font-weight:800;cursor:pointer">Join game</button>
+        <span style="font-size:15px;line-height:1.4;color:oklch(0.78 0.04 295);text-align:center">No sign-up. Your name is only shown to people in this game.</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isMissing }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:560px;margin:0 auto;padding:64px 20px;box-sizing:border-box;display:flex;flex-direction:column;gap:14px;text-align:center">
+        <span style="font-size:32px;font-weight:800;line-height:1.1">We can’t find game {{ code }}</span>
+        <span style="font-size:18px;color:oklch(0.82 0.03 295)">Check the code with whoever sent you the link.</span>
+        <button onClick="{{ goHome }}" style="height:58px;border-radius:16px;border:none;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);font-family:inherit;font-size:18px;font-weight:800;cursor:pointer">Try another code</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ inGame }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1160px;margin:0 auto;padding:24px 20px 72px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px 20px;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <span style="font-size:16px;color:oklch(0.78 0.04 295)">{{ kicker }}</span>
+            <h1 style="margin:0;font-size:clamp(32px,5vw,48px);line-height:1;font-weight:800">{{ gameName }}</h1>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span style="height:44px;padding:0 16px;border-radius:999px;background:oklch(0.27 0.08 295);display:flex;align-items:center;gap:8px;font-size:15px;color:oklch(0.82 0.03 295)">Code <b style="font-family:'JetBrains Mono',monospace;font-size:17px;color:oklch(0.83 0.16 78);letter-spacing:.08em">{{ code }}</b></span>
+            <button onClick="{{ copyLink }}" style="height:44px;padding:0 16px;border-radius:999px;border:1.5px solid oklch(0.38 0.07 295);background:transparent;color:inherit;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer">Copy link</button>
+            <button onClick="{{ toggleMute }}" style="height:44px;padding:0 16px;border-radius:999px;border:1.5px solid oklch(0.38 0.07 295);background:transparent;color:inherit;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer">{{ muteLabel }}</button>
+          </div>
+        </div>
+
+        <sc-if value="{{ isLobby }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:20px;align-items:start">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <sc-if value="{{ isHost }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;gap:12px;padding:24px;border-radius:26px;background:oklch(0.27 0.08 295);border:1px solid oklch(0.38 0.07 295)">
+                  <span style="font-size:22px;font-weight:800;line-height:1.1">Share this link with everyone</span>
+                  <div style="padding:12px 14px;border-radius:12px;background:oklch(0.21 0.07 295);font-family:'JetBrains Mono',monospace;font-size:13px;color:oklch(0.82 0.03 295);word-break:break-all">{{ link }}</div>
+                  <button onClick="{{ shareWA }}" style="height:60px;border-radius:16px;border:none;background:oklch(0.68 0.16 150);color:#fff;font-family:inherit;font-size:19px;font-weight:800;cursor:pointer">Share on WhatsApp</button>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button onClick="{{ copyLink }}" style="flex:1 1 140px;height:50px;border-radius:999px;border:1.5px solid oklch(0.38 0.07 295);background:transparent;color:inherit;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer">Copy link</button>
+                    <a href="{{ link }}" target="_blank" style="flex:1 1 140px;height:50px;border-radius:999px;border:1.5px solid oklch(0.38 0.07 295);color:inherit;text-decoration:none;font-size:16px;font-weight:700;display:grid;place-items:center">Open as a guest ↗</a>
+                  </div>
+                  <span style="font-size:15px;color:oklch(0.78 0.04 295)">Playing in the same room? Read out the code: <b style="font-family:'JetBrains Mono',monospace;color:oklch(0.83 0.16 78)">{{ code }}</b></span>
+                </div>
+                <button onClick="{{ startGame }}" style="height:64px;border-radius:18px;border:none;background:{{ startBg }};color:oklch(0.25 0.07 295);font-family:inherit;font-size:21px;font-weight:800;cursor:pointer">{{ startLabel }}</button>
+              </sc-if>
+              <sc-if value="{{ notHost }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:20px 22px;border-radius:22px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);font-size:19px;line-height:1.35"><b>You’re in!</b> Waiting for {{ hostName }} to start the game.</div>
+              </sc-if>
+              <sc-if value="{{ hasTicket }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <span style="font-size:17px;font-weight:800">Your ticket</span>
+                  <div style="background:oklch(0.96 0.03 85);border-radius:16px;padding:8px">
+                    <div style="display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:2px;background:oklch(0.25 0.07 295 / .2);border-radius:8px;overflow:hidden">
+                      <sc-for list="{{ cells }}" as="c" hint-placeholder-count="27"><span style="aspect-ratio:1/1.15;display:grid;place-items:center;background:{{ c.bg }};color:oklch(0.25 0.07 295);font-size:clamp(15px,4vw,20px);font-weight:800">{{ c.label }}</span></sc-for>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-size:17px;font-weight:800">Who’s here · {{ playerCount }}</span>
+                <div style="display:flex;flex-direction:column;border-radius:20px;background:oklch(0.27 0.08 295);overflow:hidden">
+                  <sc-for list="{{ players }}" as="pl" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-top:1px solid oklch(0.33 0.08 295)">
+                      <span style="width:40px;height:40px;border-radius:50%;background:{{ pl.color }};color:oklch(0.25 0.07 295);display:grid;place-items:center;font-weight:800;font-size:17px;flex-shrink:0">{{ pl.init }}</span>
+                      <span style="flex:1;font-size:18px;font-weight:600">{{ pl.name }}</span>
+                      <span style="font-size:14px;color:oklch(0.78 0.04 295)">{{ pl.tag }}</span>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ noPlayers }}" hint-placeholder-val="{{ false }}"><div style="padding:16px;font-size:16px;color:oklch(0.78 0.04 295)">No one yet — share the link.</div></sc-if>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-size:17px;font-weight:800">Ways to win</span>
+                <div style="display:flex;flex-direction:column;border-radius:20px;background:oklch(0.27 0.08 295);overflow:hidden">
+                  <sc-for list="{{ prizes }}" as="pr" hint-placeholder-count="4">
+                    <div style="display:flex;justify-content:space-between;gap:10px;padding:10px 14px;border-top:1px solid oklch(0.33 0.08 295)"><span style="font-size:17px;font-weight:800">{{ pr.label }}</span><span style="font-size:14px;color:oklch(0.78 0.04 295);text-align:right">{{ pr.rule }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isGame }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px;align-items:start">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="border-radius:26px;background:oklch(0.27 0.08 295);overflow:hidden">
+                <div style="height:12px;background:radial-gradient(circle,oklch(0.83 0.16 78) 3px,transparent 3.5px) 0 0/18px 12px repeat-x"></div>
+                <div style="padding:20px;display:flex;gap:18px;align-items:center">
+                  <div style="width:116px;height:116px;border-radius:50%;background:oklch(0.68 0.22 358);display:grid;place-items:center;flex-shrink:0;box-shadow:0 0 0 5px oklch(0.83 0.16 78),0 0 50px oklch(0.68 0.22 358 / .5)">
+                    <div style="width:76px;height:76px;border-radius:50%;background:oklch(0.97 0.02 85);color:oklch(0.25 0.07 295);display:grid;place-items:center;font-size:42px;font-weight:800;line-height:1">{{ curNum }}</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:4px;min-width:0;line-height:1.1">
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em;color:oklch(0.83 0.16 78)">{{ countText }}</span>
+                    <span style="font-size:clamp(22px,3vw,28px);font-weight:800;text-wrap:balance">{{ curCall }}</span>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;padding:0 20px 18px;flex-wrap:wrap">
+                  <span style="font-size:14px;color:oklch(0.78 0.04 295)">Before:</span>
+                  <sc-for list="{{ recent }}" as="rc" hint-placeholder-count="4">
+                    <span style="width:40px;height:40px;border-radius:50%;background:oklch(0.33 0.08 295);display:grid;place-items:center;font-size:17px;font-weight:800">{{ rc }}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <sc-if value="{{ isHost }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;gap:8px">
+                  <button onClick="{{ callNext }}" style="flex:1;height:64px;border-radius:18px;border:none;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);font-family:inherit;font-size:20px;font-weight:800;cursor:pointer">Call next number</button>
+                  <button onClick="{{ toggleAuto }}" style="width:120px;height:64px;border-radius:18px;border:1.5px solid {{ autoBorder }};background:{{ autoBg }};color:inherit;font-family:inherit;font-size:16px;font-weight:800;cursor:pointer;line-height:1.1">{{ autoLabel }}</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ hasTicket }}" hint-placeholder-val="{{ true }}">
+                <div style="background:oklch(0.96 0.03 85);color:oklch(0.25 0.07 295);border-radius:20px;overflow:hidden;box-shadow:0 24px 50px -24px rgba(0,0,0,.8)">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px 8px 16px;background:oklch(0.68 0.22 358);color:#fff">
+                    <span style="font-size:19px;font-weight:800;min-width:0">{{ ticketTitle }}</span>
+                    <button onClick="{{ openClaim }}" style="height:46px;padding:0 22px;border-radius:999px;border:none;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);font-family:inherit;font-size:18px;font-weight:800;cursor:pointer;flex-shrink:0">Claim!</button>
+                  </div>
+                  <div style="padding:8px">
+                    <div style="display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:2px;background:oklch(0.25 0.07 295 / .2);border-radius:8px;overflow:hidden">
+                      <sc-for list="{{ cells }}" as="c" hint-placeholder-count="27">
+                        <button onClick="{{ c.onClick }}" style="aspect-ratio:1/1.15;border:none;padding:0;display:grid;place-items:center;background:{{ c.bg }};font-family:inherit;cursor:pointer"><span style="width:86%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:{{ c.dab }};color:{{ c.fg }};font-size:clamp(16px,4.6vw,24px);font-weight:800;line-height:1">{{ c.label }}</span></button>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div style="padding:0 16px 12px;font-size:15px;color:oklch(0.45 0.03 295)">{{ ticketHint }}</div>
+                </div>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-size:17px;font-weight:800">Ways to win</span>
+                <div style="display:flex;flex-direction:column;border-radius:20px;background:oklch(0.27 0.08 295);overflow:hidden">
+                  <sc-for list="{{ prizes }}" as="pr" hint-placeholder-count="4">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-top:1px solid oklch(0.33 0.08 295)">
+                      <span style="display:flex;flex-direction:column;line-height:1.2"><span style="font-size:17px;font-weight:800">{{ pr.label }}</span><span style="font-size:14px;color:oklch(0.78 0.04 295)">{{ pr.rule }}</span></span>
+                      <span style="font-size:16px;font-weight:800;color:{{ pr.winColor }};text-align:right">{{ pr.status }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:20px;background:oklch(0.27 0.08 295)">
+                <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:17px;font-weight:800">The board</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:oklch(0.83 0.16 78)">{{ countText }}</span></div>
+                <div style="display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px">
+                  <sc-for list="{{ board }}" as="b" hint-placeholder-count="90">
+                    <span style="aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:{{ b.bg }};color:{{ b.fg }};font-size:clamp(12px,2.6vw,15px);font-weight:800">{{ b.n }}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-size:17px;font-weight:800">Playing · {{ playerCount }}</span>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <sc-for list="{{ players }}" as="pl" hint-placeholder-count="3">
+                    <span style="display:flex;align-items:center;gap:8px;height:40px;padding:0 14px 0 4px;border-radius:999px;background:oklch(0.27 0.08 295);font-size:16px;font-weight:600"><span style="width:32px;height:32px;border-radius:50%;background:{{ pl.color }};color:oklch(0.25 0.07 295);display:grid;place-items:center;font-weight:800;font-size:15px">{{ pl.init }}</span>{{ pl.name }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:20px;align-items:start">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <span style="font-size:clamp(40px,7vw,64px);line-height:.95;font-weight:800;color:oklch(0.83 0.16 78)">That’s the game!</span>
+              <span style="font-size:17px;line-height:1.45;color:oklch(0.82 0.03 295)">{{ countText }}. Settle any prize money between yourselves — the app never handles payments.</span>
+              <sc-if value="{{ isHost }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ playAgain }}" style="height:64px;border-radius:18px;border:none;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);font-family:inherit;font-size:20px;font-weight:800;cursor:pointer">Play again with same people</button>
+              </sc-if>
+              <sc-if value="{{ notHost }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:16px 18px;border-radius:18px;background:oklch(0.83 0.16 78 / .14);font-size:17px;line-height:1.4">Stay on this page — if {{ hostName }} starts another round, you’ll get a fresh ticket.</div>
+              </sc-if>
+              <button onClick="{{ goCreate }}" style="height:54px;border-radius:16px;border:1.5px solid oklch(0.38 0.07 295);background:transparent;color:inherit;font-family:inherit;font-size:17px;font-weight:700;cursor:pointer">Host my own game</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:17px;font-weight:800">Winners</span>
+              <div style="display:flex;flex-direction:column;border-radius:20px;background:oklch(0.27 0.08 295);overflow:hidden">
+                <sc-for list="{{ prizes }}" as="pr" hint-placeholder-count="4">
+                  <div style="display:flex;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid oklch(0.33 0.08 295)"><span style="font-size:18px;font-weight:600">{{ pr.label }}</span><span style="font-size:18px;font-weight:800;color:{{ pr.winColor }}">{{ pr.status }}</span></div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+  </main>
+  <dc-import name="SiteFooter" hint-size="100%,120px"></dc-import>
+
+  <sc-if value="{{ claimOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeSheets }}" style="position:fixed;inset:0;background:rgba(10,6,16,.65);z-index:20;display:flex;align-items:flex-end;justify-content:center">
+      <div onClick="{{ stop }}" style="width:100%;max-width:560px;max-height:85vh;overflow-y:auto;box-sizing:border-box;background:oklch(0.97 0.02 85);color:oklch(0.25 0.07 295);border-radius:28px 28px 0 0;padding:14px 18px 26px;display:flex;flex-direction:column;gap:10px">
+        <div style="width:40px;height:4px;border-radius:2px;background:oklch(0.85 0.02 85);align-self:center"></div>
+        <span style="font-size:26px;font-weight:800;line-height:1">What are you claiming?</span>
+        <span style="font-size:16px;color:oklch(0.45 0.03 295)">We’ll check your ticket instantly.</span>
+        <sc-for list="{{ openPrizes }}" as="op" hint-placeholder-count="3">
+          <button onClick="{{ op.onClick }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:60px;padding:10px 16px;border-radius:16px;border:1.5px solid oklch(0.88 0.03 85);background:#fff;color:inherit;font-family:inherit;text-align:left;cursor:pointer"><span style="font-size:19px;font-weight:800">{{ op.label }}</span><span style="font-size:15px;color:oklch(0.45 0.03 295)">{{ op.rule }}</span></button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasWin }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;top:92px;transform:translateX(-50%);z-index:30;width:min(92vw,480px);box-sizing:border-box;padding:18px 20px;border-radius:22px;background:oklch(0.83 0.16 78);color:oklch(0.25 0.07 295);box-shadow:0 30px 60px -20px rgba(0,0,0,.7);text-align:center;display:flex;flex-direction:column;gap:2px">
+      <span style="font-size:28px;font-weight:800;line-height:1.05">{{ winTitle }}</span>
+      <span style="font-size:16px">{{ winSub }}</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:40;max-width:90vw;padding:12px 20px;border-radius:999px;background:oklch(0.97 0.02 85);color:oklch(0.25 0.07 295);font-size:17px;font-weight:600;box-shadow:0 16px 40px -12px rgba(0,0,0,.6)">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;markMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;tap&quot;,&quot;auto&quot;],&quot;default&quot;:&quot;tap&quot;,&quot;tsType&quot;:&quot;'tap'|'auto'&quot;},&quot;autoSeconds&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;4&quot;,&quot;6&quot;,&quot;8&quot;,&quot;10&quot;],&quot;default&quot;:&quot;6&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showRhymes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  static CALLS = ["Kelly's eye","One little duck","Cup of tea","Knock at the door","Man alive","Pick up sticks","Lucky seven, straight to heaven","Close the garden gate","Doctor's orders","Big fat hen","Legs eleven","One dozen, call your cousin","Unlucky for some","Valentine's day","Young and keen","Sweet sixteen","Dancing queen","Voting age, take the stage","Goodbye teens","Plenty twenty","Key of the door","Two little ducks, quack quack","You and me","Two dozen","Duck and dive","Pick and mix","Gateway to heaven","In a state","Rise and shine","Flirty thirty","Get up and run","Buckle my shoe","All the threes, buzzing bees","Ask for more","Jump and jive","Three dozen","A flea in heaven","Christmas cake","Thirty-nine steps","Naughty forty","Life's begun at forty-one","Quit India movement","Down on your knees","All the fours, shut the doors","Halfway there","Up to tricks","Year of Independence","Four dozen","Rain or shine, forty-nine","Half a century","Tweak of the thumb","Deck of cards","Stuck in a tree","Clean the floor","Snakes alive, all the fives","Mixed up tricks","Mutiny year","Make them wait","Fifty-nine, feeling fine","Five dozen, senior citizen","Baker's bun","Tickety-boo","Tickle me","When I'm sixty-four","Old age pension","Clickety click","Made in heaven","Saving grace","Either way up","Three score and ten","Bang on the drum","Six dozen, lucky cousin","Queen bee, under the tree","Candy store","Diamond jubilee","Trombones","All the sevens, double heaven","Heaven's gate","One more time","Gandhi's breakfast, ate nothing","Stop and run","Straight on through","Time for tea","Seven dozen","Staying alive","Between the sticks","Nearly heaven","Two fat ladies","Nearly there","Top of the house"];
+  static RULES = [
+    ['early5', 'Early Five', 'Quick', 'Any 5 numbers'], ['early7', 'Early Seven', 'Quick', 'Any 7 numbers'], ['early9', 'Early Nine', 'Quick', 'Any 9 numbers'],
+    ['lucky3', 'Lucky Three', 'Quick', '3 of the first 5 numbers called'], ['laddoo', 'Laddoo', 'Quick', 'Centre number of the middle line'], ['temp', 'Temperature / BP', 'Quick', 'Smallest and biggest number on the ticket'],
+    ['top', 'Top Line', 'Lines', 'All 5 numbers of the top line'], ['middle', 'Middle Line', 'Lines', 'All 5 numbers of the middle line'], ['bottom', 'Bottom Line', 'Lines', 'All 5 numbers of the bottom line'], ['railway', 'Railway Lines', 'Lines', 'First and last column (1–9 and 80–90)'], ['bamboo', 'Bamboo', 'Lines', 'All numbers in the 40s'],
+    ['corners', 'Four Corners', 'Corners', 'First & last of top and bottom lines'], ['star', 'Star', 'Corners', 'Four corners + centre'], ['six', 'Six Corners', 'Corners', 'First & last of every line'], ['kings', 'King’s Corner', 'Corners', 'First number of each line'], ['queens', 'Queen’s Corner', 'Corners', 'Last number of each line'],
+    ['pyramid', 'Pyramid', 'Shapes', '1 top, 2 middle, 3 bottom — a triangle'], ['rpyramid', 'Reverse Pyramid', 'Shapes', '3 top, 2 middle, 1 bottom'], ['diamond', 'Diamond', 'Shapes', 'Centre top & bottom + ends of middle'], ['one24', '1-2 ka 4', 'Shapes', '1st of top, 2 of middle, 4 of bottom'],
+    ['breakfast', 'Breakfast', 'Number ranges', 'Every number from 1–29'], ['lunch', 'Lunch', 'Number ranges', 'Every number from 30–59'], ['dinner', 'Dinner', 'Number ranges', 'Every number from 60–90'], ['day', 'Devrani (Day)', 'Number ranges', 'Every number from 1–45'], ['night', 'Jethani (Night)', 'Number ranges', 'Every number from 46–90'],
+    ['full', 'Full House', 'Full ticket', 'All 15 numbers — add again for Second House']];
+  static PRESETS = [['Classic', ['early5', 'top', 'middle', 'bottom', 'corners', 'full']], ['Lines + House', ['top', 'middle', 'bottom', 'full']], ['Just Full House', ['full']]];
+  static AV = ['oklch(0.68 0.22 358)', 'oklch(0.83 0.16 78)', 'oklch(0.8 0.13 180)', 'oklch(0.75 0.14 260)', 'oklch(0.8 0.15 140)', 'oklch(0.75 0.15 30)'];
+
+  state = { screen: 'home', gid: null, game: null, name: localStorage.getItem('lpt:name') || '', gname: 'Tambola Night', sel: Component.PRESETS[0][1].slice(), showAll: false, hostPlays: true, joinCode: '', step: 'setup', price: '', claimOpen: false, boardOpen: false, toast: '', muted: localStorage.getItem('lpt:muted') === '1' };
+
+  componentDidMount() {
+    const qp = new URLSearchParams(location.search);
+    this.pid = qp.get('pid') || sessionStorage.getItem('lpt:pid') || Math.random().toString(36).slice(2, 10);
+    if (!qp.get('pid')) sessionStorage.setItem('lpt:pid', this.pid);
+    if (qp.get('mute')) this.state.muted = true;
+    if (qp.get('name') !== null) this.state.name = qp.get('name');
+    this.onHash = () => { const h = location.hash, m = h.match(/g=([A-Z0-9]+)/i); if (!m) this.setState({ screen: /host/.test(h) ? 'create' : 'home', step: /prizes/.test(h) ? 'prizes' : 'setup' }); this.open(m ? m[1].toUpperCase() : null); };
+    this.onStorage = e => { if (this.state.gid && e.key === this.key(this.state.gid)) this.refresh(); };
+    window.addEventListener('hashchange', this.onHash); window.addEventListener('storage', this.onStorage);
+    try { this.bc = new BroadcastChannel('lpt'); this.bc.onmessage = e => { if (e.data === this.state.gid) this.refresh(); }; } catch (e) {}
+    this.poll = setInterval(() => this.state.gid ? this.refresh(true) : null, 1500);
+    if (window.speechSynthesis) speechSynthesis.getVoices();
+    this.onHash();
+  }
+  componentWillUnmount() { window.removeEventListener('hashchange', this.onHash); window.removeEventListener('storage', this.onStorage); clearInterval(this.poll); clearInterval(this.autoT); this.bc && this.bc.close(); }
+  key(id) { return 'lpt:g:' + id; }
+  read(id) { try { return JSON.parse(localStorage.getItem(this.key(id))); } catch (e) { return null; } }
+  write(g) { localStorage.setItem(this.key(g.id), JSON.stringify(g)); this.bc && this.bc.postMessage(g.id); }
+  open(gid) {
+    const g = gid ? this.read(gid) : null;
+    this.seen = g ? g.called.length : 0; this.seenSeq = g ? g.seq || 0 : 0;
+    this.setState({ gid, game: g, claimOpen: false, boardOpen: false }, () => this.syncAuto());
+  }
+  refresh(tick) {
+    const g = this.read(this.state.gid);
+    if (JSON.stringify(g) === JSON.stringify(this.state.game)) { if (tick) this.forceUpdate(); return; }
+    this.setState({ game: g }, () => this.after(g));
+  }
+  update(fn) { const g = JSON.parse(JSON.stringify(this.read(this.state.gid))); if (!g) return; fn(g); this.write(g); this.setState({ game: g }, () => this.after(g)); }
+  after(g) {
+    if (!g) return;
+    if (g.called.length > this.seen) this.speakNum(g.called[g.called.length - 1]);
+    this.seen = g.called.length;
+    const wins = (g.feed || []).filter(f => f.kind === 'win' && f.seq > this.seenSeq);
+    if (wins.length) { const w = wins[wins.length - 1]; setTimeout(() => this.say(`${w.who} wins ${w.label}!`), 1200); }
+    this.seenSeq = g.seq || 0;
+    this.syncAuto();
+  }
+  feed(g, item) { g.seq = (g.seq || 0) + 1; g.feed = [...(g.feed || []), { ...item, seq: g.seq, at: Date.now() }].slice(-30); }
+  flash(t) { clearTimeout(this.tt); this.setState({ toast: t }); this.tt = setTimeout(() => this.setState({ toast: '' }), 2400); }
+  setHash(gid) { history.replaceState(null, '', location.pathname + location.search + (gid === 'host' ? '#host' : gid ? '#g=' + gid : '#join')); }
+  isHost() { return this.state.game && this.state.game.hostPid === this.pid; }
+  syncAuto() {
+    const g = this.state.game, on = g && this.isHost() && g.status === 'live' && g.auto;
+    const ms = (Number(this.props.autoSeconds) || 6) * 1000;
+    if (on && this.autoMs !== ms) { clearInterval(this.autoT); this.autoT = setInterval(() => this.callNext(), ms); this.autoMs = ms; }
+    if (!on) { clearInterval(this.autoT); this.autoT = null; this.autoMs = null; }
+  }
+  say(text, cut) {
+    if (this.state.muted || !window.speechSynthesis) return;
+    const u = new SpeechSynthesisUtterance(text), vs = speechSynthesis.getVoices();
+    u.voice = vs.find(v => v.lang === 'en-IN') || vs.find(v => /^en/.test(v.lang)) || null; u.rate = 0.95; u.pitch = 1.15;
+    if (cut) speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }
+  speakNum(n) { const d = n < 10 ? `Single number, ${n}` : `${Math.floor(n / 10)} and ${n % 10}, ${n}`; this.say((this.props.showRhymes === false ? '' : Component.CALLS[n - 1] + '! ... ') + d, true); }
+
+  genTicket() {
+    for (;;) {
+      const counts = Array(9).fill(1); let extra = 6;
+      while (extra) { const c = Math.floor(Math.random() * 9); if (counts[c] < 3) { counts[c]++; extra--; } }
+      const rows = [0, 0, 0], g = [0, 1, 2].map(() => Array(9).fill(0));
+      const order = [...Array(9).keys()].map(c => [c, Math.random()]).sort((a, b) => counts[b[0]] - counts[a[0]] || a[1] - b[1]).map(x => x[0]);
+      let fail = false;
+      for (const c of order) {
+        const avail = [0, 1, 2].filter(r => rows[r] < 5).map(r => [r, Math.random()]).sort((a, b) => rows[a[0]] - rows[b[0]] || a[1] - b[1]).map(x => x[0]);
+        if (avail.length < counts[c]) { fail = true; break; }
+        avail.slice(0, counts[c]).forEach(r => { g[r][c] = 1; rows[r]++; });
+      }
+      if (fail || !rows.every(x => x === 5)) continue;
+      for (let c = 0; c < 9; c++) {
+        const lo = c === 0 ? 1 : c * 10, hi = c === 8 ? 90 : c * 10 + 9, pool = [];
+        for (let n = lo; n <= hi; n++) pool.push(n);
+        const pick = []; while (pick.length < counts[c]) pick.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+        pick.sort((a, b) => a - b);
+        let i = 0; for (let r = 0; r < 3; r++) if (g[r][c]) g[r][c] = pick[i++];
+      }
+      return g;
+    }
+  }
+  marksOf(p, called) { const cs = new Set(called); return new Set(this.props.markMode === 'auto' ? p.ticket.flat().filter(n => n && cs.has(n)) : p.marks.filter(n => cs.has(n))); }
+  check(p, rule, called) {
+    const v = this.marksOf(p, called), rows = p.ticket.map(r => r.filter(Boolean)), nums = rows.flat(), all = a => a.length > 0 && a.every(n => n && v.has(n));
+    const col = c => p.ticket.map(r => r[c]).filter(Boolean), range = (lo, hi) => nums.filter(n => n >= lo && n <= hi), c4 = [rows[0][0], rows[0][4], rows[2][0], rows[2][4]];
+    switch (rule) {
+      case 'early5': return v.size >= 5; case 'early7': return v.size >= 7; case 'early9': return v.size >= 9;
+      case 'lucky3': { const f = called.slice(0, 5); return nums.filter(n => f.includes(n) && v.has(n)).length >= 3; }
+      case 'laddoo': return all([rows[1][2]]);
+      case 'temp': return all([Math.min(...nums), Math.max(...nums)]);
+      case 'top': return all(rows[0]); case 'middle': return all(rows[1]); case 'bottom': return all(rows[2]);
+      case 'railway': return all([...col(0), ...col(8)]); case 'bamboo': return all(range(40, 49));
+      case 'corners': return all(c4); case 'star': return all([...c4, rows[1][2]]);
+      case 'six': return all(rows.flatMap(r => [r[0], r[4]])); case 'kings': return all(rows.map(r => r[0])); case 'queens': return all(rows.map(r => r[4]));
+      case 'pyramid': return all([rows[0][2], rows[1][1], rows[1][3], rows[2][1], rows[2][2], rows[2][3]]);
+      case 'rpyramid': return all([rows[0][1], rows[0][2], rows[0][3], rows[1][1], rows[1][3], rows[2][2]]);
+      case 'diamond': return all([rows[0][2], rows[1][0], rows[1][4], rows[2][2]]);
+      case 'one24': return all([rows[0][0], rows[1][0], rows[1][1], rows[2][0], rows[2][1], rows[2][2], rows[2][3]]);
+      case 'breakfast': return all(range(1, 29)); case 'lunch': return all(range(30, 59)); case 'dinner': return all(range(60, 90));
+      case 'day': return all(range(1, 45)); case 'night': return all(range(46, 90));
+      case 'full': return v.size === 15;
+    }
+    return false;
+  }
+  rule(id) { return Component.RULES.find(r => r[0] === id) || [id, id, '', '']; }
+  saveName(n) { localStorage.setItem('lpt:name', n.trim()); }
+
+  createGame = () => {
+    const s = this.state, name = s.name.trim();
+    if (!name) return this.flash('Type your name first');
+    if (!s.sel.length) return this.flash('Pick at least one way to win');
+    const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let id; do { id = Array.from({ length: 5 }, () => A[Math.floor(Math.random() * A.length)]).join(''); } while (this.read(id));
+    const g = { id, price: Number(s.price) || 0, name: s.gname.trim() || 'Tambola Night', hostPid: this.pid, hostName: name, status: 'lobby', called: [], auto: 0, seq: 0, feed: [],
+      players: s.hostPlays ? [{ pid: this.pid, name, color: Component.AV[0], ticket: this.genTicket(), marks: [] }] : [],
+      prizes: s.sel.map(r => ({ id: r, label: this.rule(r)[1], rule: r, winner: null })) };
+    this.saveName(name); this.write(g); this.setHash(id); this.open(id);
+  };
+  joinGame = () => {
+    const name = this.state.name.trim(); if (!name) return this.flash('Type your name to join');
+    this.saveName(name);
+    this.update(g => { if (g.players.some(p => p.pid === this.pid)) return; g.players.push({ pid: this.pid, name, color: Component.AV[g.players.length % 6], ticket: this.genTicket(), marks: [] }); this.feed(g, { kind: 'info', text: name + ' joined' }); });
+    this.flash('You’re in — ticket dealt!');
+  };
+  callNext = () => {
+    const g = this.read(this.state.gid); if (!g || g.status !== 'live') return;
+    const left = []; for (let n = 1; n <= 90; n++) if (!g.called.includes(n)) left.push(n);
+    if (!left.length) return;
+    this.update(x => { x.called.push(left[Math.floor(Math.random() * left.length)]); if (x.called.length === 90) { x.status = 'done'; x.auto = 0; } });
+  };
+  claim(pid) {
+    const g = this.read(this.state.gid), me = g && g.players.find(p => p.pid === this.pid), pr = g && g.prizes.find(p => p.id === pid);
+    this.setState({ claimOpen: false });
+    if (!pr || !me) return;
+    if (pr.winner) return this.flash(`${pr.winner} already won ${pr.label}`);
+    if (!this.check(me, pr.rule, g.called)) return this.flash(`Not yet for ${pr.label} — keep playing!`);
+    this.update(x => { const p = x.prizes.find(q => q.id === pid); if (p.winner) return; p.winner = me.name; this.feed(x, { kind: 'win', who: me.name, label: p.label }); if (x.prizes.every(q => q.winner)) { x.status = 'done'; x.auto = 0; } });
+  }
+  mark(n) {
+    const g = this.state.game; if (!n || !g || g.status !== 'live') return;
+    if (this.props.markMode === 'auto') return this.flash('Numbers are marked for you');
+    if (!g.called.includes(n)) return this.flash(`${n} hasn’t been called yet`);
+    this.update(x => { const p = x.players.find(q => q.pid === this.pid); p.marks = p.marks.includes(n) ? p.marks.filter(m => m !== n) : [...p.marks, n]; });
+  }
+
+  renderVals() {
+    const s = this.state, g = s.game, pid = this.pid, host = this.isHost(), me = g && g.players.find(p => p.pid === pid);
+    const ink = 'oklch(0.25 0.07 295)', mari = 'oklch(0.83 0.16 78)', pink = 'oklch(0.68 0.22 358)', line = 'oklch(0.38 0.07 295)', muted = 'oklch(0.78 0.04 295)', dim = 'oklch(0.5 0.08 295)';
+    const view = !s.gid ? s.screen : !g ? 'missing' : (!me && !host) ? 'join' : g.status;
+    const called = g ? g.called : [], cs = new Set(called), last = called[called.length - 1];
+    const out = {
+      isHome: view === 'home', isSetup: view === 'create' && s.step !== 'prizes', isPrizes: view === 'create' && s.step === 'prizes', isJoin: view === 'join', isMissing: view === 'missing', isLobby: view === 'lobby', isGame: view === 'live', isDone: view === 'done', inGame: ['lobby', 'live', 'done'].includes(view),
+      hasCode: !!s.gid, code: s.gid || '', isHost: host, notHost: !host,
+      muteLabel: s.muted ? 'Sound off' : 'Sound on',
+      toggleMute: () => { const m = !s.muted; localStorage.setItem('lpt:muted', m ? '1' : '0'); if (m && window.speechSynthesis) speechSynthesis.cancel(); this.setState({ muted: m }); },
+      goHome: () => { this.setHash(null); this.setState({ screen: 'home', gid: null, game: null }, () => this.syncAuto()); },
+      goCreate: () => { this.setHash('host'); window.scrollTo(0, 0); this.state.step = 'setup'; this.setState({ screen: 'create', gid: null, game: null }, () => this.syncAuto()); },
+      joinCode: s.joinCode, onJoinCode: e => this.setState({ joinCode: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) }),
+      joinByCode: () => { const c = s.joinCode.trim(); if (!c) return this.flash('Type the game code'); this.setHash(c); this.open(c); },
+      name: s.name, onName: e => this.setState({ name: e.target.value.slice(0, 24) }),
+      gname: s.gname, onGname: e => this.setState({ gname: e.target.value.slice(0, 32) }),
+      selCount: s.sel.length, nameShown: s.name.trim() || 'Priya',
+      price: s.price, onPrice: e => this.setState({ price: e.target.value.replace(/\D/g, '').slice(0, 5) }),
+      nameIdeas: ['Kitty Party', 'Diwali Night', 'Family Sunday', 'Teej Special'].map(l => ({ label: l, border: s.gname === l ? 'oklch(0.83 0.16 78)' : 'oklch(0.38 0.07 295)', onClick: () => this.setState({ gname: l }) })),
+      prizeSummary: (() => { const pr = Component.PRESETS.find(([, ids]) => ids.length === s.sel.length && ids.every(i => s.sel.includes(i))); return (pr ? pr[0] : 'Your own mix') + ' · ' + s.sel.length + (s.sel.length === 1 ? ' way' : ' ways'); })(),
+      toPrizes: () => { history.replaceState(null, '', location.pathname + location.search + '#host/prizes'); window.scrollTo(0, 0); this.setState({ step: 'prizes' }); },
+      toSetup: () => { if (!s.sel.length) return this.flash('Pick at least one way to win'); history.replaceState(null, '', location.pathname + location.search + '#host'); window.scrollTo(0, 0); this.setState({ step: 'setup' }); }, showAll: s.showAll, allLabel: s.showAll ? 'Hide the full list' : 'See all 26 ways to win',
+      toggleAll: () => this.setState({ showAll: !s.showAll }),
+      hpTrack: s.hostPlays ? 'oklch(0.68 0.16 150)' : line, hpJustify: s.hostPlays ? 'flex-end' : 'flex-start',
+      toggleHostPlays: () => this.setState({ hostPlays: !s.hostPlays }),
+      createBg: s.name.trim() && s.sel.length ? mari : dim, createGame: this.createGame,
+      toast: s.toast, hasToast: !!s.toast, stop: e => e.stopPropagation(),
+      closeSheets: () => this.setState({ claimOpen: false, boardOpen: false }),
+      claimOpen: s.claimOpen && view === 'live', boardOpen: s.boardOpen && view === 'live',
+    };
+    out.presets = Component.PRESETS.map(([label, ids]) => { const on = ids.length === s.sel.length && ids.every(i => s.sel.includes(i)); return { label, bg: on ? mari : 'transparent', fg: on ? ink : 'inherit', border: on ? mari : line, onClick: () => this.setState({ sel: ids.slice() }) }; });
+    out.selRows = s.sel.map(id => { const r = this.rule(id); return { label: r[1], rule: r[3] }; });
+    const gnames = [...new Set(Component.RULES.map(r => r[2]))];
+    out.groups = gnames.map(name => ({ name, items: Component.RULES.filter(r => r[2] === name).map(r => { const on = s.sel.includes(r[0]); return { label: r[1], rule: r[3], tick: on ? '✓' : '', boxBg: on ? mari : 'transparent', border: on ? mari : line, onClick: () => this.setState(st => ({ sel: on ? st.sel.filter(x => x !== r[0]) : [...st.sel, r[0]] })) }; }) }));
+    if (!g) return out;
+
+    const link = location.href.split('#')[0] + '#g=' + g.id;
+    Object.assign(out, {
+      gameName: g.name, hostName: g.hostName, link,
+      joinMeta: `${g.players.length} ${g.players.length === 1 ? 'person' : 'people'} in · ${g.prizes.length} ways to win` + (g.price ? ` · ₹${g.price} ticket, pay ${g.hostName} directly` : '') + (g.status === 'live' ? ' · already playing' : ''),
+      joinBg: s.name.trim() ? mari : dim, joinGame: this.joinGame,
+      kicker: host ? 'You’re hosting' : `${g.hostName}’s game`,
+      playerCount: g.players.length, noPlayers: !g.players.length,
+      players: g.players.map(p => ({ name: p.name, init: p.name.trim()[0].toUpperCase(), color: p.color, tag: [p.pid === g.hostPid ? 'host' : '', p.pid === pid ? 'you' : ''].filter(Boolean).join(' · ') })),
+      shareWA: () => window.open('https://wa.me/?text=' + encodeURIComponent(`Join my Tambola game “${g.name}”! Tap the link, type your name and you’re in:\n${link}`), '_blank', 'noopener'),
+      copyLink: () => { (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(() => this.flash('Link copied'), () => this.flash('Copy: ' + link)); },
+      startBg: g.players.length ? mari : dim, startLabel: g.players.length ? 'Start the game' : 'Waiting for players…',
+      startGame: () => { if (!g.players.length) return this.flash('Share the link — no one has joined yet'); this.update(x => { x.status = 'live'; this.feed(x, { kind: 'info', text: 'Game started' }); }); },
+      curNum: last || '–', curCall: last ? (this.props.showRhymes === false ? `Number ${last}` : Component.CALLS[last - 1]) : (host ? 'Tap “Call next number” to begin' : `Waiting for ${g.hostName} to call`),
+      countText: `${called.length} OF 90 CALLED`,
+      recent: called.slice(-6, -1).reverse(),
+      openBoard: () => this.setState({ boardOpen: true }),
+      board: Array.from({ length: 90 }, (_, i) => { const n = i + 1, on = cs.has(n); return { n, bg: n === last ? pink : on ? mari : 'oklch(0.21 0.07 295)', fgx: 0, fg: on ? ink : 'oklch(0.6 0.04 295)' }; }),
+      callNext: this.callNext,
+      toggleAuto: () => this.update(x => { x.auto = x.auto ? 0 : 1; }),
+      autoLabel: g.auto ? 'Auto on · Stop' : 'Auto call', autoBg: g.auto ? 'oklch(0.68 0.16 150 / .25)' : 'transparent', autoBorder: g.auto ? 'oklch(0.68 0.16 150)' : line,
+      prizes: g.prizes.map(p => ({ label: p.label, rule: this.rule(p.rule)[3], status: p.winner ? p.winner + (p.winner === (me && me.name) ? ' (you)' : '') : 'Open', winColor: p.winner ? mari : muted })),
+      openPrizes: g.prizes.filter(p => !p.winner).map(p => ({ label: p.label, rule: this.rule(p.rule)[3], onClick: () => this.claim(p.id) })),
+      playersLine: `${g.players.length} playing · share code ${g.id} to add more`,
+      playAgain: () => this.update(x => { x.status = 'lobby'; x.called = []; x.auto = 0; x.prizes.forEach(p => { p.winner = null; }); x.players.forEach(p => { p.ticket = this.genTicket(); p.marks = []; }); this.feed(x, { kind: 'info', text: 'New round' }); }),
+    });
+    out.hasTicket = !!me;
+    if (me) {
+      const mk = this.marksOf(me, called), auto = this.props.markMode === 'auto';
+      out.ticketTitle = me.name + '’s ticket';
+      out.cells = me.ticket.flat().map(n => ({ label: n || '', bg: n ? 'oklch(0.96 0.03 85)' : 'repeating-linear-gradient(45deg,oklch(0.9 0.06 80) 0 4px,oklch(0.95 0.03 85) 4px 8px)', dab: mk.has(n) ? pink : 'transparent', fg: mk.has(n) ? '#fff' : ink, onClick: () => this.mark(n) }));
+      out.ticketHint = auto ? 'Called numbers are marked for you. Tap Claim when you have a pattern.' : 'Tap a number when it’s called. Tap Claim when you have a pattern.';
+      out.openClaim = () => this.setState({ claimOpen: true });
+    } else out.cells = [];
+    const w = (g.feed || []).filter(f => f.kind === 'win').pop();
+    out.hasWin = !!w && Date.now() - w.at < 5000;
+    if (w) { out.winTitle = `${w.who} wins ${w.label}!`; out.winSub = 'Checked and confirmed ✓'; }
+    return out;
+  }
+}
+</script>
+</body>
+</html>
