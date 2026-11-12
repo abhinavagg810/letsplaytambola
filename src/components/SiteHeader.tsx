@@ -30,7 +30,7 @@ export function SiteHeader() {
   return (
     <header className={styles.header}>
       <div className={styles.bar}>
-        <Link href="/" className={styles.home} aria-label="Letsplaytambola home" onClick={close}>
+        <Link href="/" className={styles.home} onClick={close}>
           <Logo size={30} />
         </Link>
         <nav className={styles.wide} aria-label="Main">
