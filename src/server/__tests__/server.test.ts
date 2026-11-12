@@ -166,18 +166,14 @@ describe('game service on the memory store', () => {
     const { code } = await must(createGameForDevice(HOST, { hostName: 'Priya', prizes: ['full'] }, deps));
     let failures = 2;
     let commits = 0;
-    const flaky: GameStore = {
-      kind: 'memory',
-      create: (g, rng) => store.create(g, rng),
-      load: (c) => store.load(c),
-      touch: (c) => store.touch(c),
-      saveNotifyNumber: (p) => store.saveNotifyNumber(p),
+    // The real store with only `commit` replaced.
+    const flaky: GameStore = Object.assign(Object.create(store) as GameStore, {
       commit: async (c: string, v: number, w: CommitWrite) => {
         commits++;
-        if (failures > 0) { failures--; return 'conflict'; }
+        if (failures > 0) { failures--; return 'conflict' as const; }
         return store.commit(c, v, w);
       },
-    };
+    });
     const ok = await must(actOnGame(code, HOST, { type: 'start' }, { ...deps, store: flaky }));
     expect(commits).toBe(3);
     expect(ok.game.status).toBe('live');

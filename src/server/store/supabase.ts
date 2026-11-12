@@ -4,8 +4,15 @@ import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { GAME_TTL_MS, genCode } from '@/core';
 import type { GameDoc, Ticket } from '@/core';
-import { CodeSpaceError } from './types';
-import type { CommitWrite, GameStore, NewGame, PlayerWrite, StoredGame } from './types';
+import { ADMIN_MAX_PAGE, ADMIN_MAX_RANGE_ROWS, ADMIN_RETENTION_DAYS, CodeSpaceError } from './types';
+import type {
+  AdminGameFilter, AdminGamePage, AdminGameQuery, AdminGameRow, AdminNotifyRow,
+  CommitWrite, GameStore, NewGame, PlayerWrite, StoredGame,
+} from './types';
+
+/** The purge also runs from the app (at most this often per server instance), so it does not depend on pg_cron. */
+const PURGE_EVERY_MS = 60 * 60_000;
+const iso = (ms: number | undefined): string | null => (ms === undefined ? null : new Date(ms).toISOString());
 
 /** Postgres SQLSTATEs we act on. */
 const SERIALIZATION_FAILURE = '40001'; // raised by commit_game on a version / rev conflict
@@ -36,6 +43,7 @@ const playerJson = (w: PlayerWrite) => ({
 export class SupabaseStore implements GameStore {
   readonly kind = 'supabase' as const;
   private readonly db: SupabaseClient;
+  private lastPurge = 0;
 
   constructor(url: string, serviceRoleKey: string) {
     this.db = createClient(url, serviceRoleKey, {
@@ -54,8 +62,11 @@ export class SupabaseStore implements GameStore {
         p_players: game.players.map(playerJson),
         p_host_token_hash: game.hostTokenHash,
       });
-      if (!error) return code;
-      if (error.code === UNIQUE_VIOLATION) continue; // code in use by an active game: try another
+      if (!error) {
+        await this.purgeIfDue();
+        return code;
+      }
+      if (error.code === UNIQUE_VIOLATION) continue; // code in use by an active or a retained game: try another
       throw new Error(`commit_game (create) failed: ${error.code ?? ''} ${error.message}`);
     }
     throw new CodeSpaceError('no free game code');
@@ -71,7 +82,9 @@ export class SupabaseStore implements GameStore {
     const row = game.data;
     if (!row) return null;
     const updatedAt = Date.parse(row.updated_at);
-    // Expired games are treated as gone even before purge_expired_games() removes them.
+    // Expired games are treated as gone, whether or not purge_expired_games() has erased their tickets yet.
+    // (Their rows are retained for the admin's statistics; nothing in the public app reads them. The purge
+    // never moves updated_at, and commit_game refuses expired or erased games, so an expired game stays expired.)
     if (!Number.isFinite(updatedAt) || Date.now() - updatedAt > GAME_TTL_MS) return null;
     // The two reads are not one snapshot. That is safe: every write re-checks the game version
     // (and each player row's rev) inside commit_game, so a stale mix can only cause a retry.
@@ -97,7 +110,9 @@ export class SupabaseStore implements GameStore {
   }
 
   async touch(code: string): Promise<void> {
-    const { error } = await this.db.from('games').update({ updated_at: new Date().toISOString() }).eq('code', code);
+    // Only a game that is still active can be touched: an expired one must stay expired.
+    const { error } = await this.db.from('games').update({ updated_at: new Date().toISOString() })
+      .eq('code', code).gte('updated_at', new Date(Date.now() - GAME_TTL_MS).toISOString());
     if (error) throw new Error(`touch failed: ${error.code ?? ''} ${error.message}`);
   }
 
@@ -105,4 +120,86 @@ export class SupabaseStore implements GameStore {
     const { error } = await this.db.from('notify_numbers').upsert({ phone }, { onConflict: 'phone', ignoreDuplicates: true });
     if (error) throw new Error(`save notify number failed: ${error.code ?? ''} ${error.message}`);
   }
+
+  async purge(): Promise<number> {
+    this.lastPurge = Date.now();
+    const { data, error } = await this.db.rpc('purge_expired_games', { p_retention_days: ADMIN_RETENTION_DAYS });
+    if (error) throw new Error(`purge_expired_games failed: ${error.code ?? ''} ${error.message}`);
+    return typeof data === 'number' ? data : 0;
+  }
+
+  /** Best effort: a failed purge must never fail the request it rides on. */
+  private async purgeIfDue(): Promise<void> {
+    if (Date.now() - this.lastPurge < PURGE_EVERY_MS) return;
+    await this.purge().catch((e) => console.warn('[store] purge failed:', e instanceof Error ? e.message : e));
+  }
+
+  // ---------------------------------------------------------------- admin reads
+  // All of them go through the admin_* SQL functions (supabase/migrations/0002_admin.sql), which never
+  // select a ticket, marks or a full token hash. Each returns ONE json value, so PostgREST's row cap does not apply.
+
+  private async listGames(f: AdminGameFilter, sort: string, desc: boolean, limit: number, offset: number): Promise<AdminGamePage> {
+    await this.purgeIfDue();
+    const { data, error } = await this.db.rpc('admin_list_games', {
+      p_from: iso(f.from),
+      p_to: iso(f.to),
+      p_status: f.status ?? null,
+      p_search: f.search?.trim() || null,
+      p_device: f.device ?? null,
+      p_active_since: iso(f.activeSince),
+      p_sort: sort,
+      p_desc: desc,
+      p_limit: limit,
+      p_offset: offset,
+    });
+    if (error) throw new Error(`admin_list_games failed: ${error.code ?? ''} ${error.message}`);
+    const page = data as { total?: number; rows?: AdminGameRow[] } | null;
+    return { total: Number(page?.total ?? 0), rows: (page?.rows ?? []).map(adminRow) };
+  }
+
+  async adminListGames(query: AdminGameQuery): Promise<AdminGamePage> {
+    const limit = Math.min(ADMIN_MAX_PAGE, Math.max(1, Math.floor(query.limit)));
+    return this.listGames(query, query.sort ?? 'created', query.dir !== 'asc', limit, Math.max(0, Math.floor(query.offset)));
+  }
+
+  async adminGamesInRange(filter: AdminGameFilter): Promise<AdminGamePage> {
+    return this.listGames(filter, 'created', true, ADMIN_MAX_RANGE_ROWS, 0);
+  }
+
+  async adminGetGame(code: string): Promise<AdminGameRow | null> {
+    await this.purgeIfDue();
+    const { data, error } = await this.db.rpc('admin_get_game', { p_code: code });
+    if (error) throw new Error(`admin_get_game failed: ${error.code ?? ''} ${error.message}`);
+    return data ? adminRow(data as AdminGameRow) : null;
+  }
+
+  async adminListNotifyNumbers(page: { limit: number; offset: number }): Promise<{ total: number; rows: AdminNotifyRow[] }> {
+    const limit = Math.min(ADMIN_MAX_PAGE, Math.max(1, Math.floor(page.limit)));
+    const offset = Math.max(0, Math.floor(page.offset));
+    const { data, error, count } = await this.db.from('notify_numbers').select('phone, created_at', { count: 'exact' })
+      .order('created_at', { ascending: false }).order('phone').range(offset, offset + limit - 1)
+      .returns<{ phone: string; created_at: string }[]>();
+    if (error) throw new Error(`list notify numbers failed: ${error.code ?? ''} ${error.message}`);
+    return { total: count ?? 0, rows: (data ?? []).map((r) => ({ phone: r.phone, createdAt: Date.parse(r.created_at) })) };
+  }
+
+  async adminCountNotifyNumbers(from: number, to: number): Promise<number> {
+    const { error, count } = await this.db.from('notify_numbers').select('phone', { count: 'exact', head: true })
+      .gte('created_at', new Date(from).toISOString()).lt('created_at', new Date(to).toISOString());
+    if (error) throw new Error(`count notify numbers failed: ${error.code ?? ''} ${error.message}`);
+    return count ?? 0;
+  }
+}
+
+/** Copy exactly the admin fields out of what the database returned (belt and braces: nothing else can ride along). */
+function adminRow(r: AdminGameRow): AdminGameRow {
+  return {
+    code: String(r.code),
+    doc: { ...r.doc, code: String(r.code), events: Array.isArray(r.doc?.events) ? r.doc.events : [] },
+    createdAt: Number(r.createdAt),
+    updatedAt: Number(r.updatedAt),
+    erased: r.erased === true,
+    hostDevice: String(r.hostDevice ?? ''),
+    devices: r.devices && typeof r.devices === 'object' ? r.devices : {},
+  };
 }

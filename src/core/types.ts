@@ -94,6 +94,27 @@ export interface GameDoc {
   updatedAt: number;
   /** +1 on every change to this public document. Marking a ticket does not change it. */
   version: number;
+  /** When the current round started (epoch ms); null in the lobby. Absent on games made before this was recorded. */
+  startedAt?: number | null;
+  /** When the current round finished (epoch ms); null until then. */
+  finishedAt?: number | null;
+  /**
+   * Earlier rounds, oldest first (the last HISTORY_LIMIT), written by "Play again". Server-side only:
+   * it is used for the operator's statistics and is never part of a view sent to a browser.
+   */
+  history?: RoundRecord[];
+}
+
+/** What is remembered of a round once the host starts the next one. No tickets, no marks. */
+export interface RoundRecord {
+  round: number;
+  startedAt: number | null;
+  finishedAt: number | null;
+  /** How many numbers had been called. */
+  called: number;
+  /** How many people held a ticket. */
+  players: number;
+  prizes: Prize[];
 }
 
 /** A player's private state. Only ever sent to that player's own device. */

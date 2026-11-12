@@ -145,7 +145,8 @@ Decisions worth knowing:
 - **New round**: same code and players, round + 1, called numbers and winners cleared, a fresh ticket for everyone, marks cleared. People can join again once it is back in the lobby.
 - **Avatar colours** go by join order and wrap after six.
 - **Marks are private**: dabbing changes neither `version` nor anything other devices receive.
-- **Expiry**: 24 hours after the last activity. Activity = any action, or a host/player having the game open (counted at most every 30 minutes). A visitor looking at the invite does not count.
+- **Expiry**: 24 hours after the last activity. Activity = any action, or a host/player having the game open (counted at most every 30 minutes). A visitor looking at the invite does not count. An expired game answers 404 to everyone; its tickets and dabs are erased, and its public document is kept for 90 days for the operator's admin panel (`docs/ADMIN.md`) before it is deleted. Its code is not handed out again during that time.
+- **Server-only fields**: the stored document also has `startedAt`, `finishedAt` (current round) and `history` (a short record of earlier rounds: times, numbers called, winners). `history` is never part of a view sent to a browser.
 
 ## Concurrency
 Every write is a compare-and-swap on the game's `version` (and, for ticket rows, a per-row `rev`):
@@ -237,3 +238,7 @@ Interface: `create` (unique code), `load` (null when missing or expired), `commi
 - `npm test` — Vitest: tickets (2,000 seeded), all 26 patterns (checked against `data/winning-patterns.json`), engine flow and permissions, per-device views, the memory store and service (conflict retries, simultaneous claims, expiry), the `useGame` session logic, share helpers.
 - `npm run test:sql` — the migration on a local PostgreSQL: roles, row level security, compare-and-swap, purge.
 - `npm run smoke` — plays a whole game over HTTP against a running server (`BASE_URL`, default `http://localhost:8200`).
+
+## Admin API
+The operator's admin panel has its own routes under `/api/admin/*` (sign-in, plays as JSON/CSV, "Notify me" CSV).
+They need the admin session cookie and are documented in `docs/ADMIN.md`. They answer 404 when the admin is switched off.

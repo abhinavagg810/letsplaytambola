@@ -3,8 +3,11 @@ import { getMemoryStore } from './memory';
 import { SupabaseStore } from './supabase';
 import type { GameStore } from './types';
 
-export type { CommitWrite, GameStore, NewGame, PlayerWrite, StoredGame, StoredPlayer } from './types';
-export { CodeSpaceError } from './types';
+export type {
+  AdminGameFilter, AdminGamePage, AdminGameQuery, AdminGameRow, AdminNotifyRow,
+  CommitWrite, GameStore, NewGame, PlayerWrite, StoredGame, StoredPlayer,
+} from './types';
+export { ADMIN_MAX_PAGE, ADMIN_MAX_RANGE_ROWS, ADMIN_RETENTION_DAYS, ADMIN_RETENTION_MS, CodeSpaceError } from './types';
 
 const KEY = '__lpt_supabase_store_v1__';
 

@@ -34,6 +34,12 @@ npm start
 2. Import this repo in Vercel (framework: Next.js, default settings) and add the environment variables listed in `.env.example`.
 3. Deploy. Without Supabase the deployed site cannot keep games, because Vercel's servers do not share memory.
 
+## Admin panel
+
+`/admin` is a private area for the person who runs the site: a dashboard, the list of plays, play and player details,
+and the "Notify me" numbers. It is switched off until you set `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
+How to switch it on, what it shows and how it is protected: `docs/ADMIN.md`.
+
 ## Check it
 
 ```bash
@@ -62,14 +68,14 @@ npm run test:sql
 | `src/components/` | Design system (see `docs/COMPONENTS.md`) |
 | `src/features/` | Website, host setup, join, game (join card, lobby, live, results) |
 | `src/core/` | Game rules: tickets, 26 winning patterns, engine, tests |
-| `src/server/` | Game storage (memory or Supabase), realtime ping, rate limits |
+| `src/server/` | Game storage (memory or Supabase), realtime ping, rate limits, admin sign-in and statistics (`admin/`) |
 | `src/lib/` | Browser helpers: device token, API client, live game hook, sharing, caller voice |
 | `supabase/` | Database schema, tests, setup guide |
-| `docs/` | Design handoff, build notes, API reference |
+| `docs/` | Design handoff, build notes, API reference, admin guide |
 
 ## Rules the code enforces
 
 - A player's ticket and dabs are never sent to anyone else. Browsers never talk to the database; the server decides every rule.
 - Only the host can start, call numbers, switch auto-call and start a new round. Only called numbers can be dabbed. Claims are checked on the server.
 - No payments. An optional ticket price is shown for information only.
-- Games are removed 24 hours after the last activity.
+- Games stop working 24 hours after the last activity, and their tickets and dabs are erased then. A summary of each game (no tickets) is kept for 90 days for the admin panel, then deleted.

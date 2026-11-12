@@ -42,7 +42,8 @@ supabase/migrations/      SQL schema
 - **Realtime:** after each commit the server sends a tiny "changed" ping `{v}` on Supabase Realtime Broadcast channel `g:CODE`; browsers (anon key) refetch their view on ping. Polling is always on as a fallback (fast when no realtime, slow when realtime is connected), plus refetch on focus/online/visibility. The ping carries no game data.
 - **View per device:** `GET /api/games/CODE` returns the public game + `you: { role: 'host'|'player'|'visitor', pid?, ticket?, marks? }`. Visitors get the invite info only (host name, game name, player count, ways to win, price).
 - **Auto-call** runs as a timer in the host's browser that calls the draw action (6s default; 4/6/8/10). If the host leaves, calling pauses and resumes when they return.
-- **Expiry:** games are unusable 24h after last activity (treated as not found) and purged by a SQL function.
+- **Expiry:** games are unusable 24h after last activity (treated as not found). At that point a purge erases their tickets and dabs; the public document and the stripped player rows are kept 90 days for the admin panel (`docs/ADMIN.md`), then deleted.
+- **Admin panel:** `/admin/*` + `/api/admin/*`, one operator, credentials from `ADMIN_EMAIL` / `ADMIN_PASSWORD` (off when unset). The "no accounts" rule is about players and hosts; the admin area is not linked from the public site. See `docs/ADMIN.md`.
 - Env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (server only), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (realtime ping only), `NEXT_PUBLIC_SITE_URL` (share links; default from the request origin).
 
 ## Conventions

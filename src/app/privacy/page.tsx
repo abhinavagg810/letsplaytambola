@@ -5,6 +5,9 @@
 //   • the Grievance Officer's name and postal address (section "contact")
 //   • the legal name of the business that runs the site
 // If the product changes (analytics, ads, new data, longer storage), this page must change with it.
+// The retention section describes what the code does: tickets and dabs erased at 24 hours, a game summary and an
+// anonymous device identifier kept for 90 days for the operator's admin panel (docs/ADMIN.md, supabase/migrations/0002_admin.sql).
+// Storing a summary for 90 days for statistics is a NEW purpose since the first draft — ask the lawyer to check it.
 // "{email}" in the text is replaced by a mail link.
 import type { Metadata } from 'next';
 import { LegalPage } from '@/features/website/LegalPage';
@@ -12,12 +15,12 @@ import type { LegalSection } from '@/features/website/legal';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'What Letsplaytambola collects, why, how long it is kept and how you stay in control. No sign-up, and game data is deleted after 24 hours.',
+  description: 'What Letsplaytambola collects, why, how long it is kept and how you stay in control. No sign-up; tickets and dabs are erased after 24 hours and a short game summary after 90 days.',
   alternates: { canonical: '/privacy' },
 };
 
 const SUMMARY =
-  'There is nothing to sign up for. We keep the name you type, a random code that remembers your device, and the game itself — and we delete games 24 hours after the last activity. We never sell your data and we never handle money.';
+  'There is nothing to sign up for. We keep the name you type, a random code that remembers your device, and the game itself. Tickets and dabs are erased 24 hours after a game’s last activity; a short summary of the game is kept for up to 90 days and then deleted. We never sell your data and we never handle money.';
 
 const SECTIONS: LegalSection[] = [
   {
@@ -47,6 +50,7 @@ const SECTIONS: LegalSection[] = [
       'To bring you back to your own ticket, or your host controls, when you reopen the link on the same device.',
       'To send one WhatsApp message when the app launches — only to numbers given in “Notify me”.',
       'To keep the service secure, prevent misuse and fix problems.',
+      'To run and improve the service: we look at simple counts from the game summaries we keep (see “How long we keep it”) — for example how many games are played, how many people join, and which ways to win are popular.',
       'We do not show ads, we do not build profiles of you, and we never sell your personal data.',
     ],
   },
@@ -58,6 +62,7 @@ const SECTIONS: LegalSection[] = [
       'Anyone who has a game’s link or code can open its invite page and see the host’s name, the game’s name and how many people have joined. Share the link only with people you want in the game.',
     ],
     bullets: [
+      'The site’s operator (the person who runs Letsplaytambola) can see the summary of each game described in “How long we keep it”, and the “Notify me” numbers. Nobody else can. The operator cannot see your ticket or your dabs.',
       'Vercel hosts the website and its servers.',
       'Supabase stores game data and “Notify me” numbers, and delivers the live updates during a game.',
       'These providers work for us under their own data-protection terms and may process data on servers outside India.',
@@ -88,7 +93,10 @@ const SECTIONS: LegalSection[] = [
     id: 'retention',
     title: 'How long we keep it',
     bullets: [
-      'Games — including names, tickets, dabs, called numbers and winners — stop working and are deleted from our servers 24 hours after the last activity in the game.',
+      'A game, its link and its code stop working 24 hours after the last activity in the game.',
+      'Tickets and dabs are erased from our servers at that point — 24 hours after the game’s last activity.',
+      'A summary of each game is kept for up to 90 days after its last activity, and then deleted: the game’s name, the names people typed, the numbers called, who won what, the ticket price the host noted, and the times these things happened. With it we keep an anonymous device identifier — a scrambled copy of the device token — so that we can count how many different devices play. It does not contain your name, number or anything else about you.',
+      'This summary is used only to run and improve the service, and only the site’s operator can see it.',
       '“Notify me” phone numbers are kept until we have sent the launch message, or until you ask us to remove yours, whichever comes first.',
       'The items in your browser stay on your device until you clear your browser’s site data.',
       'Technical logs are kept by our hosting providers for a short period, as set by them.',

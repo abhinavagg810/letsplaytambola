@@ -33,6 +33,12 @@ export function hit(key: string, limit: Limit, now: number = Date.now()): boolea
   return b.count <= limit.max;
 }
 
+/** True when `key` has already used up `limit` in the current window. Does not count a hit (see the admin sign-in). */
+export function exhausted(key: string, limit: Limit, now: number = Date.now()): boolean {
+  const b = buckets().get(key);
+  return !!b && b.resetAt > now && b.count >= limit.max;
+}
+
 /** True when this request may go ahead. `who` = token hash and/or IP (either may be missing). */
 export function allow(name: LimitName, who: { tokenHash?: string | null; ip?: string | null }, now: number = Date.now()): boolean {
   if (process.env.RATE_LIMIT_DISABLED === '1') return true;

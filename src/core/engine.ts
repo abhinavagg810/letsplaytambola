@@ -14,6 +14,8 @@ import type {
 
 /** How many events the public document keeps. */
 export const EVENT_LIMIT = 30;
+/** How many earlier rounds the document remembers (`doc.history`). */
+export const HISTORY_LIMIT = 20;
 
 /** Every user-facing message the engine can return (ported from the prototype's toasts where it has one). */
 export const COPY = {
@@ -169,6 +171,8 @@ export function applyAction(state: GameState, action: GameAction, actor: Actor, 
       if (doc.status !== 'lobby') return fail('state', doc.status === 'live' ? COPY.alreadyStarted : COPY.gameOver);
       if (doc.players.length === 0) return fail('state', COPY.noPlayers);
       doc.status = 'live';
+      doc.startedAt = ctx.now;
+      doc.finishedAt = null;
       assignPrizeAmounts(doc);
       pushEvent(doc, { kind: 'start' }, ctx.now);
       return commit();
@@ -183,6 +187,7 @@ export function applyAction(state: GameState, action: GameAction, actor: Actor, 
       if (left.length === 0) {
         // Cannot normally happen (the 90th call ends the game) — heal rather than get stuck.
         doc.status = 'done';
+        doc.finishedAt = ctx.now;
         doc.auto = 0;
         return commit();
       }
@@ -191,6 +196,7 @@ export function applyAction(state: GameState, action: GameAction, actor: Actor, 
       pushEvent(doc, { kind: 'call', n }, ctx.now);
       if (doc.called.length === 90) {
         doc.status = 'done';
+        doc.finishedAt = ctx.now;
         doc.auto = 0;
       }
       return commit();
@@ -235,6 +241,7 @@ export function applyAction(state: GameState, action: GameAction, actor: Actor, 
       pushEvent(doc, { kind: 'win', pid: me.pid, name: publicMe.name, prizeId: prize.id, label: prize.label }, ctx.now);
       if (doc.prizes.every((p) => p.winnerPid)) {
         doc.status = 'done';
+        doc.finishedAt = ctx.now;
         doc.auto = 0;
       }
       return commit();
@@ -243,6 +250,13 @@ export function applyAction(state: GameState, action: GameAction, actor: Actor, 
     case 'newRound': {
       if (!actor.isHost) return fail('forbidden', COPY.hostOnly);
       if (doc.status !== 'done') return fail('state', COPY.roundNotOver);
+      // Remember the round that just ended (for the operator's statistics; never sent to browsers).
+      doc.history = [
+        ...(doc.history ?? []),
+        { round: doc.round, startedAt: doc.startedAt ?? null, finishedAt: doc.finishedAt ?? null, called: doc.called.length, players: doc.players.length, prizes: clone(doc.prizes) },
+      ].slice(-HISTORY_LIMIT);
+      doc.startedAt = null;
+      doc.finishedAt = null;
       doc.status = 'lobby';
       doc.called = [];
       doc.auto = 0;
@@ -289,7 +303,9 @@ export function projectView(state: GameState, actor: Actor, now: number): GameVi
   const you: MemberView['you'] = actor.isHost
     ? { role: 'host', name: publicMe?.name ?? doc.hostName, ...(own ?? {}) }
     : { role: 'player', name: publicMe!.name, ...own! };
-  return { ...clone(doc), playerCount: doc.players.length, now, you };
+  const pub = clone(doc);
+  delete pub.history;
+  return { ...pub, playerCount: doc.players.length, now, you };
 }
 
 /** The newest win event, for the banner ("Meera wins Top Line!"). */

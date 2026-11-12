@@ -98,7 +98,7 @@ const SECTIONS: LegalSection[] = [
     id: 'availability',
     title: 'Availability and game expiry',
     paras: [
-      'A game, its link and its code stop working 24 hours after the last activity, and the game’s data is then deleted. We do not keep a history of past games.',
+      'A game, its link and its code stop working 24 hours after the last activity, and its tickets and dabs are then erased. You cannot reopen a past game, and we do not offer a history of past games. A short summary of each game is kept for up to 90 days to run and improve the Service, as explained in the Privacy Policy, and then deleted.',
       'We work hard to keep games running smoothly, but the Service is provided “as is” and “as available”. Games may occasionally be interrupted by network issues, maintenance or events outside our control, and we are not responsible for games or results lost as a result.',
     ],
   },

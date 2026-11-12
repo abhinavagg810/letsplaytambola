@@ -1,0 +1,1034 @@
+/* Admin panel. Desktop-first, works down to 390px. Uses the product's tokens (src/app/globals.css). */
+
+/* ── Frame ─────────────────────────────────────────────── */
+.shell {
+  min-height: 100dvh;
+  background: var(--bg);
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.topbarInner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 8px 24px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand:hover {
+  color: var(--text);
+}
+
+.brandTag {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--marigold);
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+
+.nav {
+  display: flex;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: var(--r-pill);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-soft);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navLink:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.navLink[aria-current='page'] {
+  color: var(--bg);
+  background: var(--marigold);
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.whoEmail {
+  font-size: 15px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 260px;
+}
+
+.main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px var(--gutter) 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pageHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px 24px;
+}
+
+.pageTitle {
+  font-size: 32px;
+  line-height: 1.1;
+}
+
+.pageSub {
+  margin-top: 6px;
+  font-size: 16px;
+  color: var(--text-soft);
+  max-width: 70ch;
+  line-height: 1.4;
+}
+
+.crumb {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.sectionTitle {
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+.sectionSub {
+  margin-top: 4px;
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.panel {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  padding: 20px;
+  min-width: 0;
+}
+
+.panelHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+}
+
+.note {
+  background: var(--marigold-14);
+  border-radius: 16px;
+  padding: 12px 16px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.empty {
+  padding: 28px 12px;
+  text-align: center;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+}
+
+.dim {
+  color: var(--text-muted);
+}
+
+/* ── Buttons and form controls ─────────────────────────── */
+.btn,
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--text-soft);
+  color: var(--text);
+}
+
+.btnPrimary {
+  background: var(--marigold);
+  border-color: var(--marigold);
+  color: var(--bg);
+  font-weight: 800;
+}
+
+.btnPrimary:hover {
+  color: var(--bg);
+  filter: brightness(1.06);
+}
+
+.btn:disabled,
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.fieldGrow {
+  flex: 1 1 220px;
+}
+
+.fieldLabel {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.control {
+  height: 44px;
+  width: 100%;
+  min-width: 0;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px; /* never below 16px: iOS zooms into smaller inputs */
+  font-weight: 500;
+  color-scheme: dark;
+}
+
+.control:hover {
+  border-color: var(--text-dim);
+}
+
+.filterActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Segmented switch (date range) */
+.segment {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+}
+
+.segmentLink {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--r-pill);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-soft);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.segmentLink:hover {
+  color: var(--text);
+}
+
+.segmentLink[aria-current='true'] {
+  background: var(--marigold);
+  color: var(--bg);
+  font-weight: 800;
+}
+
+/* ── Stat tiles ─────────────────────────────────────────── */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.tile {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 16px 16px 14px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tileLabel {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.tileValue {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.tileSub {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* ── Bar chart (HTML/CSS; one hue per chart) ───────────── */
+.chart {
+  --series: var(--marigold);
+  margin: 0;
+}
+
+.chartTeal {
+  --series: var(--teal);
+}
+
+.plotWrap {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 10px;
+}
+
+.yAxis {
+  position: relative;
+  height: 180px;
+  min-width: 22px;
+}
+
+.yTick {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.plot {
+  position: relative;
+  height: 180px;
+  border-bottom: 1.5px solid var(--line);
+}
+
+.gridLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed var(--line-soft);
+}
+
+.bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--bar-gap, 2px);
+}
+
+.barCol {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.bar {
+  width: 100%;
+  max-width: 56px;
+  min-height: 0;
+  background: var(--series);
+  border-radius: 4px 4px 0 0;
+}
+
+.barCol:hover .bar,
+.barCol:focus-visible .bar {
+  filter: brightness(1.2);
+}
+
+.barCol:hover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--surface-2);
+  opacity: 0.5;
+  border-radius: 4px 4px 0 0;
+  z-index: -1;
+}
+
+.bars {
+  z-index: 0;
+}
+
+.barValue {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  padding: 6px 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+  box-shadow: var(--shadow-toast);
+  pointer-events: none;
+}
+
+.tipStart {
+  left: 0;
+  transform: none;
+}
+
+.tipEnd {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.barCol:hover .tip,
+.barCol:focus-visible .tip {
+  display: block;
+}
+
+.xAxis {
+  grid-column: 2;
+  position: relative;
+  height: 22px;
+  margin-top: 6px;
+}
+
+.xTick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.xTickStart {
+  transform: none;
+}
+
+.xTickEnd {
+  transform: translateX(-100%);
+}
+
+.axisTitle {
+  grid-column: 2;
+  margin-top: 4px;
+  text-align: center;
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+/* Ranked list with bars (most picked / most won) */
+.rank {
+  --series: var(--marigold);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rankRow {
+  display: grid;
+  grid-template-columns: minmax(96px, 150px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+}
+
+.rankLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.rankTrack {
+  height: 14px;
+}
+
+.rankBar {
+  height: 100%;
+  min-width: 3px;
+  background: var(--series);
+  border-radius: 0 4px 4px 0;
+}
+
+.rankValue {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  min-width: 2ch;
+  text-align: right;
+}
+
+/* ── Tables ─────────────────────────────────────────────── */
+.tableWrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.tableWrapFlat {
+  background: transparent;
+  border-radius: 0;
+  margin: 0 -8px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.table th,
+.table td {
+  padding: 12px 11px;
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.table thead th {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.table tbody tr + tr td,
+.table tbody tr + tr th {
+  border-top: 1px solid var(--surface-2);
+}
+
+.table tbody th {
+  font-weight: 600;
+}
+
+.table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.table .wrap {
+  white-space: normal;
+  min-width: 160px;
+}
+
+.rowLink tbody tr {
+  position: relative;
+}
+
+.rowLink tbody tr:hover {
+  background: var(--surface-2);
+}
+
+/* The first link in a row covers the whole row, so the row is one big target. */
+.stretched::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.sortLink {
+  color: inherit;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sortLink:hover {
+  color: var(--text);
+}
+
+.sortLink[data-active='true'] {
+  color: var(--marigold);
+}
+
+.cellLink {
+  font-weight: 800;
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 3px;
+}
+
+.cellLink:hover {
+  color: var(--marigold);
+}
+
+.deviceLink {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+}
+
+/* Status */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.statusDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  flex: none;
+}
+
+.status[data-status='live'] .statusDot {
+  background: var(--green);
+  box-shadow: 0 0 0 3px var(--green-25);
+}
+
+.status[data-status='lobby'] .statusDot {
+  background: var(--marigold);
+}
+
+.status[data-status='done'] .statusDot {
+  background: var(--teal);
+}
+
+.status[data-status='expired'] {
+  color: var(--text-muted);
+}
+
+.status[data-status='expired'] .statusDot {
+  background: transparent;
+  border: 2px solid var(--text-dim);
+}
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.pagerLinks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btnOff {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ── Detail page ───────────────────────────────────────── */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+
+.fact dt {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.fact dd {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.calledList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.calledNum {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 16px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.calledNum:last-child {
+  background: var(--pink);
+  color: var(--text);
+}
+
+.boardBox {
+  max-width: 400px;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline li {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 12px;
+  padding: 9px 0;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.timeline li + li {
+  border-top: 1px solid var(--surface-2);
+}
+
+.timelineTime {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  padding-top: 3px;
+  white-space: nowrap;
+}
+
+.eventWin {
+  font-weight: 800;
+  color: var(--marigold);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--r-pill);
+  background: var(--bg);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ── Sign-in / off ─────────────────────────────────────── */
+.center {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px var(--gutter);
+  background: var(--bg);
+  background-image: var(--page-gradient);
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border-radius: var(--r-card-lg);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.loginTitle {
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.loginSub {
+  font-size: 16px;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+
+.loginField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.loginInput {
+  height: 54px;
+  width: 100%;
+  padding: 0 14px;
+  border-radius: var(--r-input);
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.passwordRow {
+  position: relative;
+}
+
+.passwordRow .loginInput {
+  padding-right: 84px;
+}
+
+.showBtn {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  height: 44px;
+  min-width: 68px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.loginError {
+  min-height: 22px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--pink-soft);
+  line-height: 1.35;
+}
+
+.loginSubmit {
+  height: 56px;
+  font-size: 19px;
+  border-radius: var(--r-button-sm);
+}
+
+/* ── Narrower screens ──────────────────────────────────── */
+@media (max-width: 1100px) {
+  .tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .grid2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .nav {
+    order: 3;
+    flex: 1 1 100%;
+    overflow-x: auto;
+    margin: 0 calc(-1 * var(--gutter));
+    padding: 0 var(--gutter) 8px;
+    scrollbar-width: none;
+  }
+
+  .who {
+    margin-left: auto;
+  }
+
+  .whoEmail {
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 640px) {
+  .main {
+    padding-top: 20px;
+    gap: 20px;
+  }
+
+  .pageTitle {
+    font-size: 27px;
+  }
+
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .tileValue {
+    font-size: 28px;
+  }
+
+  .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .panel {
+    padding: 16px;
+  }
+
+  .field {
+    flex: 1 1 140px;
+  }
+
+  .fieldGrow {
+    flex-basis: 100%;
+  }
+
+  .filterActions {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .timeline li {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .whoEmail {
+    display: none;
+  }
+
+  /* Every other axis label, so they do not run into each other. */
+  .xTickAlt {
+    display: none;
+  }
+
+  .segment {
+    width: 100%;
+  }
+
+  .segmentLink {
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 0 10px;
+  }
+}
