@@ -1,31 +1,22 @@
 'use client';
 // Lobby: the host shares the link and starts the game; players see "You're in!" and their ticket.
-import { useRef, useState, useSyncExternalStore } from 'react';
+import { useRef, useState } from 'react';
 import { Avatar, Button, Pill, Ticket, toast } from '@/components';
 import { ruleDesc, type MemberView } from '@/core';
-import { canShareNative, gameUrl, inviteText, shareNative, whatsappUrl } from '@/lib/share';
+import { inviteText, whatsappUrl } from '@/lib/share';
 import { unlockSpeech } from '@/lib/speech';
 import type { UseGame } from '@/lib/useGame';
 import { copyGameLink } from './GameHeader';
 import styles from './game.module.css';
 
-const noSubscribe = () => () => undefined;
-
 export function Lobby({ game, act }: { game: MemberView; act: UseGame['act'] }) {
   const isHost = game.you.role === 'host';
   const hasPlayers = game.players.length > 0; // the engine's rule: the host's own ticket counts
-  const nativeShare = useSyncExternalStore(noSubscribe, canShareNative, () => false);
   const busy = useRef(false);
   const [starting, setStarting] = useState(false);
-  const link = gameUrl(game.code);
 
   function shareOnWhatsApp() {
     window.open(whatsappUrl(inviteText(game.name, game.code)), '_blank', 'noopener');
-  }
-
-  async function shareAnother() {
-    const res = await shareNative({ title: game.name, text: `Join my Tambola game “${game.name}”! Tap the link, type your name and you’re in:`, url: link });
-    if (res === 'unavailable') await copyGameLink(game.code);
   }
 
   async function start() {
@@ -52,7 +43,6 @@ export function Lobby({ game, act }: { game: MemberView; act: UseGame['act'] }) 
               <h2 id="share-title" className={styles.shareTitle}>
                 Share this link with everyone
               </h2>
-              <div className={styles.linkBox}>{link}</div>
               <Button variant="whatsapp" size={60} block onClick={shareOnWhatsApp}>
                 Share on WhatsApp
               </Button>
@@ -60,11 +50,6 @@ export function Lobby({ game, act }: { game: MemberView; act: UseGame['act'] }) 
                 <Pill size={50} onClick={() => void copyGameLink(game.code)}>
                   Copy link
                 </Pill>
-                {nativeShare ? (
-                  <Pill size={50} onClick={() => void shareAnother()}>
-                    Share another way
-                  </Pill>
-                ) : null}
               </div>
               <span className={styles.shareHint}>
                 Playing in the same room? Read out the code: <b className={styles.code}>{game.code}</b>
