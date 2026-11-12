@@ -1,5 +1,6 @@
 // Supabase store (production). Uses the SERVICE ROLE key, server-side only: the tables have row level
 // security with no policies, so nothing else can read or write them. See supabase/migrations/0001_init.sql.
+import { after } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { GAME_TTL_MS, genCode } from '@/core';
@@ -131,7 +132,14 @@ export class SupabaseStore implements GameStore {
   /** Best effort: a failed purge must never fail the request it rides on. */
   private async purgeIfDue(): Promise<void> {
     if (Date.now() - this.lastPurge < PURGE_EVERY_MS) return;
-    await this.purge().catch((e) => console.warn('[store] purge failed:', e instanceof Error ? e.message : e));
+    this.lastPurge = Date.now(); // claim the slot now so parallel requests don't all purge
+    const run = () => this.purge().catch((e) => console.warn('[store] purge failed:', e instanceof Error ? e.message : e));
+    // Housekeeping must not slow the page down: run it after the response has been sent.
+    try {
+      after(run);
+    } catch {
+      void run(); // not inside a request (tests, scripts)
+    }
   }
 
   // ---------------------------------------------------------------- admin reads

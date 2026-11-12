@@ -1032,3 +1032,32 @@
     padding: 0 10px;
   }
 }
+
+/* ── Loading state between admin tabs ───────────────────── */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 40vh;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 3px solid var(--line);
+  border-top-color: var(--marigold);
+  animation: adminSpin 0.8s linear infinite;
+}
+
+@keyframes adminSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; }
+}

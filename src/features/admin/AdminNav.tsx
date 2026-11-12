@@ -20,7 +20,7 @@ export function AdminNav() {
         const current = l.href === '/admin' ? path === '/admin' : path === l.href || path.startsWith(`${l.href}/`);
         return (
           // No prefetch: admin pages are never cached, and every one checks the session itself.
-          <Link key={l.href} href={l.href} prefetch={false} className={styles.navLink} aria-current={current ? 'page' : undefined}>
+          <Link key={l.href} href={l.href} className={styles.navLink} aria-current={current ? 'page' : undefined}>
             {l.label}
           </Link>
         );
