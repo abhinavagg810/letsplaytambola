@@ -1,0 +1,58 @@
+/* Join with a code (/join): two cards, stacked on mobile. */
+.page {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  align-items: stretch;
+  gap: 20px;
+  max-width: var(--content);
+  margin: 0 auto;
+  padding: 48px var(--gutter) 72px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--surface);
+}
+
+.cardHost {
+  border: none;
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--marigold);
+}
+
+.cardHost .kicker {
+  color: inherit;
+}
+
+.title {
+  font-size: clamp(34px, 6vw, 48px);
+  line-height: 1;
+}
+
+.text {
+  font-size: 18px;
+  line-height: 1.45;
+  color: var(--text-soft);
+}
+
+.cardHost .text {
+  color: inherit;
+}
+
+.hostButton {
+  margin-top: auto;
+}

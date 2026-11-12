@@ -1,0 +1,321 @@
+/* Game page (/g/CODE): the frame, the title row, the Join card, the lobby and the small shared list styles.
+   Live- and Results-specific styles live in their own module files. */
+
+/* ── frame ─────────────────────────────────────────────── */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: var(--content);
+  margin: 0 auto;
+  padding: 24px var(--gutter) 72px;
+}
+
+.narrow {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: var(--content-narrow);
+  margin: 0 auto;
+  padding: 40px var(--gutter) 72px;
+}
+
+/* ── title row ─────────────────────────────────────────── */
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px 20px;
+}
+
+.titleText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.kicker {
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.gameName {
+  font-size: clamp(32px, 5vw, 48px);
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.titleActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.codePill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 15px;
+}
+
+.code {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--marigold);
+}
+
+.codePill .code {
+  font-size: 17px;
+  letter-spacing: 0.08em;
+}
+
+.titlePill {
+  padding: 0 16px;
+  font-size: 15px;
+}
+
+/* ── two-column grid (lobby) ───────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+  align-items: start;
+  gap: 20px;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* ── shared: section with a heading and a list card ────── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionTitle {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: normal;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.personRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--surface-2);
+}
+
+.personName {
+  flex: 1;
+  min-width: 0;
+  font-size: 18px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.personTag {
+  font-size: 15px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.listEmpty {
+  padding: 16px;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.prizeRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--surface-2);
+}
+
+.prizeName {
+  font-size: 17px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.prizeRule {
+  font-size: 15px;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* ── lobby: host share card ────────────────────────────── */
+.shareCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: var(--surface);
+}
+
+.shareTitle {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.linkBox {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text-soft);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  word-break: break-all;
+  user-select: all;
+}
+
+.shareRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shareRow > * {
+  flex: 1 1 140px;
+}
+
+.shareHint {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+/* ── lobby: player note ────────────────────────────────── */
+.youreIn {
+  padding: 20px 22px;
+  border-radius: 22px;
+  background: var(--marigold);
+  color: var(--ink);
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+/* ── join card ─────────────────────────────────────────── */
+.invite {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: var(--surface);
+}
+
+.inviteBy {
+  font-size: 18px;
+  color: var(--text-soft);
+}
+
+.inviteName {
+  font-size: clamp(36px, 8vw, 48px);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--marigold);
+  overflow-wrap: anywhere;
+}
+
+.inviteMeta {
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.joinField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.joinLabel {
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.footnote {
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ── not found / finished ──────────────────────────────── */
+.missing {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: var(--content-narrow);
+  margin: 0 auto;
+  padding: 64px var(--gutter);
+  text-align: center;
+}
+
+.missingTitle {
+  font-size: 32px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.missingText {
+  font-size: 18px;
+  color: var(--text-soft);
+}
+
+/* ── loading ───────────────────────────────────────────── */
+.skeleton {
+  min-height: 70vh;
+}
+
+.bone {
+  border-radius: 12px;
+  background: var(--surface);
+  opacity: 0.6;
+}
+
+.boneKicker {
+  width: 120px;
+  height: 16px;
+  margin: 4px 0;
+}
+
+.boneTitle {
+  width: min(70%, 320px);
+  height: clamp(32px, 5vw, 48px);
+}
+
+.boneCard {
+  height: 220px;
+  border-radius: 26px;
+}
+
+.boneCardSmall {
+  height: 140px;
+  border-radius: 20px;
+}

@@ -1,0 +1,265 @@
+/* Live game — values from the prototype (Letsplaytambola Play.dc.html, "isGame"). */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* ── Caller card ─────────────────────────────────────────── */
+.callerMain {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+}
+
+.callerText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  line-height: 1.1;
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--marigold);
+}
+
+.callout {
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 800;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.before {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 20px 18px;
+}
+
+.beforeLabel {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.chip {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+/* ── Host controls ───────────────────────────────────────── */
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+.callBtn {
+  flex: 1;
+  min-width: 0;
+  height: 64px;
+  padding: 0 6px;
+  border: none;
+  border-radius: 18px;
+  background: var(--marigold);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.callBtn:disabled {
+  background: var(--disabled);
+  cursor: not-allowed;
+}
+
+.autoBtn {
+  flex-shrink: 0;
+  width: 120px;
+  height: 64px;
+  padding: 0 6px;
+  border: 1.5px solid var(--line);
+  border-radius: 18px;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.autoOn {
+  border-color: var(--green);
+  background: var(--green-25);
+}
+
+/* ── Lists (ways to win, players) ────────────────────────── */
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.heading {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: normal;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--surface-2);
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.rowLabel {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.rowRule {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.open,
+.won {
+  font-size: 16px;
+  font-weight: 800;
+  text-align: right;
+  overflow-wrap: break-word;
+}
+
+.open {
+  color: var(--text-muted);
+}
+
+.won {
+  color: var(--marigold);
+}
+
+/* ── Board ───────────────────────────────────────────────── */
+.boardCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.boardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.boardCount {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--marigold);
+}
+
+/* ── Players ─────────────────────────────────────────────── */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.playerChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  height: 40px;
+  padding: 0 14px 0 4px;
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.playerName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Win banner ──────────────────────────────────────────── */
+/* Fixed, so nothing on the page moves when it appears. */
+.bannerRegion {
+  position: fixed;
+  left: 50%;
+  top: 92px;
+  z-index: 30;
+  width: min(92vw, 480px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: var(--marigold);
+  color: var(--ink);
+  box-shadow: var(--shadow-banner);
+  text-align: center;
+}
+
+.bannerTitle {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.05;
+  overflow-wrap: break-word;
+}
+
+.bannerSub {
+  font-size: 16px;
+}

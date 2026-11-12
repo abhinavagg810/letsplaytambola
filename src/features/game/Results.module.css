@@ -1,0 +1,83 @@
+/* Results — values from the prototype (Letsplaytambola Play.dc.html, "isDone"). */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.title {
+  font-size: clamp(40px, 7vw, 64px);
+  font-weight: 800;
+  line-height: 0.95;
+  color: var(--marigold);
+}
+
+.note {
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--text-soft);
+}
+
+.stay {
+  padding: 16px 18px;
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.winners {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.heading {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: normal;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--surface-2);
+}
+
+.prize {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.open,
+.won {
+  font-size: 18px;
+  font-weight: 800;
+  text-align: right;
+  overflow-wrap: break-word;
+}
+
+.open {
+  color: var(--text-muted);
+}
+
+.won {
+  color: var(--marigold);
+}
