@@ -34,9 +34,10 @@ export function Live({ game, act, serverNow }: { game: MemberView; act: ReturnTy
           <CallerCard game={game} />
           {isHost ? <HostControls game={game} act={act} /> : null}
           {you.ticket ? <MyTicket name={you.name} ticket={you.ticket} marks={you.marks ?? []} act={act} onClaim={() => setClaimOpen(true)} /> : null}
+          {/* Ways to win sits under the ticket (or under the caller when there is no ticket); board and players fill the other column. */}
+          <WaysToWin prizes={game.prizes} youPid={you.pid} />
         </div>
         <div className={styles.col}>
-          <WaysToWin prizes={game.prizes} youPid={you.pid} />
           <section className={styles.boardCard}>
             <div className={styles.boardHead}>
               <h2 className={styles.heading}>The board</h2>
