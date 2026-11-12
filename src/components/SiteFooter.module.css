@@ -1,0 +1,44 @@
+.footer {
+  border-top: 1px solid var(--line-soft);
+  background: var(--bg-deep);
+  color: var(--text);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: calc(var(--content) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: 32px var(--gutter);
+}
+
+.links {
+  display: flex;
+  gap: 8px 20px;
+  flex-wrap: wrap;
+  font-size: 15px;
+}
+
+.links a {
+  color: var(--text-soft);
+  text-decoration: none;
+}
+
+.links a:hover {
+  color: var(--text);
+}
+
+.note {
+  font-size: 15px;
+  color: var(--text-foot);
+}
+
+.logo {
+  display: flex;
+  align-items: flex-end;
+  height: 45.9px; /* matches the design's footer height */
+}

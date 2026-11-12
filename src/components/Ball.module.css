@@ -1,0 +1,47 @@
+.ball {
+  --ball-glow-strong: rgba(250, 74, 152, 0.7);
+  --ball-glow-mid: rgba(250, 74, 152, 0.6);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--pink);
+}
+
+@supports (color: oklch(0% 0 0)) {
+  .ball {
+    --ball-glow-strong: oklch(0.68 0.22 358 / 0.7);
+    --ball-glow-mid: oklch(0.68 0.22 358 / 0.6);
+  }
+}
+
+.disc {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--ink);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-6deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(-2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float {
+    animation: none;
+  }
+}

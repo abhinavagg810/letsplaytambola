@@ -1,0 +1,41 @@
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 30px;
+  padding: 3px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: var(--line);
+  transition: background 0.15s ease;
+}
+
+.on {
+  background: var(--green);
+}
+
+.knob {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+}
+
+.on .knob {
+  transform: translateX(22px);
+}
+
+/* 44px tap target around the 30px switch */
+.button::after {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -1,0 +1,103 @@
+.logo {
+  --logo-ink: var(--text);
+  --logo-shadow: rgba(250, 74, 152, 0.55);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+  font-family: var(--font-baloo);
+  user-select: none;
+}
+
+.dark {
+  --logo-ink: var(--ink);
+  --logo-shadow: rgba(255, 184, 49, 0.6);
+}
+
+@supports (color: oklch(0% 0 0)) {
+  .logo {
+    --logo-shadow: oklch(0.68 0.22 358 / 0.55);
+  }
+
+  .dark {
+    --logo-shadow: oklch(0.83 0.16 78 / 0.6);
+  }
+}
+
+.tag {
+  position: relative;
+  z-index: 2;
+  margin: 0 0 -0.14em 0.08em;
+  padding: 0.1em 0.42em 0.02em;
+  border-radius: 999px;
+  background: var(--pink);
+  color: #fff;
+  font-size: 0.36em;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  transform: rotate(-5deg);
+  box-shadow: 0 0.09em 0 var(--pink-deep);
+}
+
+.word {
+  display: flex;
+  align-items: center;
+  font-size: 1em;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--logo-ink);
+  text-shadow: 0 0.05em 0 var(--logo-shadow);
+}
+
+.ball {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 0.74em;
+  height: 0.74em;
+  margin: 0 0.02em;
+  border-radius: 50%;
+  background: var(--marigold);
+  transform: rotate(-12deg) translateY(-0.02em);
+  box-shadow: 0 0.05em 0 var(--marigold-deep), inset 0 -0.05em 0 rgba(0, 0, 0, 0.12);
+  text-shadow: none;
+}
+
+.ballDisc {
+  display: grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  padding-top: 0.12em;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--ink);
+  font-size: 0.3em;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  background: var(--pink);
+  box-shadow: 0 0 0 0.08em var(--marigold);
+  transform: rotate(-10deg);
+}
+
+.markDisc {
+  display: grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  padding-top: 0.12em;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--ink);
+  font-size: 0.38em;
+  font-weight: 800;
+  line-height: 1;
+}

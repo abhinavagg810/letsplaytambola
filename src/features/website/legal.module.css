@@ -1,0 +1,179 @@
+/* /privacy and /terms. Values follow the prototype legal pages; the shared SiteHeader/SiteFooter replace their old header. */
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 1128px; /* 1080 + 2 × 24 */
+  margin: 0 auto;
+  padding: 56px 24px 40px;
+}
+
+.updated {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--marigold);
+}
+
+.h1 {
+  font-size: clamp(40px, 6vw, 64px);
+  line-height: 1;
+  font-weight: 800;
+}
+
+.intro {
+  max-width: 720px;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+.body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  align-items: flex-start;
+  max-width: 1128px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.toc {
+  box-sizing: content-box;
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.tocLabel {
+  padding: 4px 8px 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.tocLink,
+.tocLink:hover {
+  padding: 6px 8px;
+  border-radius: 10px;
+  color: #e4ddcf;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+@supports (color: oklch(0% 0 0)) {
+  .tocLink,
+  .tocLink:hover {
+    color: oklch(0.9 0.02 85);
+  }
+}
+
+.tocLink:hover {
+  background: var(--surface-2);
+}
+
+/* Phones: taller rows so each link is an easy tap. */
+@media (max-width: 847px) {
+  .tocLink {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 16px;
+  }
+}
+
+/* Side by side once both columns fit (240 + 40 + 520, plus padding). */
+@media (min-width: 848px) {
+  .toc {
+    flex: 0 1 240px;
+    min-width: 200px;
+    position: sticky;
+    top: 90px;
+  }
+}
+
+.content {
+  flex: 1 1 520px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.short {
+  padding: 16px 18px;
+  border: 1px solid var(--marigold-40);
+  border-radius: 18px;
+  background: var(--marigold-14);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.short b {
+  color: var(--marigold);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line-soft);
+  scroll-margin-top: 90px;
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.h2 {
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.para,
+.bullet {
+  font-size: 17px;
+  line-height: 1.6;
+  color: #d1cfdd;
+  text-wrap: pretty;
+}
+
+@supports (color: oklch(0% 0 0)) {
+  .para,
+  .bullet {
+    color: oklch(0.86 0.02 295);
+  }
+}
+
+.bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bullet {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  line-height: 1.55;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--marigold);
+  transform: translateY(-2px);
+}

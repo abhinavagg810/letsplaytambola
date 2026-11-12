@@ -1,0 +1,101 @@
+.ticket {
+  --ticket-radius: 20px;
+  --ticket-pad: 8px;
+  --ticket-head-pad: 8px 10px 8px 16px;
+  --cell-ratio: 1 / 1.15;
+  --cell-font: clamp(16px, 4.6vw, 24px);
+  --dab-size: 86%;
+  overflow: hidden;
+  border-radius: var(--ticket-radius);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-ticket);
+}
+
+.bare {
+  --ticket-radius: 16px;
+  --cell-font: clamp(15px, 4vw, 20px);
+  box-shadow: none;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: var(--ticket-head-pad);
+  background: var(--pink);
+  color: #fff;
+}
+
+.title {
+  min-width: 0;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.pad {
+  padding: var(--ticket-pad);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 2px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--ink-20);
+}
+
+.cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: var(--cell-ratio);
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: inherit;
+}
+
+.blank {
+  background: repeating-linear-gradient(45deg, var(--paper-stripe-a) 0 4px, var(--paper-stripe-b) 4px 8px);
+}
+
+.tap {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.tap:focus-visible {
+  z-index: 1;
+  outline: 3px solid var(--ink);
+  outline-offset: -3px;
+}
+
+.dab {
+  display: grid;
+  place-items: center;
+  width: var(--dab-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--cell-font);
+  font-weight: 800;
+  line-height: 1;
+  padding-top: var(--dab-nudge, 0);
+}
+
+.dabOn {
+  background: var(--dab-color, var(--pink));
+  color: #fff;
+}
+
+.hint {
+  padding: 0 16px 12px;
+  font-size: 15px;
+  color: var(--ink-muted);
+}

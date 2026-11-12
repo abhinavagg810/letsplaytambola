@@ -1,0 +1,40 @@
+.card {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.marigold {
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+.paper {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.bg {
+  background: var(--bg);
+}
+
+.note {
+  background: var(--marigold-14);
+}
+
+.border {
+  border: 1px solid var(--line);
+}
+
+.note.border {
+  border-color: var(--marigold-40);
+}
+
+.clip {
+  overflow: hidden;
+}
+
+/* marigold dotted top edge */
+.dots {
+  height: 12px;
+  background: radial-gradient(circle, var(--marigold) 3px, transparent 3.5px) 0 0 / 18px 12px repeat-x;
+}

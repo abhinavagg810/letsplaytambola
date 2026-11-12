@@ -1,0 +1,113 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: var(--btn-h, 60px);
+  padding: 0 24px;
+  border: none;
+  border-radius: var(--r-button);
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.08s ease, filter 0.15s ease;
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.block {
+  display: flex;
+  width: 100%;
+}
+
+/* sizes */
+.lg {
+  border-radius: var(--r-button);
+  font-size: 21px;
+  padding: 0 30px;
+}
+
+.md {
+  border-radius: var(--r-button-sm);
+  font-size: 18px;
+  padding: 0 22px;
+}
+
+.sm {
+  border-radius: 14px;
+  font-size: 16px;
+  padding: 0 18px;
+}
+
+/* variants */
+.primary,
+.primary:hover {
+  background: var(--marigold);
+  color: var(--ink);
+  box-shadow: var(--shadow-lip);
+}
+
+.flat,
+.flat:hover {
+  box-shadow: none;
+}
+
+.cream,
+.cream:hover {
+  background: var(--text);
+  color: var(--ink);
+}
+
+.whatsapp,
+.whatsapp:hover {
+  background: var(--green);
+  color: #fff;
+  border-radius: var(--r-button-sm);
+  font-size: 19px;
+}
+
+.outline,
+.outline:hover {
+  background: transparent;
+  color: inherit;
+  border: 1.5px solid var(--line);
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.ink,
+.ink:hover {
+  background: var(--ink);
+  color: var(--text);
+}
+
+@media (hover: hover) {
+  .button:hover {
+    filter: brightness(1.06);
+  }
+}
+
+/* Looks disabled, still tappable (see disabledLook). */
+.disabledLook,
+.disabledLook:hover {
+  background: var(--disabled);
+  color: var(--ink);
+  filter: none;
+}
+
+.outline.disabledLook {
+  background: transparent;
+  color: var(--text-dim);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+}

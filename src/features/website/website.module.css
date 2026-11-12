@@ -1,0 +1,1219 @@
+/* Marketing home page. Values follow docs/design_handoff/prototype/Letsplaytambola Website.dc.html. */
+
+.page {
+  overflow-x: clip;
+}
+
+.kicker,
+.kickerTeal {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--marigold);
+}
+
+.kickerTeal {
+  color: var(--teal);
+}
+
+.accent {
+  color: var(--marigold);
+}
+
+.sectionHead {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.h2 {
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 1;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.h2Small {
+  font-size: clamp(32px, 4.5vw, 48px);
+  line-height: 1;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.h3 {
+  font-size: clamp(30px, 4vw, 44px);
+  line-height: 1;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+/* ── 1. Hero ──────────────────────────────────────────────── */
+.hero {
+  background-image: radial-gradient(ellipse at 10% 0%, rgba(87, 15, 69, 0.55), transparent 55%), radial-gradient(ellipse at 100% 80%, rgba(0, 46, 93, 0.45), transparent 50%);
+}
+
+@supports (color: oklch(0% 0 0)) {
+  .hero {
+    background-image: radial-gradient(ellipse at 10% 0%, oklch(0.32 0.12 340 / 0.55), transparent 55%), radial-gradient(ellipse at 100% 80%, oklch(0.3 0.1 250 / 0.45), transparent 50%);
+  }
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 56px;
+  align-items: center;
+  max-width: 1208px; /* 1160 + 2 × 24 side padding */
+  margin: 0 auto;
+  padding: 72px 24px 88px;
+}
+
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+}
+
+.heroPill {
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--marigold);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+
+.h1 {
+  font-size: clamp(48px, 7vw, 84px);
+  line-height: 0.92;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.lede {
+  max-width: 500px;
+  font-size: 21px;
+  line-height: 1.45;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+.ctaRow {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.codeBox {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 460px;
+}
+
+.codeLabel {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.codeRow {
+  display: flex;
+  gap: 8px;
+}
+
+.codeInput {
+  flex: 1;
+  padding: 0 16px;
+  letter-spacing: 0.14em;
+}
+
+.madeFor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.avatars {
+  display: flex;
+  padding-left: 10px;
+}
+
+.stacked {
+  margin-left: -10px;
+}
+
+.heroArt {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  padding: 20px 0;
+}
+
+.heroStack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(100%, 440px);
+}
+
+.callerCard {
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.7);
+}
+
+.dots {
+  height: 12px;
+  background: radial-gradient(circle, var(--marigold) 3px, transparent 3.5px) 0 0 / 18px 12px repeat-x;
+}
+
+.callerBody {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding: 22px;
+}
+
+.callerText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  line-height: 1.05;
+}
+
+.callerText {
+  min-width: 0;
+}
+
+.callerKicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--marigold);
+}
+
+.callerCall {
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.callerSay {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+/* Phones: keep "Independence" and the kicker inside the card (the prototype clips them). */
+@media (max-width: 440px) {
+  .callerBody {
+    gap: 14px;
+    padding: 22px 16px;
+  }
+
+  .callerCall {
+    font-size: min(30px, 6.4vw);
+  }
+}
+
+.sampleTicket {
+  --ticket-radius: 18px;
+  --ticket-pad: 10px;
+  --ticket-head-pad: 8px 16px;
+  --cell-ratio: 1 / 1.12;
+  --cell-font: clamp(14px, 2.4vw, 20px);
+  --dab-size: 84%;
+  --dab-nudge: 2px;
+  --dab-color: rgba(250, 74, 152, 0.92);
+  box-shadow: 0 30px 60px -24px rgba(0, 0, 0, 0.8);
+  transform: rotate(-2deg);
+}
+
+@supports (color: oklch(0% 0 0)) {
+  .sampleTicket {
+    --dab-color: oklch(0.68 0.22 358 / 0.92);
+  }
+}
+
+.sampleMeta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.winChip {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 18px;
+  background: var(--marigold);
+  color: var(--ink);
+  transform: rotate(2deg);
+  box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.7);
+}
+
+.winChipKicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.winChipText {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+/* ── 2. Fact cards ────────────────────────────────────────── */
+.facts {
+  position: relative;
+  z-index: 2;
+  max-width: 1208px; /* 1160 + 2 × 24 side padding */
+  margin: -40px auto 0;
+  padding: 0 24px 40px;
+}
+
+.factGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 12px;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: 0 24px 50px -30px rgba(0, 0, 0, 0.8);
+}
+
+.factBig {
+  display: block;
+  padding-top: 4px;
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.factTitle {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.factBody {
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--text-soft);
+}
+
+/* ── 3. Marquee ───────────────────────────────────────────── */
+.marquee {
+  overflow: hidden;
+  padding: 14px 0;
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+.marqueeTrack {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.marqueeItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 22px;
+  font-size: 20px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.marqueeDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pink);
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marqueeTrack {
+    animation: none;
+  }
+}
+
+/* ── 4. How it works ──────────────────────────────────────── */
+.how {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 1208px; /* 1160 + 2 × 24 side padding */
+  margin: 0 auto;
+  padding: 96px 24px 40px;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 18px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: var(--surface);
+}
+
+.stepBall {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  transform: rotate(-8deg);
+}
+
+.stepNum {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding-top: 3px;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.stepTitle {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.stepBody {
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+/* ── 5. Features ──────────────────────────────────────────── */
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 88px;
+  max-width: 1208px; /* 1160 + 2 × 24 side padding */
+  margin: 0 auto;
+  padding: 72px 24px 40px;
+}
+
+.featureRow,
+.featureRowReverse {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  align-items: center;
+}
+
+.featureRowReverse {
+  flex-direction: row-reverse;
+}
+
+.featureCopy {
+  flex: 1 1 380px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.featureBody {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+.bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bullet {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.bulletDot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--marigold);
+  transform: translateY(-1px);
+}
+
+.featureArt {
+  flex: 1 1 380px;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* mock cards (illustrations, hidden from screen readers) */
+.mock {
+  box-sizing: content-box; /* the design sizes these mocks by their content width */
+  display: flex;
+  flex-direction: column;
+  width: min(100%, var(--mock-w, 420px));
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: var(--surface);
+  box-shadow: var(--shadow-mock);
+}
+
+.mockDots {
+  height: 10px;
+  margin: -18px -18px 6px;
+  border-radius: 25px 25px 0 0;
+  background: radial-gradient(circle, var(--marigold) 2.5px, transparent 3px) 0 0 / 16px 10px repeat-x;
+}
+
+.mockCaller {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.mockCallerText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  line-height: 1.05;
+}
+
+.mockMonoGold {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--marigold);
+}
+
+.mockMono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-soft);
+}
+
+.mockCall {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.mockSay {
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.mockControls {
+  display: flex;
+  gap: 6px;
+}
+
+.mockNext {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--marigold);
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.mockAuto {
+  box-sizing: content-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 48px;
+  border: 1.5px solid var(--teal);
+  border-radius: 14px;
+  line-height: 1.1;
+}
+
+.mockAutoLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-soft);
+}
+
+.mockAutoValue {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.mockHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.mockTitle {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.prizeRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--bg);
+}
+
+.prizeText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.prizeName {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.prizeRule {
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+.prizeWinner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prizeAvatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding-top: 2px;
+  border-radius: 50%;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.prizeWho {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.prizeClaim {
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--marigold);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.verified {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+.verifiedText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.verifiedKicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.verifiedTitle {
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.verifiedTick {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.joinInvited {
+  font-size: 16px;
+  color: var(--text-soft);
+}
+
+.joinGame {
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 800;
+  color: var(--marigold);
+}
+
+.joinAsk {
+  margin-top: 6px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.joinInput {
+  box-sizing: content-box;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 16px;
+  border: 1.5px solid var(--marigold);
+  border-radius: 14px;
+  background: var(--bg);
+  font-size: 20px;
+}
+
+.joinButton {
+  display: grid;
+  place-items: center;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--marigold);
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.joinNote {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.resultsTitle {
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 800;
+  color: var(--marigold);
+}
+
+.resultRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--bg);
+  font-size: 17px;
+}
+
+.resultPrize {
+  font-weight: 600;
+}
+
+.resultWho {
+  font-weight: 800;
+  color: var(--marigold);
+}
+
+.resultsButton {
+  display: grid;
+  place-items: center;
+  height: 54px;
+  margin-top: 4px;
+  border-radius: 16px;
+  background: var(--marigold);
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* ── 6. Comparison table ──────────────────────────────────── */
+.compare {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-width: 1008px; /* 960 + padding */
+  margin: 0 auto;
+  padding: 56px 24px 24px;
+}
+
+.table {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+}
+
+.tableHead,
+.tableRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.tableHead {
+  background: var(--bg-deep);
+  color: var(--text-soft);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.tableHead > span {
+  padding: 14px 10px;
+  text-align: center;
+}
+
+.tableHead > span:first-child {
+  padding: 14px 18px;
+  text-align: left;
+}
+
+.tableHead > .tableUs {
+  color: var(--marigold);
+}
+
+.tableRow {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.cellLabel {
+  padding: 14px 18px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.cellPaper,
+.cellUs {
+  padding: 14px 10px;
+  text-align: center;
+  font-size: 15px;
+  color: var(--text-soft);
+}
+
+.cellUs {
+  font-weight: 800;
+  color: var(--teal);
+}
+
+/* Narrow phones: tighter cells so nothing is cut off at 360px. */
+@media (max-width: 480px) {
+  .tableHead,
+  .tableRow {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .tableHead {
+    letter-spacing: 0.02em;
+  }
+
+  .tableHead > span,
+  .cellPaper,
+  .cellUs {
+    padding: 12px 6px;
+  }
+
+  .tableHead > span:first-child,
+  .cellLabel {
+    padding: 12px 6px 12px 14px;
+  }
+
+  .cellLabel {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
+  .cellPaper,
+  .cellUs {
+    line-height: 1.25;
+  }
+}
+
+/* ── 7. Ways to win ───────────────────────────────────────── */
+.ways {
+  max-width: 1208px; /* 1160 + 2 × 24 side padding */
+  margin: 0 auto;
+  padding: 56px 24px;
+}
+
+.waysCard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 32px;
+  align-items: center;
+  padding: 36px;
+  border: 1px solid var(--line);
+  border-radius: 32px;
+  background: var(--surface);
+}
+
+.waysCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.waysTitle {
+  font-size: 40px;
+  line-height: 1;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.waysBody {
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 7px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* ── 8. App coming soon ───────────────────────────────────── */
+.app {
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(113, 54, 0, 0.35), transparent 60%);
+}
+
+@supports (color: oklch(0% 0 0)) {
+  .app {
+    background-image: radial-gradient(ellipse at 50% 0%, oklch(0.4 0.14 75 / 0.35), transparent 60%);
+  }
+}
+
+.appInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  max-width: 1208px; /* 1160 + 2 × 24 side padding */
+  margin: 0 auto;
+  padding: 96px 24px;
+  text-align: center;
+}
+
+.soonPill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--pink);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+
+.appTitle {
+  max-width: 760px;
+  font-size: clamp(40px, 6vw, 68px);
+  line-height: 0.95;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.appBody {
+  max-width: 560px;
+  font-size: 19px;
+  line-height: 1.45;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+.badges {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.badge {
+  box-sizing: content-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 64px;
+  padding: 0 22px 0 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  background: #000;
+  opacity: 0.92;
+}
+
+.badgeIconAndroid,
+.badgeIconIos {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--green);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.badgeIconIos {
+  background: var(--text);
+  color: #000;
+}
+
+.badgeText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.05;
+}
+
+.badgeSmall {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.badgeBig {
+  font-size: 21px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.notify {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 520px;
+  margin-top: 10px;
+}
+
+.notifyLabel {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.notifyRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.phoneBox {
+  flex: 1 1 240px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 56px;
+  padding: 0 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.phoneBox:focus-within {
+  border-color: var(--marigold);
+  outline: 3px solid var(--marigold-40);
+}
+
+.phonePrefix {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.phoneInput {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.notifyButton {
+  flex: 0 0 auto;
+  padding: 0 24px;
+}
+
+.notifyHint,
+.notifyError {
+  font-size: 15px;
+  color: var(--text-dim);
+}
+
+.notifyError {
+  color: var(--pink-soft);
+}
+
+.notifyDone {
+  margin-top: 10px;
+  padding: 16px 22px;
+  border-radius: 18px;
+  background: var(--teal);
+  color: var(--ink);
+  font-size: 19px;
+  font-weight: 800;
+}
+
+/* ── 9. FAQ ───────────────────────────────────────────────── */
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-width: 908px; /* 860 + padding */
+  margin: 0 auto;
+  padding: 40px 24px 96px;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.faqItem {
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.faqQ {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+  font-size: 19px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.faqQ::-webkit-details-marker {
+  display: none;
+}
+
+.faqQ:focus-visible {
+  outline-offset: -3px;
+  border-radius: 20px;
+}
+
+.faqSign {
+  flex-shrink: 0;
+  font-size: 24px;
+  color: var(--marigold);
+}
+
+.faqSign::before {
+  content: '+';
+}
+
+.faqItem[open] .faqSign::before {
+  content: '−';
+}
+
+.faqA {
+  padding: 0 22px 20px;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+/* ── 10. Closing band ─────────────────────────────────────── */
+.closing {
+  max-width: 1208px; /* 1160 + 2 × 24 side padding */
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.band {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 44px 36px;
+  border-radius: 32px;
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+.bandCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 600px;
+}
+
+.bandTitle {
+  font-size: clamp(32px, 4.5vw, 48px);
+  line-height: 1;
+  font-weight: 800;
+}
+
+.bandBody {
+  font-size: 18px;
+}

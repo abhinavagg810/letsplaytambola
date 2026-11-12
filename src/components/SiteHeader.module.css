@@ -1,0 +1,84 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: var(--bg-90);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: calc(var(--content) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: 10px var(--gutter);
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+}
+
+.home {
+  display: flex;
+  align-items: flex-end;
+  height: 48.5px; /* matches the design's header height (69.5px) */
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.wide {
+  display: none;
+  align-items: center;
+  gap: 22px;
+}
+
+.link,
+.link:hover {
+  color: var(--text-soft);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.link:hover {
+  color: var(--text);
+}
+
+.narrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--gutter) 12px;
+}
+
+.row,
+.row:hover {
+  box-sizing: content-box; /* 54px row + 1px divider */
+  display: flex;
+  align-items: center;
+  min-height: 54px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+@media (min-width: 860px) {
+  .wide {
+    display: flex;
+  }
+
+  .narrow,
+  .menu {
+    display: none;
+  }
+}

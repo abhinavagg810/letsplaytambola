@@ -1,0 +1,13 @@
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: var(--ink);
+  font-weight: 800;
+  user-select: none;
+}
+
+.ring {
+  box-shadow: 0 0 0 3px var(--bg);
+}

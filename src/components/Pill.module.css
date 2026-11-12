@@ -1,0 +1,106 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border: 1.5px solid transparent;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+span.pill {
+  cursor: default;
+}
+
+.pill:hover {
+  color: inherit;
+}
+
+/* sizes */
+.s40 {
+  height: 40px;
+  padding: 0 14px;
+  font-size: 15px;
+}
+
+.s44 {
+  height: 44px;
+  padding: 0 18px;
+  font-size: 16px;
+}
+
+.s46 {
+  height: 46px;
+  padding: 0 18px;
+  font-size: 17px;
+}
+
+.s50 {
+  height: 50px;
+  padding: 0 18px;
+  font-size: 16px;
+}
+
+/* variants */
+.outline {
+  border-color: var(--line);
+}
+
+.outlineLight,
+.outlineLight:hover {
+  border-color: var(--text);
+  color: var(--text);
+}
+
+.filled,
+.filled:hover {
+  background: var(--marigold);
+  border-color: var(--marigold);
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.s44.filled {
+  padding: 0 20px;
+}
+
+.s46.filled {
+  padding: 0 22px;
+  font-size: 18px;
+}
+
+.surface {
+  background: var(--surface);
+  color: var(--text-soft);
+  font-weight: 500;
+  font-size: 15px;
+  padding: 0 16px;
+}
+
+/* selected */
+.selectedFill,
+.selectedFill:hover {
+  background: var(--marigold);
+  border-color: var(--marigold);
+  color: var(--ink);
+}
+
+.selectedBorder {
+  border-color: var(--marigold);
+}
+
+@media (hover: hover) {
+  button.outline:hover,
+  a.outline:hover {
+    border-color: var(--text-muted);
+  }
+}
