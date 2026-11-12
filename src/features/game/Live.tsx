@@ -45,7 +45,7 @@ export function Live({ game, act, serverNow }: { game: MemberView; act: ReturnTy
             </div>
             <Board called={called} latest={last} />
           </section>
-          <PlayersChips players={game.players} />
+          <PlayersChips players={game.players} prizes={game.prizes} hostName={game.hostName} hostPid={game.hostPid} youPid={you.pid} youAreHost={isHost} />
         </div>
       </div>
       {you.ticket ? <ClaimSheet open={claimOpen} onClose={() => setClaimOpen(false)} prizes={game.prizes} act={act} /> : null}
