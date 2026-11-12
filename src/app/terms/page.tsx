@@ -13,7 +13,6 @@ export const metadata: Metadata = {
   title: 'Terms of Use',
   description: 'The rules for using Letsplaytambola, in plain words: a free Tambola game for fun, with no sign-up and no real-money play.',
   alternates: { canonical: '/terms' },
-  openGraph: { title: 'Terms of Use — Letsplaytambola', url: '/terms' },
 };
 
 const SUMMARY =

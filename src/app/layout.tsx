@@ -18,13 +18,11 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   applicationName: 'Letsplaytambola',
   keywords: ['Tambola', 'Housie', 'Tambola online', 'Housie online', 'kitty party games', 'Tambola with family', 'Indian bingo'],
-  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     siteName: 'Letsplaytambola',
     title: 'Letsplaytambola — Housie night, sorted.',
     description: DESCRIPTION,
-    url: '/',
     locale: 'en_IN',
   },
   twitter: {

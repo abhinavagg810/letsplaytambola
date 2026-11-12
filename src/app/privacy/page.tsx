@@ -14,7 +14,6 @@ export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: 'What Letsplaytambola collects, why, how long it is kept and how you stay in control. No sign-up, and game data is deleted after 24 hours.',
   alternates: { canonical: '/privacy' },
-  openGraph: { title: 'Privacy Policy — Letsplaytambola', url: '/privacy' },
 };
 
 const SUMMARY =
