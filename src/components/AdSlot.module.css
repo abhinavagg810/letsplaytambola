@@ -22,3 +22,11 @@
   display: block;
   min-height: 100px;
 }
+
+.narrow {
+  max-width: 560px;
+}
+
+.gapTop {
+  margin-top: 56px;
+}
