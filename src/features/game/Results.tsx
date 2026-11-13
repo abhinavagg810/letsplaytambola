@@ -65,7 +65,7 @@ export function Results({ game, act }: { game: MemberView; act: ReturnType<typeo
           </ul>
         </section>
       </div>
-      {/* The game is over here, so an ad is allowed; there are none in the lobby or during play. */}
+      {/* The game is over here, so an ad is allowed. Never during play. */}
       <AdSlot placement="results" />
       <WinBanner code={game.code} />
     </>

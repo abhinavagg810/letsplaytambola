@@ -90,7 +90,7 @@ const SECTIONS: LegalSection[] = [
           id: 'ads',
           title: 'Advertising',
           paras: [
-            'To keep the game free we show ads from Google AdSense on some pages, such as the home page and the results screen. We never show ads while a game is being set up or played.',
+            'To keep the game free we show ads from Google AdSense in two places: the waiting room before a game starts and the results screen after it ends. We never show ads while a game is being played.',
             'Google and its partners may use cookies or similar identifiers in your browser to show and measure ads, including ads based on your earlier visits to this and other websites. We do not give Google the name you type, your ticket or anything about your game.',
             'You can switch off personalised ads in Google’s Ads Settings (adssettings.google.com), and read how Google uses information from sites that use its services at policies.google.com/technologies/partner-sites.',
           ],

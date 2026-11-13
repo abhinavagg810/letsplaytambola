@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { PageShell } from '@/components/PageShell';
-import { AdSlot } from '@/components/AdSlot';
 import { JoinByCode } from '@/features/join/JoinByCode';
 
 export const metadata: Metadata = {
@@ -13,7 +12,6 @@ export default function JoinPage() {
   return (
     <PageShell>
       <JoinByCode />
-      <AdSlot placement="join" />
     </PageShell>
   );
 }

@@ -2,6 +2,7 @@
 // Lobby: the host shares the link and starts the game; players see "You're in!" and their ticket.
 import { useRef, useState } from 'react';
 import { Avatar, Button, Pill, Ticket, toast } from '@/components';
+import { AdSlot } from '@/components/AdSlot';
 import { ruleDesc, type MemberView } from '@/core';
 import { inviteText, whatsappUrl } from '@/lib/share';
 import { unlockSpeech } from '@/lib/speech';
@@ -104,6 +105,10 @@ export function Lobby({ game, act }: { game: MemberView; act: UseGame['act'] }) 
             ))}
           </ul>
         </section>
+      </div>
+      {/* Waiting room only — the game has not started. Kept at the very bottom, far from Share and Start. */}
+      <div style={{ gridColumn: '1 / -1' }}>
+        <AdSlot placement="lobby" />
       </div>
     </div>
   );
