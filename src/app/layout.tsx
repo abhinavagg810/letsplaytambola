@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { Toaster } from '@/components/Toast';
 import { baloo, balooExt, mono } from '@/fonts';
+import { ADSENSE_CLIENT, ADS_ON } from '@/lib/ads';
 import './globals.css';
 
 /** Public address of the site. Set NEXT_PUBLIC_SITE_URL on Vercel; the default is the planned domain. */
@@ -31,6 +32,8 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
   },
   formatDetection: { telephone: false },
+  // Lets Google AdSense verify the site. Only present once ads are switched on (docs/ADS.md).
+  ...(ADS_ON ? { other: { 'google-adsense-account': ADSENSE_CLIENT } } : {}),
 };
 
 export const viewport: Viewport = {
@@ -44,6 +47,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en-IN" className={`${baloo.variable} ${balooExt.variable} ${mono.variable}`} data-scroll-behavior="smooth">
+      {ADS_ON ? (
+        <head>
+          {/* Google AdSense. Ads show only where an <AdSlot> is placed — never during a game. Keep "Auto ads" OFF in AdSense. */}
+          <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`} crossOrigin="anonymous" />
+        </head>
+      ) : null}
       <body>
         {children}
         <Toaster />

@@ -2,6 +2,7 @@
 import { useRef, type JSX } from 'react';
 import { rupees, type MemberView } from '@/core';
 import { Button, Card, toast } from '@/components';
+import { AdSlot } from '@/components/AdSlot';
 import { useGame } from '@/lib/useGame';
 import { WinBanner } from './WinBanner';
 import { useGameEvents } from './useGameEvents';
@@ -64,6 +65,8 @@ export function Results({ game, act }: { game: MemberView; act: ReturnType<typeo
           </ul>
         </section>
       </div>
+      {/* The game is over here, so an ad is allowed; there are none in the lobby or during play. */}
+      <AdSlot placement="results" />
       <WinBanner code={game.code} />
     </>
   );

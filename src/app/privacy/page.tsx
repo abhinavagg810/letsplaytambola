@@ -9,6 +9,7 @@
 // anonymous device identifier kept for 90 days for the operator's admin panel (docs/ADMIN.md, supabase/migrations/0002_admin.sql).
 // Storing a summary for 90 days for statistics is a NEW purpose since the first draft — ask the lawyer to check it.
 // "{email}" in the text is replaced by a mail link.
+import { ADS_ON } from '@/lib/ads';
 import type { Metadata } from 'next';
 import { LegalPage } from '@/features/website/LegalPage';
 import type { LegalSection } from '@/features/website/legal';
@@ -73,7 +74,9 @@ const SECTIONS: LegalSection[] = [
     id: 'storage',
     title: 'Cookies and browser storage',
     paras: [
-      'We do not use advertising or tracking cookies. The site keeps a few small items in your browser’s local storage so the game works without any registration:',
+      ADS_ON
+        ? 'The game itself sets no tracking cookies. The site keeps a few small items in your browser’s local storage so the game works without any registration:'
+        : 'We do not use advertising or tracking cookies. The site keeps a few small items in your browser’s local storage so the game works without any registration:',
     ],
     bullets: [
       'Your device token (see “What we collect”).',
@@ -81,6 +84,19 @@ const SECTIONS: LegalSection[] = [
       'Your sound on/off choice for the voice caller.',
     ],
   },
+  ...(ADS_ON
+    ? [
+        {
+          id: 'ads',
+          title: 'Advertising',
+          paras: [
+            'To keep the game free we show ads from Google AdSense on some pages, such as the home page and the results screen. We never show ads while a game is being set up or played.',
+            'Google and its partners may use cookies or similar identifiers in your browser to show and measure ads, including ads based on your earlier visits to this and other websites. We do not give Google the name you type, your ticket or anything about your game.',
+            'You can switch off personalised ads in Google’s Ads Settings (adssettings.google.com), and read how Google uses information from sites that use its services at policies.google.com/technologies/partner-sites.',
+          ],
+        } satisfies LegalSection,
+      ]
+    : []),
   {
     id: 'whatsapp',
     title: 'WhatsApp, sharing and the voice caller',

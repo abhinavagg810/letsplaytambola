@@ -1,3 +1,4 @@
+import { AdSlot } from '@/components/AdSlot';
 import type { CSSProperties, ReactNode } from 'react';
 import { Avatar } from '@/components/Avatar';
 import { Ball } from '@/components/Ball';
@@ -21,6 +22,7 @@ export function Website() {
       <Facts />
       <Marquee />
       <HowItWorks />
+      <AdSlot placement="home" />
       <Features />
       <Compare />
       <WaysToWin />
