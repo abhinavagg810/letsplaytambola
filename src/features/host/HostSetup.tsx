@@ -4,11 +4,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from 'react';
 import { Button, Input, Pill, Toggle, toast } from '@/components';
-import { GAME_NAME_IDEAS, MAX_GAME_NAME_LENGTH, MAX_NAME_LENGTH, prizeSummary } from '@/core';
+import { GAME_NAME_IDEAS, MAX_GAME_NAME_LENGTH, MAX_NAME_LENGTH, prizeSummary, rupees } from '@/core';
 import { createGame } from '@/lib/api';
 import { getSavedName, saveName } from '@/lib/device';
 import { unlockSpeech } from '@/lib/speech';
-import { resetDraft, updateDraft, useHostDraft } from './draft';
+import { amountsTotal, pickedAmounts, resetDraft, updateDraft, useHostDraft } from './draft';
 import { canGoBackInSite, keepInView, markPrizesOpenedFromSetup } from './nav';
 import styles from './host.module.css';
 
@@ -57,6 +57,7 @@ export function HostSetup() {
       price: Number(draft.price) || 0,
       hostPlays: draft.hostPlays,
       prizes: draft.prizes,
+      amounts: pickedAmounts(draft),
     });
     if (!res.ok) {
       busy.current = false;
@@ -175,7 +176,10 @@ export function HostSetup() {
         <Link href="/host/prizes" className={styles.row} onClick={() => markPrizesOpenedFromSetup(true)}>
           <span className={styles.rowText}>
             <span className={styles.rowTitle}>Ways to win</span>
-            <span className={styles.rowSub}>{prizeSummary(draft.prizes)}</span>
+            <span className={styles.rowSub}>
+              {prizeSummary(draft.prizes)}
+              {amountsTotal(draft) > 0 ? ` · ${rupees(amountsTotal(draft))} in prizes` : ''}
+            </span>
           </span>
           <span className={styles.change}>Change →</span>
         </Link>

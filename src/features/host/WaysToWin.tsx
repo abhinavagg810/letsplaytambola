@@ -2,8 +2,8 @@
 // Ways to win (/host/prizes): presets + all 26 patterns as toggles. A sub-step of host setup.
 import { useRouter } from 'next/navigation';
 import { Button, Pill, toast } from '@/components';
-import { PRESETS, RULES, RULE_GROUPS, matchPreset } from '@/core';
-import { togglePrize, updateDraft, useHostDraft } from './draft';
+import { PRESETS, RULES, RULE_GROUPS, matchPreset, rupees } from '@/core';
+import { amountsTotal, setPrizeAmount, togglePrize, updateDraft, useHostDraft } from './draft';
 import { markPrizesOpenedFromSetup, wasPrizesOpenedFromSetup } from './nav';
 import styles from './host.module.css';
 
@@ -12,6 +12,7 @@ export function WaysToWin() {
   const draft = useHostDraft();
   const picked = new Set(draft.prizes);
   const preset = matchPreset(draft.prizes);
+  const total = amountsTotal(draft);
 
   function done() {
     if (!draft.prizes.length) {
@@ -38,6 +39,10 @@ export function WaysToWin() {
       <div className={styles.head}>
         <h1 className={`${styles.h1} ${styles.h1Prizes}`}>How can people win?</h1>
         <p className={styles.sub}>Pick a ready-made set, or tap any pattern to add or remove it.</p>
+        <p className={styles.amountHelp}>
+          You can type a prize amount for each one. Leave them empty and, if you set a ticket price, we split the ticket money for you. The app
+          never handles payments.
+        </p>
       </div>
 
       <div className={styles.presets} role="group" aria-label="Ready-made sets">
@@ -55,15 +60,40 @@ export function WaysToWin() {
             {RULES.filter((r) => r.group === group).map((r) => {
               const on = picked.has(r.id);
               return (
-                <button key={r.id} type="button" role="checkbox" aria-checked={on} className={styles.pattern} onClick={() => togglePrize(r.id)}>
-                  <span className={styles.patternText}>
-                    <span className={styles.patternName}>{r.name}</span>
-                    <span className={styles.patternRule}>{r.rule}</span>
-                  </span>
-                  <span className={`${styles.check} ${on ? styles.checkOn : ''}`} aria-hidden="true">
-                    {on ? '✓' : ''}
-                  </span>
-                </button>
+                <div key={r.id} className={styles.patternWrap}>
+                  <button type="button" role="checkbox" aria-checked={on} className={styles.pattern} onClick={() => togglePrize(r.id)}>
+                    <span className={styles.patternText}>
+                      <span className={styles.patternName}>{r.name}</span>
+                      <span className={styles.patternRule}>{r.rule}</span>
+                    </span>
+                    <span className={`${styles.check} ${on ? styles.checkOn : ''}`} aria-hidden="true">
+                      {on ? '✓' : ''}
+                    </span>
+                  </button>
+                  {on ? (
+                    <label className={styles.amountRow}>
+                      <span className={styles.amountLabel}>
+                        Prize amount <span className={styles.optional}>OPTIONAL</span>
+                      </span>
+                      <span className={styles.amountBox}>
+                        <span className={styles.rupee} aria-hidden="true">
+                          ₹
+                        </span>
+                        <input
+                          className={styles.amountInput}
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          value={draft.amounts[r.id] ?? ''}
+                          onChange={(e) => setPrizeAmount(r.id, e.target.value)}
+                          placeholder="0"
+                          autoComplete="off"
+                          enterKeyHint="done"
+                          aria-label={`Prize amount for ${r.name} in rupees (optional)`}
+                        />
+                      </span>
+                    </label>
+                  ) : null}
+                </div>
               );
             })}
           </div>
@@ -72,7 +102,7 @@ export function WaysToWin() {
 
       <div className={styles.sticky}>
         <Button size={62} block onClick={done}>
-          Done · {draft.prizes.length} picked
+          Done · {draft.prizes.length} picked{total > 0 ? ` · ${rupees(total)} in prizes` : ''}
         </Button>
       </div>
     </div>

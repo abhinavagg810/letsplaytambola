@@ -45,3 +45,45 @@ describe('prize money', () => {
     expect(rupees(0)).toBe('₹0'); expect(rupees(950)).toBe('₹950'); expect(rupees(1250)).toBe('₹1,250'); expect(rupees(125000)).toBe('₹1,25,000');
   });
 });
+
+import { applyAction, createGame } from '..';
+import type { Actor, GameState } from '..';
+
+describe('prize amounts typed by the host', () => {
+  const ctx = { now: 1_700_000_000_000, rng: (() => { let s = 7; return () => ((s = (s * 16807) % 2147483647) / 2147483647); })() };
+  const host: Actor = { isHost: true, pid: null } as unknown as Actor;
+  const make = (input: Record<string, unknown>) => createGame({ hostName: 'Priya', prizes: ['early5', 'top', 'full'], ...input } as never, 'ABCDE', ctx);
+
+  it('keeps the typed amounts, marks them fixed, and ignores unpicked patterns', () => {
+    const r = make({ amounts: { early5: 100, full: 500, middle: 999 } });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.doc.fixedAmounts).toBe(true);
+    expect(r.state.doc.prizes.map((p) => p.amount)).toEqual([100, 0, 500]);
+  });
+  it('does not re-split typed amounts at start, even with a ticket price, and keeps them for the next round', () => {
+    const r = make({ price: 100, amounts: { early5: 100, top: 150, full: 500 } });
+    if (!r.ok) throw new Error('create failed');
+    let state: GameState = r.state;
+    const hostActor = { ...host, pid: state.doc.hostPid } as Actor;
+    const s = applyAction(state, { type: 'start' }, hostActor, ctx);
+    if (!s.ok) throw new Error('start failed');
+    state = s.state;
+    expect(state.doc.prizes.map((p) => p.amount)).toEqual([100, 150, 500]);
+    state = { ...state, doc: { ...state.doc, status: 'done' } };
+    const n = applyAction(state, { type: 'newRound' }, hostActor, ctx);
+    if (!n.ok) throw new Error('newRound failed');
+    expect(n.state.doc.prizes.map((p) => p.amount)).toEqual([100, 150, 500]);
+  });
+  it('with no typed amounts nothing is fixed (ticket money is split at start as before)', () => {
+    const r = make({ price: 100, amounts: { early5: 0 } });
+    if (!r.ok) throw new Error('create failed');
+    expect(r.state.doc.fixedAmounts).toBeUndefined();
+    expect(r.state.doc.prizes.every((p) => p.amount === 0)).toBe(true);
+  });
+  it('rejects bad amounts', () => {
+    for (const bad of [{ early5: -1 }, { early5: 1.5 }, { early5: '100' }, { early5: 1_000_000 }, [100]]) {
+      expect(make({ amounts: bad }).ok).toBe(false);
+    }
+  });
+});

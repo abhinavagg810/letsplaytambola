@@ -311,3 +311,67 @@ a.row:hover {
   border-color: var(--marigold);
   background: var(--marigold);
 }
+
+/* ── Prize amount per way to win ─────────────────────────── */
+.patternWrap {
+  border-top: 1px solid var(--surface-2);
+}
+
+.patternWrap:first-child {
+  border-top: none;
+}
+
+.patternWrap .pattern {
+  border-top: none;
+}
+
+.amountHelp {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.amountRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px 12px;
+}
+
+.amountLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-soft, var(--text-muted));
+}
+
+.amountBox {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 132px;
+  height: 48px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.amountInput {
+  width: 100%;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.amountBox:focus-within {
+  outline: 2px solid var(--marigold);
+  outline-offset: 1px;
+}

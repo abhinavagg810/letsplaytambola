@@ -1,7 +1,7 @@
 // The game rules. Pure: time and randomness come from `ctx`; nothing here touches the network or storage.
 // The server runs every action through `applyAction`; the same checks decide what each device may see (`projectView`).
 import {
-  AUTO_SECONDS, AVATAR_COLORS, DEFAULT_GAME_NAME, MAX_GAME_NAME_LENGTH, MAX_NAME_LENGTH, MAX_PLAYERS, MAX_PRICE,
+  AUTO_SECONDS, AVATAR_COLORS, DEFAULT_GAME_NAME, MAX_GAME_NAME_LENGTH, MAX_NAME_LENGTH, MAX_PLAYERS, MAX_PRICE, MAX_PRIZE_AMOUNT,
   isRuleId, ruleName,
 } from './data';
 import { checkPattern } from './patterns';
@@ -26,6 +26,7 @@ export const COPY = {
   pickOne: 'Pick at least one way to win',
   badPrize: 'That way to win isn’t on our list',
   badPrice: `Ticket price must be a whole number up to ₹${MAX_PRICE}`,
+  badAmount: `Prize amounts must be whole numbers up to ₹${MAX_PRIZE_AMOUNT}`,
   hostOnly: 'Only the host can do that',
   noPlayers: 'Share the link — no one has joined yet',
   alreadyStarted: 'The game has already started',
@@ -113,12 +114,25 @@ export function createGame(input: CreateGameInput, code: string, ctx: Ctx): Engi
     if (!isRuleId(r) || rules.includes(r)) return fail('invalid', COPY.badPrize);
     rules.push(r);
   }
-  const prizes: Prize[] = rules.map((rule) => ({ id: rule, rule, label: ruleName(rule), winnerPid: null, winnerName: null, wonAt: null, amount: 0 }));
+  // Prize money typed by the host (optional). Amounts for patterns that were not picked are ignored.
+  const typed: Partial<Record<RuleId, number>> = {};
+  if (raw.amounts !== undefined && raw.amounts !== null) {
+    if (typeof raw.amounts !== 'object' || Array.isArray(raw.amounts)) return fail('invalid', COPY.badAmount);
+    for (const rule of rules) {
+      const a = (raw.amounts as Record<string, unknown>)[rule];
+      if (a === undefined || a === null) continue;
+      if (typeof a !== 'number' || !Number.isInteger(a) || a < 0 || a > MAX_PRIZE_AMOUNT) return fail('invalid', COPY.badAmount);
+      if (a > 0) typed[rule] = a;
+    }
+  }
+  const fixedAmounts = Object.keys(typed).length > 0;
+  const prizes: Prize[] = rules.map((rule) => ({ id: rule, rule, label: ruleName(rule), winnerPid: null, winnerName: null, wonAt: null, amount: typed[rule] ?? 0 }));
 
   const state: GameState = {
     doc: {
       code, name, hostName, hostPid: null, price, status: 'lobby', called: [], auto: 0, round: 1,
       prizes, players: [], events: [], seq: 0, createdAt: ctx.now, updatedAt: ctx.now, version: 1,
+      ...(fixedAmounts ? { fixedAmounts: true } : {}),
     },
     players: {},
   };
@@ -265,7 +279,7 @@ export function applyAction(state: GameState, action: GameAction, actor: Actor, 
         p.winnerPid = null;
         p.winnerName = null;
         p.wonAt = null;
-        p.amount = 0;
+        if (!doc.fixedAmounts) p.amount = 0; // typed amounts stay for the next round
       }
       const touched: string[] = [];
       for (const p of doc.players) {

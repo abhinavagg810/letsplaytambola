@@ -174,6 +174,8 @@ export const DEFAULT_GAME_NAME = 'Tambola Night';
 export const MAX_NAME_LENGTH = 24;
 export const MAX_GAME_NAME_LENGTH = 32;
 export const MAX_PRICE = 99999;
+/** Largest prize amount a host may type for one way to win. */
+export const MAX_PRIZE_AMOUNT = 999999;
 /** Safety cap, not a product feature: keeps one game document a sensible size. */
 export const MAX_PLAYERS = 100;
 

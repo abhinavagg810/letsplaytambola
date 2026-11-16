@@ -66,6 +66,7 @@ interface CreateGameInput {
   price?: number;          // whole rupees 0–99999; 0 = none
   hostPlays?: boolean;     // "Deal me a ticket", default true
   prizes: RuleId[];        // ≥ 1, no repeats, display order
+  amounts?: Partial<Record<RuleId, number>>; // optional prize money typed per way to win (whole rupees, 0–999999). If any is given the amounts are fixed; otherwise ticket money is split at start
 }
 
 type GameAction =

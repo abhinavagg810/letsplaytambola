@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { Avatar, Button, Pill, Ticket, toast } from '@/components';
 import { AdSlot } from '@/components/AdSlot';
-import { ruleDesc, type MemberView } from '@/core';
+import { ruleDesc, rupees, type MemberView } from '@/core';
 import { inviteText, whatsappUrl } from '@/lib/share';
 import { unlockSpeech } from '@/lib/speech';
 import type { UseGame } from '@/lib/useGame';
@@ -100,7 +100,10 @@ export function Lobby({ game, act }: { game: MemberView; act: UseGame['act'] }) 
             {game.prizes.map((p) => (
               <li key={p.id} className={styles.prizeRow}>
                 <span className={styles.prizeName}>{p.label}</span>
-                <span className={styles.prizeRule}>{ruleDesc(p.rule)}</span>
+                <span className={styles.prizeRule}>
+                  {p.amount > 0 ? <b style={{ color: 'var(--marigold)' }}>{rupees(p.amount)} · </b> : null}
+                  {ruleDesc(p.rule)}
+                </span>
               </li>
             ))}
           </ul>

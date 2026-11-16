@@ -38,6 +38,7 @@ export function splitPot(pot: number, rules: readonly RuleId[]): number[] {
  * so prizes that were already won never change.
  */
 export function assignPrizeAmounts(doc: GameDoc): void {
+  if (doc.fixedAmounts) return; // the host typed the amounts: leave them exactly as they are
   const open = doc.prizes.filter((p) => !p.winnerPid);
   if (!doc.price) { for (const p of doc.prizes) p.amount = 0; return; }
   const won = doc.prizes.filter((p) => p.winnerPid).reduce((a, p) => a + (p.amount || 0), 0);

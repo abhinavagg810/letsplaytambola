@@ -70,6 +70,8 @@ export type GameEventInput =
 
 /** The public game document: everything every member of the game may see. No tickets, no marks, no tokens. */
 export interface GameDoc {
+  /** True when the host typed the prize amounts: they are never re-split and stay the same for every round. */
+  fixedAmounts?: boolean;
   code: string;
   name: string;
   hostName: string;
@@ -158,6 +160,11 @@ export interface CreateGameInput {
   hostPlays?: boolean;
   /** Rule ids of the ways to win, in display order: at least one, no repeats. */
   prizes: RuleId[];
+  /**
+   * Optional prize money the host typed for each way to win (whole rupees). If any amount is given, the amounts are
+   * used exactly as typed and nothing is split automatically; if none is, the ticket money is split when the game starts.
+   */
+  amounts?: Partial<Record<RuleId, number>>;
 }
 
 export type GameAction =

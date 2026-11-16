@@ -14,6 +14,8 @@ export interface HostDraft {
   hostPlays: boolean;
   /** Selected ways to win, in the order picked. */
   prizes: RuleId[];
+  /** Optional prize amount typed for a way to win: digits only, up to 6; missing or '' = none. */
+  amounts: Partial<Record<RuleId, string>>;
 }
 
 const KEY = 'lpt:host-draft';
@@ -24,10 +26,44 @@ const DEFAULT_DRAFT: HostDraft = Object.freeze({
   price: '',
   hostPlays: true,
   prizes: [...PRESETS[0].rules],
+  amounts: {},
 });
 
 let current: HostDraft | null = null;
 const listeners = new Set<() => void>();
+
+function loadAmounts(raw: unknown): Partial<Record<RuleId, string>> {
+  const out: Partial<Record<RuleId, string>> = {};
+  if (!raw || typeof raw !== 'object') return out;
+  for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+    if (isRuleId(k) && typeof v === 'string') {
+      const digits = v.replace(/\D/g, '').slice(0, 6);
+      if (digits) out[k] = digits;
+    }
+  }
+  return out;
+}
+
+/** Type (or clear) the prize amount for one way to win. */
+export function setPrizeAmount(rule: RuleId, value: string): void {
+  const digits = value.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, 6);
+  const amounts = { ...getSnapshot().amounts };
+  if (digits) amounts[rule] = digits;
+  else delete amounts[rule];
+  set({ ...getSnapshot(), amounts });
+}
+
+/** The typed amounts for the PICKED ways to win, as numbers (only those above zero). */
+export function pickedAmounts(d: HostDraft): Partial<Record<RuleId, number>> {
+  const out: Partial<Record<RuleId, number>> = {};
+  for (const r of d.prizes) {
+    const n = Number(d.amounts[r] || 0);
+    if (n > 0) out[r] = n;
+  }
+  return out;
+}
+
+export const amountsTotal = (d: HostDraft): number => Object.values(pickedAmounts(d)).reduce((a, b) => a + (b || 0), 0);
 
 function load(): HostDraft {
   try {
@@ -41,6 +77,7 @@ function load(): HostDraft {
       price: typeof d.price === 'string' ? d.price.replace(/\D/g, '').slice(0, 5) : '',
       hostPlays: typeof d.hostPlays === 'boolean' ? d.hostPlays : true,
       prizes,
+      amounts: loadAmounts(d.amounts),
     };
   } catch {
     return DEFAULT_DRAFT;
