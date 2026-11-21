@@ -3,14 +3,18 @@
 Ads are **off** until `NEXT_PUBLIC_ADSENSE_CLIENT` is set. Nothing about the site changes before that.
 
 ## Where ads can appear
-| Placement | Page | Env var for its ad unit id |
+| Spot | Where | Env var for its ad unit id |
 |---|---|---|
-| `lobby` | Lobby (waiting for the host to start), at the very bottom under "Ways to win" | `NEXT_PUBLIC_ADSENSE_SLOT_LOBBY` |
-| `results` | Results screen, after a game is over, under the winners | `NEXT_PUBLIC_ADSENSE_SLOT_RESULTS` |
+| Waiting room — players | Right under the player's ticket, on screen without scrolling | `NEXT_PUBLIC_ADSENSE_SLOT_LOBBY` |
+| Waiting room — host | At the very bottom, far from Share and Start | `NEXT_PUBLIC_ADSENSE_SLOT_LOBBY` (same unit) |
+| Results | Under the Play again / Host my own buttons with a gap, above the winners on phones | `NEXT_PUBLIC_ADSENSE_SLOT_RESULTS` |
 
 **Owner's rule: no ads during the game.** There is no placement on the live game screen and none may be added.
 Also none on the home page, host setup, ways to win, join pages, legal pages or admin.
 Keep **Auto ads switched off** in AdSense — Auto ads place themselves anywhere, including the live game.
+
+**Ad views in the admin:** Admin → Engagement → "Ad views" counts an ad as seen when at least half of it is on screen
+for one second (event `ad_seen`, once per spot per page view). AdSense's own reports remain the source of truth for earnings.
 
 ## Switching on
 1. Apply at https://adsense.google.com with the site's domain.

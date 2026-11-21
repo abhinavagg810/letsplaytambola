@@ -59,7 +59,7 @@ const EVENT_NAMES: Record<string, string> = {
   share_whatsapp: 'Share: WhatsApp', share_copy: 'Share: copy link (lobby)', share_header_copy: 'Share: copy link (header)',
   join_name_typed: 'Join: name typed', join_tap: 'Join: “Join game” tapped', join_ok: 'Join: joined', join_failed: 'Join: failed', game_not_found: 'Join: game not found',
   game_start: 'Game: started', first_call: 'Game: first number called', auto_on: 'Game: auto-call on', auto_off: 'Game: auto-call off', mute_on: 'Sound off', mute_off: 'Sound on',
-  claim_open: 'Claim: sheet opened', claim_valid: 'Claim: valid', claim_invalid: 'Claim: not valid', new_round: 'Game: new round', results_seen: 'Results seen',
+  claim_open: 'Claim: sheet opened', claim_valid: 'Claim: valid', claim_invalid: 'Claim: not valid', new_round: 'Game: new round', results_seen: 'Results seen', ad_seen: 'Ad seen',
   host_own_tap: '“Host my own game” tapped', toast: 'Message shown', offline: 'Went offline', online: 'Back online',
 };
 export const eventLabel = (name: string): string => EVENT_NAMES[name] ?? name;

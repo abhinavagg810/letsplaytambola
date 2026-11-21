@@ -54,6 +54,8 @@ export const EVENTS: Record<string, Record<string, Spec>> = {
   game_start: {}, first_call: {}, auto_on: {}, auto_off: {}, mute_on: {}, mute_off: {},
   claim_open: {}, claim_valid: { prize: str(16, /^[a-z0-9]+$/), called: int(0, 90) }, claim_invalid: { prize: str(16, /^[a-z0-9]+$/), reason: en('not_yet', 'taken', 'other') },
   new_round: {}, results_seen: { role: en(...ROLES) }, host_own_tap: {},
+  // ads: an ad slot was at least half on screen for a second (once per slot per page view)
+  ad_seen: { slot: en('lobby_player', 'lobby_host', 'results') },
   // problems
   toast: { cls: en(...TOAST_CLASSES) },
   offline: {}, online: {},

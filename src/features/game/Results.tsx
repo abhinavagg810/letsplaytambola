@@ -50,6 +50,8 @@ export function Results({ game, act }: { game: MemberView; act: ReturnType<typeo
           <Button href="/host" variant="outline" size={54} block>
             Host my own game
           </Button>
+          {/* The game is over here, so an ad is allowed (never during play). Above the winners on phones, with a clear gap from the buttons. */}
+          <AdSlot placement="results" seenAs="results" gapTop />
         </div>
         <section className={styles.winners}>
           <h2 className={styles.heading}>Winners</h2>
@@ -65,8 +67,6 @@ export function Results({ game, act }: { game: MemberView; act: ReturnType<typeo
           </ul>
         </section>
       </div>
-      {/* The game is over here, so an ad is allowed. Never during play. */}
-      <AdSlot placement="results" />
       <WinBanner code={game.code} />
     </>
   );

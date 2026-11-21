@@ -74,6 +74,8 @@ export function Lobby({ game, act }: { game: MemberView; act: UseGame['act'] }) 
             <Ticket ticket={game.you.ticket} bare />
           </section>
         ) : null}
+        {/* Players have nothing to do while they wait, so their ad sits right under the ticket, on screen without scrolling. */}
+        {!isHost ? <AdSlot placement="lobby" seenAs="lobby_player" /> : null}
       </div>
 
       <div className={styles.col}>
@@ -111,10 +113,12 @@ export function Lobby({ game, act }: { game: MemberView; act: UseGame['act'] }) 
           </ul>
         </section>
       </div>
-      {/* Waiting room only — the game has not started. Kept at the very bottom, far from Share and Start. */}
-      <div style={{ gridColumn: '1 / -1' }}>
-        <AdSlot placement="lobby" />
-      </div>
+      {/* The host is busy sharing and starting, so the host's ad stays at the very bottom, far from Share and Start. */}
+      {isHost ? (
+        <div style={{ gridColumn: '1 / -1' }}>
+          <AdSlot placement="lobby" seenAs="lobby_host" />
+        </div>
+      ) : null}
     </div>
   );
 }

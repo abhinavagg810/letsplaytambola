@@ -8,9 +8,14 @@ describe('the event whitelist', () => {
     for (const name of ['session_start', 'session_end', 'page_view', 'cta_host', 'cta_join', 'cta_code', 'cta_notify', 'host_name_typed', 'host_preset',
       'host_amount_typed', 'host_price_set', 'host_create_tap', 'host_created', 'host_create_failed', 'share_whatsapp', 'share_copy', 'share_header_copy',
       'join_name_typed', 'join_tap', 'join_ok', 'join_failed', 'game_not_found', 'game_start', 'first_call', 'auto_on', 'auto_off', 'mute_on', 'mute_off',
-      'claim_open', 'claim_valid', 'claim_invalid', 'new_round', 'results_seen', 'host_own_tap', 'toast', 'offline', 'online']) {
+      'claim_open', 'claim_valid', 'claim_invalid', 'new_round', 'results_seen', 'host_own_tap', 'toast', 'offline', 'online', 'ad_seen']) {
       expect(EVENT_NAMES, name).toContain(name);
     }
+  });
+  it('ad_seen keeps only a known ad spot', () => {
+    expect(cleanEvent({ n: 'ad_seen', d: { slot: 'lobby_player' } }, NOW)?.props).toEqual({ slot: 'lobby_player' });
+    expect(cleanEvent({ n: 'ad_seen', d: { slot: 'results', ip: '1.2.3.4' } }, NOW)?.props).toEqual({ slot: 'results' });
+    expect(cleanEvent({ n: 'ad_seen', d: { slot: 'live_game' } }, NOW)?.props).toEqual({});
   });
   it('drops names that are not on it', () => {
     for (const n of ['evil', 'PAGE_VIEW', '', 'constructor', '__proto__', 'toString', 42, null]) expect(cleanEvent({ n }, NOW)).toBeNull();

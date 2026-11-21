@@ -28,6 +28,8 @@ const bars = (b: readonly Bucket[]) => b.map((x) => ({ label: x.label, value: x.
 const dur = (ms: number | null): string => (ms === null ? '—' : formatDuration(ms));
 const spread = (s: Summary, f: (n: number | null) => string): string => (s.n ? `middle half ${f(s.p25)}–${f(s.p75)}` : 'no data yet');
 
+const AD_SPOT: Record<string, string> = { lobby_player: 'Waiting room — players', lobby_host: 'Waiting room — host', results: 'Results' };
+
 export default async function AdminEngagementPage({ searchParams }: PageProps<'/admin/engagement'>) {
   const admin = await requireAdmin();
   if (admin.off) return <AdminOff />;
@@ -37,7 +39,7 @@ export default async function AdminEngagementPage({ searchParams }: PageProps<'/
   const { from, to } = range;
   const ev = (key: string, q: Parameters<typeof store.eventBreakdown>[0]) => cached(`eng:${key}:${from}:${to}`, () => store.eventBreakdown(q));
 
-  const [games, names, autoGames, valid, invalid, calledAt, toasts] = await Promise.all([
+  const [games, names, autoGames, valid, invalid, calledAt, toasts, ads] = await Promise.all([
     cached(`games:${from}:${to}`, () => store.adminGamesInRange({ from, to })),
     ev('names', { from, to, dim: 'name' }),
     ev('auto', { from, to, dim: 'code', names: ['auto_on'], limit: 3000 }),
@@ -45,6 +47,7 @@ export default async function AdminEngagementPage({ searchParams }: PageProps<'/
     ev('invalid', { from, to, dim: 'prop:prize', names: ['claim_invalid'] }),
     ev('calledAt', { from, to, dim: 'prop:prize+called', names: ['claim_valid'], limit: 3000 }),
     ev('toasts', { from, to, dim: 'prop:cls', names: ['toast'] }),
+    ev('ads', { from, to, dim: 'prop:slot', names: ['ad_seen'] }),
   ]);
   const o = gameOverview(games.rows, range.days, now);
   const dist = gameDistributions(games.rows, now);
@@ -174,6 +177,16 @@ export default async function AdminEngagementPage({ searchParams }: PageProps<'/
           <Ranked items={toasts.map((r) => ({ label: toastLabel(r.key), value: r.events }))} unit={['time', 'times']} hue="pink" max={12} empty="No error or warning message was shown in this period." />
         </ChartBox>
       </div>
+
+      <ChartBox
+        title="Ad views"
+        sub="An ad counts as seen when at least half of it was on screen for one second. Counted only while ads are switched on."
+        file="ad-views"
+        table={{ head: ['Ad spot', 'Views', 'Devices'], rows: ads.map((r) => [AD_SPOT[r.key] ?? r.key, r.events, r.devices]) }}
+        footer={<p className={styles.hint}>Total {num(events('ad_seen'))} {events('ad_seen') === 1 ? 'view' : 'views'} by {num(devices('ad_seen'))} {devices('ad_seen') === 1 ? 'device' : 'devices'}. Google’s own reports in AdSense are the source of truth for earnings.</p>}
+      >
+        <Ranked items={ads.map((r) => ({ label: AD_SPOT[r.key] ?? r.key, value: r.events }))} unit={['view', 'views']} hue="teal" empty="No ad was seen in this period. Ads show only after AdSense is set up." />
+      </ChartBox>
     </>
   );
 }
