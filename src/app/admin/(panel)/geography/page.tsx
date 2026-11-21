@@ -88,11 +88,11 @@ export default async function AdminGeographyPage({ searchParams }: PageProps<'/a
 
       <section aria-label="Geography totals" className={styles.kpis}>
         <Kpi label="Visitors" value={num(total)} sub="different devices" />
-        <Kpi label="From India" value={pct(india, total)} sub={`${num(india)} visitors`} />
+        <Kpi label="From India" value={pct(india, total)} sub={`${num(india)} ${india === 1 ? 'visitor' : 'visitors'}`} />
         <Kpi label="Countries" value={num(countries.filter((c) => c.key).length)} />
         <Kpi label="Indian states" value={num(states.length)} sub="and union territories" />
-        <Kpi label="Top city" value={topCity ? cityLabel(topCity.key).city : '—'} sub={topCity ? `${num(topCity.visitors)} visitors` : undefined} />
-        <Kpi label="Place unknown" value={pct(unknown, total)} sub={`${num(unknown)} visitors`} />
+        <Kpi label="Top city" value={topCity ? cityLabel(topCity.key).city : '—'} sub={topCity ? `${num(topCity.visitors)} ${topCity.visitors === 1 ? 'visitor' : 'visitors'}` : undefined} />
+        <Kpi label="Place unknown" value={pct(unknown, total)} sub={`${num(unknown)} ${unknown === 1 ? 'visitor' : 'visitors'}`} />
       </section>
 
       <div className={styles.grid2}>

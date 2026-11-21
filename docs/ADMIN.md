@@ -168,6 +168,11 @@ To remove a Notify-me number: `delete from public.notify_numbers where phone = '
 - **Session:** a cookie (`HttpOnly`, `Secure` in production, `SameSite=Lax`) holding only an expiry time and an
   HMAC-SHA256 signature. It lasts 12 hours. The signing key is SHA-256 of the password together with
   `ADMIN_SESSION_SECRET` (or, if that is not set, the Supabase service key).
+- **Sign out** clears the cookie and also ends that session on the server, so a copied cookie cannot be replayed afterwards.
+  (That list lives in the server's memory, like the brute-force counter: on Vercel treat it as best effort. To end every
+  session everywhere for certain, change `ADMIN_PASSWORD` or `ADMIN_SESSION_SECRET` and redeploy.)
+- **If a page's numbers cannot be loaded** (the database does not answer), the page says so inside the admin frame with a
+  **Try again** button; the other sections keep working.
 - **Every admin page and every admin API route checks the cookie on the server on every request.** A check in front of the
   pages (`src/proxy.ts`) additionally turns a signed-out visit into a real redirect to the sign-in page; it is a
   convenience, not the lock.

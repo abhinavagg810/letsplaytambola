@@ -116,7 +116,7 @@ function intlCountryName(code: string): string | null {
   try {
     if (!/^[A-Z]{2}$/.test(code)) return null;
     const name = new Intl.DisplayNames(['en'], { type: 'region', fallback: 'none' }).of(code);
-    return name && name !== code ? name : null;
+    return name && name !== code && !/^unknown/i.test(name) ? name : null;
   } catch {
     return null;
   }

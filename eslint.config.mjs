@@ -15,6 +15,11 @@ const eslintConfig = defineConfig([
     // Design references (prototype HTML/JS), not app code:
     "docs/**",
   ]),
+  // The admin QA suite is plain CommonJS run by Node (it is preloaded with `node --require`): require() is how it loads.
+  {
+    files: ["e2e/admin/**/*.cjs"],
+    rules: { "@typescript-eslint/no-require-imports": "off", "@typescript-eslint/no-unused-vars": "off" },
+  },
 ]);
 
 export default eslintConfig;

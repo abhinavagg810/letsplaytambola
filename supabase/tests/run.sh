@@ -44,5 +44,18 @@ sql < migrations/0001_init.sql
 sql < migrations/0002_admin.sql
 sql -c "set role service_role" -c "select purge_expired_games()" -c "select admin_list_games()" > /dev/null
 echo "ok   migrations 0001 + 0002 alone still work (0003 not yet run)"
+# QA (docs/qa/TEST_PLAN_ADMIN.md, MIG-*): a fresh database; each migration applied a SECOND time must stop
+# with a clear "already exists" error and change nothing; then the lock-down is checked from pg_catalog, object by object.
+fresh
+sql < tests/helpers.sql
+before=$(run -X -q -At -d "$DB" -c "select md5(string_agg(x, '|' order by x)) from (select 'f:' || p.oid::regprocedure || ':' || md5(p.prosrc) || ':' || coalesce(p.proacl::text, '') as x from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' union all select 'c:' || table_name || '.' || column_name || ':' || data_type from information_schema.columns where table_schema = 'public' union all select 't:' || c.relname || ':' || c.relrowsecurity || ':' || coalesce(c.relacl::text, '') from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public') s")
+for f in migrations/*.sql; do
+  if out=$(run -X -q -v ON_ERROR_STOP=1 -1 -d "$DB" < "$f" 2>&1); then echo "FAILED: re-applying $f did not stop with an error" >&2; exit 1; fi
+  echo "$out" | grep -q "already exists" || { echo "FAILED: re-applying $f gave an unclear error: $out" >&2; exit 1; }
+done
+after=$(run -X -q -At -d "$DB" -c "select md5(string_agg(x, '|' order by x)) from (select 'f:' || p.oid::regprocedure || ':' || md5(p.prosrc) || ':' || coalesce(p.proacl::text, '') as x from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' union all select 'c:' || table_name || '.' || column_name || ':' || data_type from information_schema.columns where table_schema = 'public' union all select 't:' || c.relname || ':' || c.relrowsecurity || ':' || coalesce(c.relacl::text, '') from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public') s")
+[ "$before" = "$after" ] || { echo "FAILED: re-applying the migrations changed the schema, a function or a grant" >&2; exit 1; }
+echo "ok   each migration, run a second time, stops with \"already exists\" and changes nothing"
+sql -At < tests/qa_admin.sql
 run -X -q -d postgres -c "drop database $DB"
 echo "SQL tests passed"

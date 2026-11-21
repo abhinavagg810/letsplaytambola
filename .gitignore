@@ -41,3 +41,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /e2e/.results/
+
+# QA output of the admin suite
+/e2e/admin/.out/

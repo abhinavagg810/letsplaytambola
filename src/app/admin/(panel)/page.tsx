@@ -29,7 +29,7 @@ export default async function AdminOverviewPage({ searchParams }: PageProps<'/ad
   const store = getStore();
   const { from, to, prev, cmp } = range;
 
-  const [games, prevGames, totals, prevTotals, byDay, byHour, liveNow, active, notify] = await Promise.all([
+  const [games, prevGames, totals, prevTotals, byDay, byHour, liveNow, active, notify, prevNotify] = await Promise.all([
     cached(`games:${from}:${to}`, () => store.adminGamesInRange({ from, to })),
     cmp ? cached(`games:${prev.from}:${prev.to}`, () => store.adminGamesInRange({ from: prev.from, to: prev.to })) : null,
     cached(`totals:${from}:${to}`, () => store.trafficTotals(from, to)),
@@ -39,6 +39,7 @@ export default async function AdminOverviewPage({ searchParams }: PageProps<'/ad
     store.adminListGames({ status: 'open', activeSince: now - LIVE_NOW_MS, sort: 'activity', dir: 'desc', limit: 50, offset: 0 }),
     store.trafficTotals(now - ACTIVE_VISITOR_MS, now + 1000),
     store.adminCountNotifyNumbers(from, to),
+    cmp ? store.adminCountNotifyNumbers(prev.from, prev.to) : null,
   ]);
   const g = gameOverview(games.rows, range.days, now);
   const p = prevGames ? gameOverview(prevGames.rows, prev.days, now) : null;
@@ -127,7 +128,7 @@ export default async function AdminOverviewPage({ searchParams }: PageProps<'/ad
         <Kpi label="Avg game length" value={g.avgDurationMs === null ? '—' : formatDuration(g.avgDurationMs)} delta={g.avgDurationMs !== null && p?.avgDurationMs ? d(g.avgDurationMs, p.avgDurationMs) : null} sub={`${num(g.finishedRounds)} finished ${g.finishedRounds === 1 ? 'round' : 'rounds'}`} />
         <Kpi label="Prize money" value={rupees(g.prizeMoney)} delta={d(g.prizeMoney, p?.prizeMoney)} sub="recorded only" title="Prize amounts shown in started rounds. The app never handles money." />
         <Kpi label="Ticket money" value={rupees(g.ticketMoney)} delta={d(g.ticketMoney, p?.ticketMoney)} sub={`recorded only · ${num(g.pricedGames)} priced ${g.pricedGames === 1 ? 'game' : 'games'}`} title="Ticket price × players, for started rounds. Collected outside the app." />
-        <Kpi label="Notify-me sign-ups" value={num(notify)} />
+        <Kpi label="Notify-me sign-ups" value={num(notify)} delta={d(notify, prevNotify)} />
       </section>
 
       <div className={styles.grid2}>
