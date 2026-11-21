@@ -44,9 +44,17 @@ function loadAmounts(raw: unknown): Partial<Record<RuleId, string>> {
   return out;
 }
 
+/**
+ * Whole rupees from whatever was typed or pasted: "₹1,500" → "1500", "1500.50" → "1500" (paise are dropped,
+ * not glued on as extra digits). Digits only, at most `maxDigits`.
+ */
+export function wholeRupees(raw: string, maxDigits: number): string {
+  return raw.replace(/\.\d{0,2}\s*$/, '').replace(/\D/g, '').slice(0, maxDigits);
+}
+
 /** Type (or clear) the prize amount for one way to win. */
 export function setPrizeAmount(rule: RuleId, value: string): void {
-  const digits = value.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, 6);
+  const digits = wholeRupees(value.replace(/^[^\d.]*0+(?=\d)/, ''), 6);
   const amounts = { ...getSnapshot().amounts };
   if (digits) amounts[rule] = digits;
   else delete amounts[rule];

@@ -8,7 +8,7 @@ const pattern = (page, name) => page.getByRole('checkbox', { name: new RegExp(`^
 const amount = (page, name) => page.getByLabel(`Prize amount for ${name} in rupees (optional)`);
 const summary = (page) => page.getByRole('link', { name: /Ways to win/ }).innerText();
 
-export default [
+const cases = [
   {
     id: 'HOST-01', area: 'Host setup', priority: 'P0', type: 'functional',
     title: 'Host setup screen matches the spec; Create looks disabled until a name is typed and explains itself',
@@ -110,7 +110,7 @@ export default [
       await go(page, '/host');
       await hydrated(page);
       const price = page.locator('input[name="price"]');
-      for (const [typed, want] of [['abc', ''], ['12ab3', '123'], ['₹1,500', '1500'], ['1234567', '12345'], ['-50', '50'], ['1e3', '13'], ['١٢٣', ''], ['0', '0']]) {
+      for (const [typed, want] of [['abc', ''], ['12ab3', '123'], ['₹1,500', '1500'], ['1234567', '12345'], ['-50', '50'], ['1e3', '13'], ['1500.50', '1500'], ['₹2,000.00', '2000'], ['12.5', '12'], ['١٢٣', ''], ['0', '0']]) {
         await price.fill(typed);
         equal(await price.inputValue(), want, `typing ${JSON.stringify(typed)}`);
       }
@@ -381,7 +381,7 @@ export default [
       await page.getByRole('link', { name: /Ways to win/ }).click();
       await page.waitForURL('**/host/prizes');
       equal(await page.getByLabel(/Prize amount for/).count(), 6, 'one amount field per picked pattern');
-      for (const [typed, want] of [['abc', ''], ['₹1,000', '1000'], ['1234567', '123456'], ['999999', '999999'], ['007', '7'], ['0', '0'], ['000', '0'], ['12.50', '1250'], ['-5', '5']]) {
+      for (const [typed, want] of [['abc', ''], ['₹1,000', '1000'], ['1234567', '123456'], ['999999', '999999'], ['007', '7'], ['0', '0'], ['000', '0'], ['12.50', '12'], ['1,500.75', '1500'], ['-5', '5']]) {
         await amount(page, 'Top Line').fill(typed);
         equal(await amount(page, 'Top Line').inputValue(), want, `typing ${JSON.stringify(typed)}`);
       }
@@ -435,3 +435,4 @@ export default [
     },
   },
 ];
+export default cases;

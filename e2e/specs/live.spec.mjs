@@ -1,7 +1,7 @@
 // The live game: calling, the voice, dabbing, claims, the win banner, the end of the round.
 import fs from 'node:fs';
 import crypto from 'node:crypto';
-import { act, callUntilComplete, cell, check, drawUntil, equal, expectToast, go, needFor, sleep, spoken, table, ticketNumbers, toastNow, until, view } from '../lib.mjs';
+import { act, callUntilComplete, cell, check, drawUntil, equal, expectToast, go, needFor, sleep, spoken, table, ticketNumbers, until, view } from '../lib.mjs';
 
 const CALLOUTS = JSON.parse(fs.readFileSync(new URL('../../docs/design_handoff/data/number-callouts.json', import.meta.url), 'utf8'));
 /** What the caller should say for n — written from the README, with the callouts from the design's seed data. */
@@ -20,7 +20,7 @@ async function claimOnScreen(page, prize) {
   await page.getByRole('dialog').getByRole('button', { name: new RegExp(`^${prize}`) }).click();
 }
 
-export default [
+const cases = [
   {
     id: 'LIVE-01', area: 'Live', priority: 'P0', type: 'responsive',
     title: 'Live layout: phone = caller, controls, ticket, ways to win, board, players; desktop = caller+controls+ticket+ways left, board+players right',
@@ -400,7 +400,6 @@ export default [
       await banner(a.page).getByText(/wins Early Five!/).waitFor({ timeout: 5000 });
       const g = await myView(code, host.token);
       const winner = g.prizes[0].winnerName;
-      const loser = winner === 'Asha' ? b : a;
       check(['Asha', 'Bina'].includes(winner), `winner: ${winner}`);
       equal(g.events.filter((e) => e.kind === 'win').length, 1, 'win events');
       for (const s of [a, b]) await banner(s.page).getByText(`${winner} wins Early Five!`).waitFor({ timeout: 5000 });
@@ -589,3 +588,4 @@ export default [
     },
   },
 ];
+export default cases;

@@ -239,7 +239,7 @@ export async function until(fn, what, timeout = 8000, every = 100) {
 // ---------------------------------------------------------------- game shortcuts for UI cases
 
 /** Make this page BE the device with `token` (set before the app first reads it). */
-export async function useToken(page, token) {
+export async function asDevice(page, token) {
   await page.addInitScript((tok) => {
     try {
       if (!window.localStorage.getItem('lpt:token')) window.localStorage.setItem('lpt:token', tok);
@@ -275,11 +275,11 @@ export async function table(t, { input = {}, players = ['Meera'], kinds = [], st
     if (attempt >= 6) throw new Error('could not prepare a game in 6 attempts');
   }
   const hostPage = await t.device(hostKind);
-  await useToken(hostPage, hostToken);
+  await asDevice(hostPage, hostToken);
   await go(hostPage, `/g/${code}`);
   for (let i = 0; i < seats.length; i++) {
     const page = await t.device(kinds[i] ?? (i % 2 ? 'android' : 'iphone'));
-    await useToken(page, seats[i].token);
+    await asDevice(page, seats[i].token);
     await go(page, `/g/${code}`);
     seats[i].page = page;
   }

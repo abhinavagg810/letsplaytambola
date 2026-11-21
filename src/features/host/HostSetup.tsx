@@ -8,7 +8,7 @@ import { GAME_NAME_IDEAS, MAX_GAME_NAME_LENGTH, MAX_NAME_LENGTH, prizeSummary, r
 import { createGame } from '@/lib/api';
 import { getSavedName, saveName } from '@/lib/device';
 import { unlockSpeech } from '@/lib/speech';
-import { amountsTotal, pickedAmounts, resetDraft, updateDraft, useHostDraft } from './draft';
+import { amountsTotal, pickedAmounts, resetDraft, updateDraft, useHostDraft, wholeRupees } from './draft';
 import { canGoBackInSite, keepInView, markPrizesOpenedFromSetup } from './nav';
 import styles from './host.module.css';
 
@@ -154,7 +154,7 @@ export function HostSetup() {
               inputMode="numeric"
               pattern="[0-9]*"
               value={draft.price}
-              onChange={(e) => updateDraft({ price: e.target.value.replace(/\D/g, '').slice(0, 5) })}
+              onChange={(e) => updateDraft({ price: wholeRupees(e.target.value, 5) })}
               onFocus={keepInView}
               placeholder="0"
               autoComplete="off"

@@ -109,3 +109,20 @@ describe('U-07/U-08 notify-me numbers', () => {
     for (const bad of ['1234567890', '5999999999', '0981001100', '981001100', '98100110011', '', '98100 11001']) expect(isIndianMobile(bad), bad).toBe(false);
   });
 });
+
+describe('voice caller text for all 90 numbers (QA LIVE-04)', () => {
+  it('is "<rhyme>! ... Single number, N" below 10 and "<rhyme>! ... T and U, N" from 10', async () => {
+    const { speechFor } = await import('../index');
+    const { readFileSync } = await import('node:fs');
+    const seed = JSON.parse(readFileSync(new URL('../../../docs/design_handoff/data/number-callouts.json', import.meta.url), 'utf8')) as { number: number; callout: string }[];
+    expect(seed).toHaveLength(90);
+    for (const { number: n, callout } of seed) {
+      const want = n < 10 ? `${callout}! ... Single number, ${n}` : `${callout}! ... ${Math.floor(n / 10)} and ${n % 10}, ${n}`;
+      expect(speechFor(n), `number ${n}`).toBe(want);
+    }
+    expect(speechFor(7)).toBe('Lucky seven, straight to heaven! ... Single number, 7');
+    expect(speechFor(10)).toContain('1 and 0, 10');
+    expect(speechFor(88)).toBe('Two fat ladies! ... 8 and 8, 88');
+    expect(speechFor(90)).toContain('9 and 0, 90');
+  });
+});

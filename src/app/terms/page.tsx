@@ -62,6 +62,7 @@ const SECTIONS: LegalSection[] = [
       'Your host controls or your ticket live on the device and browser you used. If you clear your browser data, use private browsing or switch to another device, we cannot give them back to you.',
       'Anyone using your device and browser can act as you in that game, so keep your phone to yourself while you play.',
       'Use a name that is not offensive or misleading and does not pretend to be someone else.',
+      'To run the Service, prevent misuse and understand how it is used, we record technical and usage information — including your IP address and the approximate location it points to — for up to 90 days, as explained in the Privacy Policy.',
     ],
   },
   {
@@ -98,7 +99,7 @@ const SECTIONS: LegalSection[] = [
     id: 'availability',
     title: 'Availability and game expiry',
     paras: [
-      'A game, its link and its code stop working 24 hours after the last activity, and its tickets and dabs are then erased. You cannot reopen a past game, and we do not offer a history of past games. A short summary of each game is kept for up to 90 days to run and improve the Service, as explained in the Privacy Policy, and then deleted.',
+      'A game, its link and its code stop working 24 hours after the last activity, and its tickets and dabs are then erased. You cannot reopen a past game, and we do not offer a history of past games. A short summary of each game, and the technical and usage records described in the Privacy Policy, are kept for up to 90 days to run and improve the Service, and then deleted.',
       'We work hard to keep games running smoothly, but the Service is provided “as is” and “as available”. Games may occasionally be interrupted by network issues, maintenance or events outside our control, and we are not responsible for games or results lost as a result.',
     ],
   },

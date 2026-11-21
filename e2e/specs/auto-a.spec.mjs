@@ -1,5 +1,5 @@
 // Auto-call (the timer runs in the host's browser). These cases wait in real time, so they are slow.
-import { act, check, equal, sleep, table, until, view } from '../lib.mjs';
+import { check, equal, sleep, table, until, view } from '../lib.mjs';
 
 const calledCount = async (code, token) => (await view(code, token)).body.game.called.length;
 /** Watch the server for `ms` and return the times (ms from now) at which each new number appeared. */
@@ -16,7 +16,7 @@ export async function watchCalls(code, token, ms) {
 }
 const gaps = (times) => times.slice(1).map((x, i) => x - times[i]);
 
-export default [
+const cases = [
   {
     id: 'AUTO-01', area: 'Auto-call', priority: 'P0', type: 'functional',
     title: 'Auto call: waits one full interval after being switched on, then a number every 6 seconds; Stop stops',
@@ -86,3 +86,4 @@ export default [
     },
   },
 ];
+export default cases;

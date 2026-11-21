@@ -27,7 +27,8 @@ Success: `{ ok: true, … }`. Failure: `{ ok: false, error, code }` where `error
 | `POST /api/games` | `CreateGameInput` | `201 { ok, code }` | token required |
 | `GET /api/games/:code` | – | `200 { ok, game: GameView }` | token optional (none = visitor). Not found / expired: `404 { ok:false, error, code:'not_found', notFound:true }` |
 | `POST /api/games/:code/act` | `GameAction` | `200 { ok, game: GameView }` (the fresh view for this device) | token required |
-| `POST /api/notify` | `{ phone }` (10 digits; spaces and dashes are ignored) | `200 { ok }` | token optional |
+| `POST /api/notify` | `{ phone }` — an Indian mobile number: 10 digits starting 6–9; spaces, dashes and a leading `+91` / `0` are ignored | `200 { ok }` | token optional. Anything else: `400 invalid` "Please type a 10-digit Indian mobile number (it starts with 6, 7, 8 or 9)" |
+| `POST /api/t` | a batch of usage events (below) | `204`, no body | token optional; see “Usage events” |
 
 `:code` is case-insensitive.
 
@@ -52,6 +53,40 @@ Success: `{ ok: true, … }`. Failure: `{ ok: false, error, code }` where `error
 | other actions | 600 / min | 6000 / min |
 | GET view | 240 / min | 6000 / min |
 | notify | 5 / hour | 20 / hour |
+| track (`/api/t`) | 120 / min | 1200 / min |
+
+## Usage events — `POST /api/t`
+First-party analytics for the operator's admin panel (`docs/ADMIN.md`). No third-party service, no cookie.
+
+```
+POST /api/t        Content-Type: text/plain (what navigator.sendBeacon sends) or application/json
+{ "sid": "9f1c…",                 // random id of this browser-tab session (8–40 letters, digits, dashes)
+  "tk":  "<device token>",        // optional: the same UUID as x-device-token (sendBeacon cannot set headers)
+  "src": "whatsapp",              // optional: utm_source, else the referrer's host, else "direct"
+  "e": [ { "n": "page_view",      // event name — must be on the server's whitelist
+           "o": 1200,             // optional: how many ms ago it happened (capped at 1 hour)
+           "p": "/host",          // optional: the path ("/g/K7RQ2" is stored as "/g/[code]")
+           "c": "K7RQ2",          // optional: game code
+           "d": { "page": "host" } } ] }   // optional: properties — only those listed for that event are kept
+```
+- Answers `204` with no body. `400` bad JSON or envelope · `413` body over 16 KB · `429` rate limited. At most 50 events
+  of a batch are stored; the rest are dropped.
+- **Whitelist:** `src/server/insights/events.ts` lists every event name and, per event, the properties it may carry with
+  their type, length and allowed values. Unknown events and properties are dropped silently. Nothing free-form is stored.
+- **IP address, place and device are taken from the request headers only** (`src/server/client-info.ts`,
+  `src/server/insights/ua.ts`): `x-forwarded-for` (first hop) / `x-real-ip`, Vercel's `x-vercel-ip-country`,
+  `-country-region`, `-city` (URL-encoded), `-latitude`, `-longitude`, `-timezone`, `-postal-code`, `user-agent`,
+  `accept-language`. Nothing in the body can set them. Without those headers (local development) they are null.
+- Requests from crawlers and link-preview fetchers are answered `204` and not stored; events from `/admin` pages neither.
+- The write happens after the response (`after()`); if the database has not been given migration 0003 it is skipped.
+- **Creating and joining a game** also record, for the admin only, the IP address, place and device of that request
+  (`participations`). This is never part of any response: the views below are unchanged.
+
+Browser side (`src/lib/track.ts`): `track(name, props?)` queues an event and returns at once; batches go out every 4
+seconds, when 20 events wait, and when the tab is hidden or closed (`navigator.sendBeacon`, else `fetch` with
+`keepalive`). It never throws and does nothing on the server, on `/admin`, or when the request is blocked.
+`<TrackPageViews />` in the root layout starts a session and counts page views; `src/lib/api.ts` reports the funnel
+steps that go through the API (create, join, start, first call, auto-call, claims, new round) and what a game page shows.
 
 ## Types (`src/core/types.ts`)
 ```ts
@@ -72,7 +107,8 @@ interface CreateGameInput {
 type GameAction =
   | { type: 'join'; name: string }             // visitor → player; ticket dealt at once
   | { type: 'start' }                          // host; lobby → live; needs ≥ 1 player
-  | { type: 'draw' }                           // host; live; the server picks the number
+  | { type: 'draw'; after?: number }           // host; live; the server picks the number. `after` = numbers the sender has seen:
+                                               //   the draw happens only if exactly that many are called (safe for double taps, retries, two host tabs)
   | { type: 'setAuto'; auto: AutoSetting }     // host; live
   | { type: 'mark'; n: number; on?: boolean }  // own ticket; called numbers only; no `on` = toggle
   | { type: 'claim'; prizeId: string }         // anyone with a ticket; live; checked on the server
@@ -137,6 +173,8 @@ Any host-only action from someone else: `Only the host can do that` (403).
 
 Decisions worth knowing:
 - **One player may win several prizes** (as in the prototype — there is no "one prize each" rule).
+- **Draw is safe to repeat.** The screens always send `{ type: 'draw', after: called.length }`. If another tab or an earlier tap already called the next number the server answers `200` with the current view and calls nothing. Auto-call waits one full interval after it is switched on (or after the host's page opens), then one interval after each number.
+- **Names** are trimmed, inner white space is collapsed, and invisible or text-flipping characters (control characters, zero-width space, direction overrides, half an emoji) are removed; a name with nothing visible is refused.
 - **A pattern can be picked once per game.** The prototype's picker is a set of toggles; "add again for Second House" in the Full House rule text is not supported in v2.
 - **Duplicate names**: compared without regard to case; the second "Meera" is shown as "Meera (2)", the third "Meera (3)". If the host plays, their name counts.
 - **A claim counts only dabs of called numbers** (`marks ∩ called`), checked on the server against the claimant's own ticket.
@@ -205,6 +243,14 @@ shareNative(data: { title?: string; text?: string; url?: string }): Promise<'sha
 copy(text: string): Promise<boolean>
 normaliseCode(input: string): string     // accepts a code or a pasted link; '' if nothing usable
 
+// track.ts — first-party usage events (see “Usage events”); never throw, no-ops on the server
+track(name: string, props?: Record<string, string | number | boolean | null | undefined>): void   // props.code = game code
+flush(closing?: boolean): void           // send what is queued now (true = with sendBeacon)
+trackPage(pathname: string): void        // a page view of a normal page
+trackGameView(code, view | null): void   // what a game page shows: invite / lobby / live / results / not found
+trackToast(message: string): void        // records the KIND of message shown, never its text
+startTracking(): void                    // once, from <TrackPageViews />
+
 // speech.ts — no-ops without speech support or when muted
 speechSupported(): boolean
 unlockSpeech(): void                     // call inside a tap (Join, Start, Sound on) — needed on iOS
@@ -233,13 +279,13 @@ Useful from `@/core`: `RULES`, `RULE_GROUPS`, `PRESETS`, `matchPreset`, `prizeSu
 | Keeps games | in the Node process (`globalThis`, survives dev hot reload, lost on restart) | Postgres (`supabase/migrations/0001_init.sql`) |
 | Good for | `npm run dev`, a game on the home Wi-Fi, tests | production / Vercel |
 
-Interface: `create` (unique code), `load` (null when missing or expired), `commit` (compare-and-swap → `'ok' | 'conflict'`), `touch`, `saveNotifyNumber`.
+Interface: `create` (unique code), `load` (null when missing or expired), `commit` (compare-and-swap → `'ok' | 'conflict'`), `touch`, `saveNotifyNumber`, `purge`, the admin reads, and the insights (`trackBatch`, `recordParticipation`, `recordWin`, the aggregates, `eraseDevice` — see `src/server/store/types.ts`).
 
 ## Tests
 - `npm test` — Vitest: tickets (2,000 seeded), all 26 patterns (checked against `data/winning-patterns.json`), engine flow and permissions, per-device views, the memory store and service (conflict retries, simultaneous claims, expiry), the `useGame` session logic, share helpers.
-- `npm run test:sql` — the migration on a local PostgreSQL: roles, row level security, compare-and-swap, purge.
+- `npm run test:sql` — the migrations on a local PostgreSQL: roles, row level security, compare-and-swap, purge; the analytics tables (lock-down, writes, 90-day purge, erase a device) and SQL ↔ TypeScript parity of every aggregate on a seeded dataset.
 - `npm run smoke` — plays a whole game over HTTP against a running server (`BASE_URL`, default `http://localhost:8200`).
 
 ## Admin API
-The operator's admin panel has its own routes under `/api/admin/*` (sign-in, plays as JSON/CSV, "Notify me" CSV).
+The operator's admin panel has its own routes under `/api/admin/*` (sign-in, plays / players / events as CSV, erase a device, "Notify me" CSV).
 They need the admin session cookie and are documented in `docs/ADMIN.md`. They answer 404 when the admin is switched off.

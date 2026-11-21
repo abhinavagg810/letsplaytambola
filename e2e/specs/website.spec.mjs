@@ -1,9 +1,9 @@
 // The marketing website, navigation, legal pages, metadata, robots, 404.
-import { BASE, api, check, createGame, equal, go, hydrated, newToken, until } from '../lib.mjs';
+import { BASE, check, createGame, equal, go, hydrated, newToken, until } from '../lib.mjs';
 
 const text = (page) => page.evaluate(() => document.body.innerText);
 
-export default [
+const cases = [
   {
     id: 'WEB-01', area: 'Website', priority: 'P0', type: 'functional',
     title: 'Home page shows every section in the specified order with the specified copy',
@@ -354,3 +354,4 @@ export default [
     },
   },
 ];
+export default cases;

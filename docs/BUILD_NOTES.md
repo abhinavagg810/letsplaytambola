@@ -29,6 +29,7 @@ src/
     api/games/[code]/route.ts     GET  view for this device
     api/games/[code]/act/route.ts POST one action
     api/notify/route.ts           POST "notify me" number
+    api/t/route.ts                POST usage events (first-party analytics, admin only — docs/API.md)
   components/             design system (Button, Pill, Input, Toggle, Card, Sheet, Toast, Ticket, Board, Ball, Avatar, Logo, SiteHeader, SiteFooter)
   features/               website/, host/, join/, game/ (Join, Lobby, Live, Results, ClaimSheet, WinBanner, voice)
   lib/                    client helpers: device token, api client, useGame hook, share links, speech
@@ -43,6 +44,7 @@ supabase/migrations/      SQL schema
 - **View per device:** `GET /api/games/CODE` returns the public game + `you: { role: 'host'|'player'|'visitor', pid?, ticket?, marks? }`. Visitors get the invite info only (host name, game name, player count, ways to win, price).
 - **Auto-call** runs as a timer in the host's browser that calls the draw action (6s default; 4/6/8/10). If the host leaves, calling pauses and resumes when they return.
 - **Expiry:** games are unusable 24h after last activity (treated as not found). At that point a purge erases their tickets and dabs; the public document and the stripped player rows are kept 90 days for the admin panel (`docs/ADMIN.md`), then deleted.
+- **Insights:** the server records, for the admin only, each visitor's IP address and approximate location (Vercel's `x-vercel-ip-*` headers), device details and usage events (`src/server/insights`, `src/lib/track.ts`, `supabase/migrations/0003_insights.sql`). Never part of a public response; kept 90 days; one device can be erased from the admin.
 - **Admin panel:** `/admin/*` + `/api/admin/*`, one operator, credentials from `ADMIN_EMAIL` / `ADMIN_PASSWORD` (off when unset). The "no accounts" rule is about players and hosts; the admin area is not linked from the public site. See `docs/ADMIN.md`.
 - Env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (server only), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (realtime ping only), `NEXT_PUBLIC_SITE_URL` (share links; default from the request origin).
 

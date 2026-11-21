@@ -31,7 +31,7 @@ async function dabAll(code, token) {
   return g;
 }
 
-export default [
+const cases = [
   {
     id: 'API-01', area: 'API', priority: 'P0', type: 'functional',
     title: 'Create a game: 201, a 5-character code from the allowed alphabet, never cached',
@@ -304,7 +304,10 @@ export default [
           if (g.status !== 'live') break;
           if (g.called.length % 10 === 0 && (await call('host', 'GET', P)).body.game.status !== 'live') break;
         }
-        if (round === 1) await call('host', 'POST', `${P}/act`, { type: 'newRound' }), await call('host', 'POST', `${P}/act`, { type: 'start' });
+        if (round === 1) {
+          await call('host', 'POST', `${P}/act`, { type: 'newRound' });
+          await call('host', 'POST', `${P}/act`, { type: 'start' });
+        }
       }
       let responses = 0;
       for (const who of Object.keys(toks)) {
@@ -625,8 +628,14 @@ export default [
       }
       g = (await view(code, host)).body.game;
       const open = g.prizes.filter((p) => !p.winnerPid).map((p) => p.rule);
-      check(open.every((r) => r === 'lucky3'), `only Lucky Three may stay open on a single ticket; open: ${open}`);
-      check(Object.keys(wonAt).length >= 25, `25+ patterns won: ${Object.keys(wonAt).length}`);
+      // Two honest reasons for a prize to stay open on a single ticket: Lucky Three needs 3 of the FIRST five numbers,
+      // and a pattern whose last number was the 90th call cannot be claimed (the round ends the moment it is called —
+      // see "needs decision" D-1 in the QA report).
+      const last = g.called[89];
+      const neededLast = (rule) => g.called.length === 90 && (needFor(ticket, rule, g.called).nums ?? mine).includes(last);
+      check(open.every((r) => r === 'lucky3' || neededLast(r)), `prizes left open without a reason: ${open.filter((r) => r !== 'lucky3' && !neededLast(r))}`);
+      check(Object.keys(wonAt).length + open.length === 26 && Object.keys(wonAt).length >= 12, `patterns won: ${Object.keys(wonAt).length}, open: ${open.length}`);
+      if (open.some((r) => r !== 'lucky3')) t.note(`the 90th number (${last}) completed ${open.filter((r) => r !== 'lucky3').join(', ')} — they could not be claimed because the round ended on that call`);
       t.note(`${claims} claims compared with the independent rule check; won after N numbers: ${JSON.stringify(wonAt)}; left open: ${open.join(',') || 'none'}`);
     },
   },
@@ -765,4 +774,30 @@ export default [
       equal([g.players.length, new Set(g.players.map((p) => p.pid)).size, new Set(g.players.map((p) => p.name.toLowerCase())).size], [30, 30, 30], 'seats / pids / unique display names');
     },
   },
+  {
+    id: 'API-28', area: 'API', priority: 'P1', type: 'edge',
+    title: 'What happens to a prize that only the 90th number completes (and to slow claimers)',
+    steps: 'Full House only, one ticket; call all 90 numbers while dabbing; after the 90th try to dab it and claim', expected: 'Recorded behaviour (as specified: "the game ends when all 90 numbers are called"): the round ends the instant the 90th number is called, so the last number cannot be dabbed and Full House can no longer be claimed — it stays "Open". Reported for the owner’s decision (D-1)',
+    run: async (t) => {
+      const host = newToken();
+      const code = await createGame(host, { prizes: ['full'] });
+      let g = (await act(code, host, { type: 'start' })).body.game;
+      const mine = nums(g.you.ticket);
+      for (;;) {
+        g = (await act(code, host, { type: 'draw' })).body.game;
+        const n = g.called[g.called.length - 1];
+        if (g.status !== 'live') break;
+        if (mine.includes(n)) await act(code, host, { type: 'mark', n, on: true });
+      }
+      equal([g.status, g.called.length], ['done', 90], 'round over at 90');
+      const last = g.called[89];
+      const mark = await act(code, host, { type: 'mark', n: mine.includes(last) ? last : mine[0], on: true });
+      const claim = await act(code, host, { type: 'claim', prizeId: 'full' });
+      equal([mark.status, claim.status, claim.body.error], [409, 409, 'This game has finished'], 'dab and claim after the 90th number');
+      equal((await view(code, host)).body.game.prizes[0].winnerPid, null, 'Full House stays open');
+      t.note(`ticket had ${mine.includes(last) ? 'the last number ' + last + ' on it' : 'all 15 numbers dabbed before the end'}; claim after the 90th call → 409 "This game has finished"`);
+      t.open('D-1: once the 90th number is called the round ends at once — a prize completed by that number, or one a slow player has not claimed yet, can never be claimed. Matches the written spec; needs a product decision (e.g. keep claims open until the host taps "Finish")');
+    },
+  },
 ];
+export default cases;

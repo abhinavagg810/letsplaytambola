@@ -1,9 +1,9 @@
 // Joining a game (by link, by code) and the lobby.
-import { BASE, act, addressFor, api, check, createGame, drawUntil, equal, expectToast, go, hostThroughUi, hydrated, joinThroughUi, newToken, table, ticketNumbers, toastNow, tokenOf, until, useToken, view } from '../lib.mjs';
+import { BASE, act, check, createGame, drawUntil, equal, expectToast, go, hostThroughUi, hydrated, joinThroughUi, newToken, table, tokenOf, until, asDevice, view } from '../lib.mjs';
 
 const ticketOnPage = (page) => page.locator('[role="group"]').first().evaluate((g) => [...g.children].map((c) => (c.getAttribute('aria-hidden') ? 0 : parseInt(c.textContent, 10))));
 
-export default [
+const cases = [
   {
     id: 'JOIN-01', area: 'Join', priority: 'P0', type: 'functional',
     title: 'Join with a code (/join): the code field cleans what is typed; "Find my game" opens the invite',
@@ -230,7 +230,7 @@ export default [
       await expectToast(page, 'This game is full');
       await page.getByRole('button', { name: 'Join game' }).waitFor();
       const host = await t.device('android');
-      await useToken(host, hostTok);
+      await asDevice(host, hostTok);
       await go(host, `/g/${code}`);
       await host.getByRole('heading', { name: 'Who’s here · 100' }).waitFor();
       equal(await host.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), 0, 'lobby with 100 people overflows sideways');
@@ -428,3 +428,4 @@ export default [
     },
   },
 ];
+export default cases;

@@ -36,9 +36,12 @@ npm start
 
 ## Admin panel
 
-`/admin` is a private area for the person who runs the site: a dashboard, the list of plays, play and player details,
-and the "Notify me" numbers. It is switched off until you set `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
-How to switch it on, what it shows and how it is protected: `docs/ADMIN.md`.
+`/admin` is a private area for the person who runs the site: an analytics dashboard (visitors, where they come from and
+where they are, devices, funnels, engagement, retention), the list of plays, play and player details with IP address and
+approximate location, an events explorer, the "Notify me" numbers, and a Data & privacy page with "Erase a device".
+It is switched off until you set `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
+How to switch it on, what it shows, what is captured and how it is protected: `docs/ADMIN.md`.
+With Supabase, run `supabase/migrations/0003_insights.sql` once for the analytics (`supabase/README.md`).
 
 ## Check it
 
@@ -60,6 +63,29 @@ npm run test:sql
 
 `npm run test:sql` needs a local PostgreSQL. `npm run smoke` plays a whole game through the API against a running server.
 
+### End-to-end tests (real browsers)
+
+`npm run e2e` plays the site the way people do — several "phones" at once (separate browser contexts with Android and
+iPhone settings), plus the API checks. About 110 cases, 3–4 minutes. It needs a **running** server and Playwright:
+
+```bash
+npm install -g playwright && npx playwright install chromium   # once per computer; Playwright is deliberately not in package.json
+```
+
+```bash
+npm run build && npx next start -p 3000
+```
+
+```bash
+BASE_URL=http://localhost:3000 npm run e2e
+```
+
+- `npm run e2e -- live` runs the spec files whose name contains "live"; `npm run e2e -- CLM- LIVE-07` runs cases by id.
+- Results and screenshots of failures go to `e2e/.results/` (not committed). `E2E_HEADED=1` shows the browsers.
+- Run it against a server in memory mode with rate limits ON (the default). Each simulated device sends its own
+  `X-Forwarded-For` so the per-address limits behave as they would with real phones.
+- The cases, what each one checks and the last full results are in `docs/qa/` (`TEST_PLAN.md`, `QA_REPORT_USER.md`).
+
 ## Layout
 
 | Path | What |
@@ -71,7 +97,8 @@ npm run test:sql
 | `src/server/` | Game storage (memory or Supabase), realtime ping, rate limits, admin sign-in and statistics (`admin/`) |
 | `src/lib/` | Browser helpers: device token, API client, live game hook, sharing, caller voice |
 | `supabase/` | Database schema, tests, setup guide |
-| `docs/` | Design handoff, build notes, API reference, admin guide |
+| `e2e/` | End-to-end suite: `run.mjs` (runner), `lib.mjs` (helpers), `specs/*.spec.mjs` |
+| `docs/` | Design handoff, build notes, API reference, admin guide, QA plan and report (`docs/qa/`) |
 
 ## Rules the code enforces
 
@@ -79,3 +106,4 @@ npm run test:sql
 - Only the host can start, call numbers, switch auto-call and start a new round. Only called numbers can be dabbed. Claims are checked on the server.
 - No payments. An optional ticket price is shown for information only.
 - Games stop working 24 hours after the last activity, and their tickets and dabs are erased then. A summary of each game (no tickets) is kept for 90 days for the admin panel, then deleted.
+- For the operator only, the server records each visitor's IP address and the approximate location it points to, device details and usage events (first-party, no outside analytics). They are never part of a public page or API answer, are deleted after 90 days, and one device can be erased on request. The Privacy Policy (`/privacy`) says so.

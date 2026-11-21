@@ -1,5 +1,5 @@
 // The results screen, "Play again" and "Host my own game".
-import { act, callUntilComplete, check, drawUntil, equal, go, hydrated, needFor, sleep, spoken, table, ticketNumbers, tokenOf, until, view } from '../lib.mjs';
+import { act, callUntilComplete, check, drawUntil, equal, go, hydrated, needFor, sleep, spoken, table, tokenOf, until, view } from '../lib.mjs';
 
 const banner = (page) => page.locator('[aria-live="assertive"][aria-atomic="true"]');
 const ticketOnPage = (page) => page.locator('[role="group"]').first().evaluate((g) => [...g.children].map((c) => (c.getAttribute('aria-hidden') ? 0 : parseInt(c.textContent, 10))));
@@ -17,7 +17,7 @@ async function finishedTable(t, opts = {}) {
   return tb;
 }
 
-export default [
+const cases = [
   {
     id: 'RES-01', area: 'Results', priority: 'P0', type: 'functional',
     title: 'Results screen: headline, count line in normal words, payment note, winners with amounts, the right buttons for host and players',
@@ -68,7 +68,9 @@ export default [
       await p.page.getByRole('heading', { name: 'That’s the game!' }).waitFor({ timeout: 6000 });
       const r1 = {};
       for (const s of [p, q]) r1[s.name] = JSON.stringify((await view(code, s.token)).body.game.you.ticket);
-      const saidBefore = (await spoken(p.page)).length;
+      await sleep(2000); // a page opened within 3 s of the last call reads that number once: let it finish
+      const saidAtResults = await spoken(p.page);
+      const saidBefore = saidAtResults.length;
       await host.page.getByRole('button', { name: 'Play again with same people' }).click();
       await host.page.getByRole('heading', { name: 'Share this link with everyone' }).waitFor();
       for (const s of [p, q]) {
@@ -91,7 +93,7 @@ export default [
         check((await s.page.locator('li', { hasText: 'All 5 numbers of the top line' }).innerText()).includes('Open'), `${s.name}: Top Line open again`);
       }
       await sleep(1600);
-      equal((await spoken(p.page)).length, saidBefore, 'the voice replayed something from the old round');
+      equal(await spoken(p.page), saidAtResults, 'the voice said something new before any number of round 2 was called');
       await host.page.getByRole('button', { name: 'Call next number' }).click();
       await p.page.getByText('1 OF 90 CALLED').first().waitFor({ timeout: 6000 });
       equal((await spoken(p.page)).length, saidBefore + 1, 'the first number of round 2 is spoken once');
@@ -147,3 +149,4 @@ export default [
     },
   },
 ];
+export default cases;

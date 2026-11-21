@@ -1,5 +1,5 @@
 // Responsive layout and accessibility checks that hold on every screen.
-import { ALL_RULES, act, callUntilComplete, cell, check, createGame, drawUntil, equal, expectToast, go, hydrated, needFor, newToken, sleep, ticketNumbers, until, useToken, view } from '../lib.mjs';
+import { ALL_RULES, act, cell, check, createGame, drawUntil, equal, expectToast, go, hydrated, newToken, sleep, ticketNumbers, until, asDevice, view } from '../lib.mjs';
 
 const WIDTHS = [[320, 640], [360, 760], [390, 844], [414, 896], [640, 900], [768, 1024], [1024, 768], [1280, 800], [1440, 900], [1920, 1080], [760, 360]];
 const LONG_HOST = 'Wwwwwwwwwwwwwwwwwwwwwwww'; // 24 wide letters
@@ -145,9 +145,9 @@ const smallText = (page) => page.evaluate(() => {
 
 async function screens(t, w, kind = 'android') {
   const hostPage = await t.device(kind);
-  await useToken(hostPage, w.host);
+  await asDevice(hostPage, w.host);
   const playerPage = await t.device(kind);
-  await useToken(playerPage, w.player);
+  await asDevice(playerPage, w.player);
   const visitor = await t.device(kind);
   const ready = {
     lobby: (p) => p.getByRole('heading', { name: /Who’s here/ }).waitFor(),
@@ -165,7 +165,7 @@ async function screens(t, w, kind = 'android') {
   return { list, hostPage, playerPage, visitor };
 }
 
-export default [
+const cases = [
   {
     id: 'RSP-01', area: 'Responsive', priority: 'P0', type: 'responsive',
     title: 'No sideways scrolling and nothing cut off on any screen at 320–1920px and on a phone held sideways',
@@ -326,7 +326,7 @@ export default [
     run: async (t) => {
       const w = await world({ allPrizes: true });
       const page = await t.device('android', { viewport: { width: 760, height: 360 } });
-      await useToken(page, w.player);
+      await asDevice(page, w.player);
       await go(page, `/g/${w.live}`);
       await page.getByRole('heading', { name: 'The board' }).waitFor();
       const header = await page.locator('header').first().evaluate((e) => e.getBoundingClientRect().height);
@@ -502,7 +502,7 @@ export default [
     run: async (t) => {
       const w = await world();
       const page = await t.device('iphone');
-      await useToken(page, w.player);
+      await asDevice(page, w.player);
       await go(page, `/g/${w.live}`);
       await page.getByRole('heading', { name: 'The board' }).waitFor();
       const g = (await view(w.live, w.player)).body.game;
@@ -549,7 +549,10 @@ export default [
       const fresh = [];
       for (const line of problems) {
         const [screen, rest] = [line.slice(0, line.indexOf(': ')), line.slice(line.indexOf(': ') + 2)];
-        for (const item of rest.split(' | ')) (KNOWN.some((k) => k.test(item)) ? t.open(`contrast below WCAG AA on ${screen}: ${item}`) : fresh.push(`${screen}: ${item}`));
+        for (const item of rest.split(' | ')) {
+          if (KNOWN.some((k) => k.test(item))) t.open(`contrast below WCAG AA on ${screen}: ${item}`);
+          else fresh.push(`${screen}: ${item}`);
+        }
       }
       equal(fresh, [], 'text with too little contrast');
     },
@@ -561,7 +564,7 @@ export default [
     run: async (t) => {
       const w = await world();
       const page = await t.device('android', { reducedMotion: 'reduce' });
-      await useToken(page, w.player);
+      await asDevice(page, w.player);
       const running = () => page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running' && (a.effect?.getComputedTiming().duration ?? 0) > 50 && (a.effect?.getComputedTiming().iterations ?? 1) !== 0).map((a) => `${a.animationName || a.transitionProperty || 'animation'} on ${a.effect?.target?.className?.toString().slice(0, 24)} (${a.effect?.getComputedTiming().duration}ms)`));
       await go(page, '/');
       await page.waitForTimeout(500);
@@ -582,3 +585,4 @@ export default [
     },
   },
 ];
+export default cases;

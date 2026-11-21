@@ -4,7 +4,7 @@ import { watchCalls } from './auto-a.spec.mjs';
 
 const calledCount = async (code, token) => (await view(code, token)).body.game.called.length;
 
-export default [
+const cases = [
   {
     id: 'AUTO-04', area: 'Auto-call', priority: 'P0', type: 'resilience',
     title: 'Host goes offline with auto-call on: calling pauses; it resumes by itself when the connection returns',
@@ -99,3 +99,4 @@ export default [
     },
   },
 ];
+export default cases;
