@@ -21,6 +21,13 @@ export function proxy(request: NextRequest) {
     res.headers.set('X-Robots-Tag', 'noindex, nofollow');
     return res;
   }
+  // Already signed in: the sign-in page has nothing to show.
+  if (adminConfigured() && pathname === LOGIN && verifySessionToken(request.cookies.get(ADMIN_COOKIE)?.value)) {
+    const res = NextResponse.redirect(new URL('/admin', request.url), 307);
+    res.headers.set('Cache-Control', 'no-store, max-age=0');
+    res.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return res;
+  }
   const res = NextResponse.next();
   res.headers.set('X-Robots-Tag', 'noindex, nofollow');
   return res;

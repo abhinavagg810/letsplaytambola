@@ -19,7 +19,8 @@ export async function POST(request: Request): Promise<Response> {
   try {
     if (Number(request.headers.get('content-length') ?? 0) > TRACK_MAX_BYTES) return done(413);
     const text = await request.text();
-    if (text.length > TRACK_MAX_BYTES) return done(413);
+    // Bytes, not characters: a body without Content-Length (chunked) full of multi-byte text must not slip through.
+    if (text.length > TRACK_MAX_BYTES || Buffer.byteLength(text, 'utf8') > TRACK_MAX_BYTES) return done(413);
     let body: unknown;
     try {
       body = JSON.parse(text);

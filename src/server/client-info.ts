@@ -111,9 +111,20 @@ export const IN_STATES: Record<string, string> = {
   RJ: 'Rajasthan', SK: 'Sikkim', TN: 'Tamil Nadu', TS: 'Telangana', TG: 'Telangana', TR: 'Tripura', UP: 'Uttar Pradesh', UK: 'Uttarakhand', UT: 'Uttarakhand', WB: 'West Bengal',
 };
 
+/** Any other ISO country code, named by the runtime's own data ("BR" → "Brazil"); null when it does not know it. */
+function intlCountryName(code: string): string | null {
+  try {
+    if (!/^[A-Z]{2}$/.test(code)) return null;
+    const name = new Intl.DisplayNames(['en'], { type: 'region', fallback: 'none' }).of(code);
+    return name && name !== code ? name : null;
+  } catch {
+    return null;
+  }
+}
+
 export function countryName(code: string | null | undefined): string {
   if (!code) return 'Unknown';
-  return COUNTRY_NAMES[code] ?? code;
+  return COUNTRY_NAMES[code] ?? intlCountryName(code) ?? code;
 }
 
 /** "Maharashtra" for ("IN", "MH"); the bare code for other countries; "Unknown" when there is none. */
