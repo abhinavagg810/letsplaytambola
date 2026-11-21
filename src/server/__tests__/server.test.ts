@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { GAME_TTL_MS } from '@/core';
+import { BAD_MOBILE, GAME_TTL_MS } from '@/core';
 import type { MemberView, VisitorView } from '@/core';
 import { actOnGame, createGameForDevice, saveNotifyNumber, viewGame } from '../games';
 import { LIMITS, allow, hit, resetRateLimits } from '../rateLimit';
@@ -252,7 +252,20 @@ describe('game service on the memory store', () => {
     expect(await saveNotifyNumber('9810011001', deps)).toEqual({ ok: true });
     expect(store.notifyNumbers).toEqual(['9810011001']);
     for (const bad of ['981001100', '98100110011', 'abcdefghij', '', null, 9810011001]) {
-      expect(await saveNotifyNumber(bad, deps)).toMatchObject({ ok: false, status: 400, error: 'Type your 10-digit WhatsApp number' });
+      expect(await saveNotifyNumber(bad, deps)).toMatchObject({ ok: false, status: 400, error: BAD_MOBILE });
     }
+  });
+
+  it('accepts Indian mobile numbers only, with or without +91 / 0 in front (QA U-07, U-08)', async () => {
+    const { deps, store } = setup();
+    for (const good of ['+91 98100 11001', '091-9810011001', '09810011001', '(+91) 98100-11001', '919810011001']) {
+      expect(await saveNotifyNumber(good, deps), good).toEqual({ ok: true });
+    }
+    expect(store.notifyNumbers).toEqual(['9810011001']); // one number, saved once
+    // Ten digits that cannot be an Indian mobile, text around a number, and numbers that are too long.
+    for (const bad of ['1234567890', '0000000000', '5810011001', 'call 9810011001', '9810011001 or 9810011002', '98100110019810011001', '9810011001<script>']) {
+      expect(await saveNotifyNumber(bad, deps), bad).toMatchObject({ ok: false, status: 400, code: 'invalid', error: BAD_MOBILE });
+    }
+    expect(store.notifyNumbers).toEqual(['9810011001']);
   });
 });

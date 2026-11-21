@@ -17,6 +17,8 @@ export const LIMITS = {
   act: { token: { max: 600, windowMs: 60_000 }, ip: { max: 6000, windowMs: 60_000 } },
   view: { token: { max: 240, windowMs: 60_000 }, ip: { max: 6000, windowMs: 60_000 } },
   notify: { token: { max: 5, windowMs: 60 * 60_000 }, ip: { max: 20, windowMs: 60 * 60_000 } },
+  /** POST /api/t: batches of usage events (a batch every few seconds per open tab). */
+  track: { token: { max: 120, windowMs: 60_000 }, ip: { max: 1200, windowMs: 60_000 } },
 } as const satisfies Record<string, { token: Limit; ip: Limit }>;
 export type LimitName = keyof typeof LIMITS;
 

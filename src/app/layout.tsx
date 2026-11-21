@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Toaster } from '@/components/Toast';
 import { baloo, balooExt, mono } from '@/fonts';
 import { ADSENSE_CLIENT, ADS_ON } from '@/lib/ads';
+import { TrackPageViews } from '@/lib/TrackPageViews';
 import './globals.css';
 
 /** Public address of the site. Set NEXT_PUBLIC_SITE_URL on Vercel; the default is the planned domain. */
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         {children}
         <Toaster />
+        <TrackPageViews />
       </body>
     </html>
   );

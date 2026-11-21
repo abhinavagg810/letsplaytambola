@@ -385,7 +385,7 @@ function WaysToWin() {
           <span className={styles.kickerTeal}>26 WAYS TO WIN</span>
           <h3 className={styles.waysTitle}>Your kitty, your rules.</h3>
           <p className={styles.waysBody}>
-            From Early Five and Laddoo to Pyramid, Breakfast-Lunch-Dinner and Second House — pick with one tap. Every rule is explained on screen, and every claim is checked
+            From Early Five and Laddoo to Pyramid, Breakfast-Lunch-Dinner and Full House — pick with one tap. Every rule is explained on screen, and every claim is checked
             instantly.
           </p>
         </div>

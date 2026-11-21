@@ -1,7 +1,9 @@
 // POST /api/games/CODE/act — one action: join, start, draw, setAuto, mark, claim, newRound.
 import { after } from 'next/server';
+import { isMember } from '@/core';
 import { actOnGame, normaliseCodeParam } from '@/server/games';
 import { HTTP_COPY, clientIp, json, readJson, respond, serviceError } from '@/server/http';
+import { noteParticipation, noteWin } from '@/server/insights/record';
 import { allow } from '@/server/rateLimit';
 import { broadcastChanged } from '@/server/realtime';
 import { tokenHashFrom } from '@/server/tokens';
@@ -22,6 +24,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ cod
     if (changedVersion !== null) {
       // Tell everyone else to refetch — after this response has gone out, so the actor is never kept waiting.
       after(() => broadcastChanged(normaliseCodeParam(code), changedVersion));
+    }
+    // For the operator's admin only (recorded after the response; never part of any view): a new seat, a prize won.
+    if (changedVersion !== null && body.type === 'join' && game.you.role === 'player') {
+      noteParticipation(request.headers, tokenHash, { code: game.code, role: 'player', pid: game.you.pid, name: game.you.name });
+    } else if (changedVersion !== null && body.type === 'claim' && isMember(game)) {
+      const prize = game.prizes.find((p) => p.id === body.prizeId);
+      if (prize) noteWin(tokenHash, prize.amount);
     }
     return json({ ok: true, game });
   } catch (e) {

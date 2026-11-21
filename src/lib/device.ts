@@ -1,6 +1,8 @@
 // Per-device storage: the device token (identity without accounts), the last name typed, and the mute choice.
 // Safe to import anywhere: on the server (and when storage is blocked) reads return defaults and writes do nothing.
 
+import { track } from './track';
+
 const TOKEN_KEY = 'lpt:token';
 const NAME_KEY = 'lpt:name';
 const MUTED_KEY = 'lpt:muted';
@@ -62,7 +64,8 @@ export function getSavedName(): string {
 }
 
 export function saveName(name: string): void {
-  write(NAME_KEY, name.trim().slice(0, 24));
+  // Same tidy-up as the server (inner runs of spaces become one), so the prefilled name matches what people saw.
+  write(NAME_KEY, name.replace(/\s+/g, ' ').trim().slice(0, 24));
 }
 
 /** Has this device turned the voice caller off? */
@@ -71,6 +74,7 @@ export function isMuted(): boolean {
 }
 
 export function setMuted(muted: boolean): void {
+  if (muted !== isMuted()) track(muted ? 'mute_on' : 'mute_off');
   write(MUTED_KEY, muted ? '1' : '0');
   if (typeof window !== 'undefined') window.dispatchEvent(new Event(MUTE_EVENT));
 }

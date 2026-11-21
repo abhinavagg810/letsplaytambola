@@ -99,3 +99,27 @@
   font-size: 15px;
   color: var(--ink-muted);
 }
+
+/*
+ * A ticket you can tap, on a phone: nine columns cannot be 44px wide on a 360px screen, so the ticket uses the
+ * page's side margin and a slimmer frame (wider cells), and every number cell is at least 44px tall.
+ */
+@media (max-width: 480px) {
+  .playable {
+    --ticket-pad: 4px;
+    /* 19px bold counts as large text: the white number on a pink dab then meets the 3:1 contrast rule, and is easier to read. */
+    --cell-font: clamp(19px, 5.4vw, 24px);
+    margin-inline: -10px;
+  }
+}
+
+/*
+ * Below 400px the 1 : 1.15 shape would make cells shorter than 44px, so they get a fixed height instead.
+ * (Not min-height: with an aspect-ratio that would also widen the cell and make neighbours overlap.)
+ */
+@media (max-width: 400px) {
+  .playable .cell {
+    aspect-ratio: auto;
+    height: 46px;
+  }
+}

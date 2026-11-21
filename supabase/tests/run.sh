@@ -21,9 +21,28 @@ else run() { sudo -u postgres psql "$@"; }
 fi
 sql() { run -X -q -v ON_ERROR_STOP=1 -d "$DB" "$@"; }
 
+# A brand-new database with every migration applied.
+fresh() {
+  run -X -q -d postgres -c "drop database if exists $DB" -c "create database $DB"
+  sql < tests/stub_supabase.sql
+  for f in migrations/*.sql; do [ -n "${1:-}" ] && echo "apply $f"; sql < "$f"; done
+}
+
+fresh verbose
+sql < tests/security.sql
+# The insights (migration 0003): lock-down, writes, purge, erase — then SQL ↔ TypeScript parity on a seeded dataset.
+fresh
+sql < tests/helpers.sql
+sql < tests/insights.sql
+fresh
+sql < tests/helpers.sql
+sql < tests/insights_parity.sql | tail -n 1
+# What the site meets when 0003 has NOT been run yet: the first two migrations alone must still pass their own checks.
 run -X -q -d postgres -c "drop database if exists $DB" -c "create database $DB"
 sql < tests/stub_supabase.sql
-for f in migrations/*.sql; do echo "apply $f"; sql < "$f"; done
-sql < tests/security.sql
+sql < migrations/0001_init.sql
+sql < migrations/0002_admin.sql
+sql -c "set role service_role" -c "select purge_expired_games()" -c "select admin_list_games()" > /dev/null
+echo "ok   migrations 0001 + 0002 alone still work (0003 not yet run)"
 run -X -q -d postgres -c "drop database $DB"
 echo "SQL tests passed"

@@ -17,7 +17,8 @@ export function HostControls({ game, act }: { game: MemberView; act: UseGame['ac
     if (drawing.current || allCalled) return; // one number per tap, even on a double tap
     drawing.current = true;
     try {
-      const r = await act({ type: 'draw' });
+      // `after` makes the tap safe to repeat: the server calls a number only if it has not moved on since this screen was drawn.
+      const r = await act({ type: 'draw', after: game.called.length });
       if (!r.ok) toast(r.error);
     } finally {
       drawing.current = false;

@@ -5,3 +5,4 @@ export * from './patterns';
 export * from './engine';
 
 export * from './prizeMoney';
+export * from './phone';

@@ -49,9 +49,19 @@ export const COPY = {
 const fail = (code: EngineErrorCode, error: string): EngineError => ({ ok: false, error, code });
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
 
-/** Trim and collapse runs of white space (names are single-line). */
+// Characters that are invisible or change how the text around them is drawn: control characters, zero-width space,
+// word joiner, BOM, direction marks and the "right-to-left override" family; plus half of a broken emoji (a lone surrogate).
+// The zero-width joiners (U+200C/U+200D) stay: Hindi and other Indian scripts, and family emoji, need them.
+const INVISIBLE = /[\u0000-\u001f\u007f-\u009f\u200b\u200e\u200f\u2028\u2029\u202a-\u202e\u2060\u2066-\u2069\ufeff]|\p{Cs}/gu;
+
+/**
+ * Trim and collapse runs of white space (names are single-line) and drop invisible characters,
+ * so a name can never be blank on screen or flip the text next to it. A name made only of joiners is empty.
+ */
 export function cleanName(raw: unknown): string {
-  return typeof raw === 'string' ? raw.replace(/\s+/g, ' ').trim() : '';
+  if (typeof raw !== 'string') return '';
+  const s = raw.replace(/[\t\n\r]/g, ' ').replace(INVISIBLE, '').replace(/\s+/g, ' ').trim();
+  return /[^\s\u200c\u200d]/.test(s) ? s : '';
 }
 
 /** "Meera" → "Meera (2)" when a Meera is already in (case-insensitive), then "(3)" … */
@@ -195,6 +205,12 @@ export function applyAction(state: GameState, action: GameAction, actor: Actor, 
     case 'draw': {
       if (!actor.isHost) return fail('forbidden', COPY.hostOnly);
       if (doc.status !== 'live') return fail('state', doc.status === 'lobby' ? COPY.notStarted : COPY.gameOver);
+      const after = (action as { after?: unknown }).after;
+      if (after !== undefined) {
+        if (typeof after !== 'number' || !Number.isInteger(after) || after < 0 || after > 90) return fail('invalid', COPY.badAction);
+        // The sender is behind (another tab or an earlier tap already called the next number): nothing to do.
+        if (after !== doc.called.length) return unchanged();
+      }
       const calledSet = new Set(doc.called);
       const left: number[] = [];
       for (let n = 1; n <= 90; n++) if (!calledSet.has(n)) left.push(n);

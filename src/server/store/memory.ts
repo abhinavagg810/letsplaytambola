@@ -1,8 +1,15 @@
 // In-memory store: the default when the Supabase env vars are absent.
 // Kept on globalThis so Next.js dev hot reload (which re-evaluates modules) does not lose games.
 // One process only — on serverless hosts use the Supabase store.
+import { randomBytes } from 'node:crypto';
 import { GAME_TTL_MS, genCode } from '@/core';
-import { ADMIN_MAX_PAGE, ADMIN_MAX_RANGE_ROWS, ADMIN_RETENTION_MS, CodeSpaceError } from './types';
+import * as agg from '../insights/aggregate';
+import type { CleanBatch } from '../insights/events';
+import type {
+  AdminDevice, AdminEvent, AdminIp, AdminParticipation, AuditRow, BreakdownQuery, BreakdownRow, DeviceListQuery, EraseResult, EventListQuery,
+  FunnelQuery, FunnelStep, GameInsights, InsightsData, ParticipationDim, ParticipationRow, RequestContext, RetentionStats, TableCounts, TrafficTotals,
+} from '../insights/types';
+import { ABANDONED_AFTER_MS, ADMIN_MAX_PAGE, ADMIN_MAX_RANGE_ROWS, ADMIN_RETENTION_MS, CodeSpaceError } from './types';
 import type {
   AdminGameFilter, AdminGamePage, AdminGameQuery, AdminGameRow, AdminNotifyRow,
   CommitWrite, GameStore, NewGame, PlayerWrite, StoredGame, StoredPlayer,
@@ -20,6 +27,8 @@ interface MemoryData {
   /** "Notify me" numbers → when they were saved. */
   phones: Map<string, number>;
   lastSweep?: number;
+  /** First-party analytics rows (src/server/insights). */
+  insights?: InsightsData;
 }
 
 const KEY = '__lpt_memory_store_v2__';
@@ -33,6 +42,11 @@ export class MemoryStore implements GameStore {
   readonly kind = 'memory' as const;
 
   constructor(private readonly data: MemoryData = newData(), private readonly now: () => number = Date.now) {}
+
+  /** The analytics rows (created on first use: data kept across a dev hot reload may predate them). */
+  private get ins(): InsightsData {
+    return (this.data.insights ??= agg.newInsightsData());
+  }
 
   private expired(g: MemoryGame): boolean {
     return this.now() - g.updatedAt > GAME_TTL_MS;
@@ -72,11 +86,14 @@ export class MemoryStore implements GameStore {
     for (const [code, g] of [...this.data.games]) {
       if (now - g.updatedAt > ADMIN_RETENTION_MS) {
         this.data.games.delete(code);
+        this.ins.participations = this.ins.participations.filter((p) => p.code !== code); // as the database's "on delete cascade"
         n++;
       } else if (this.expired(g) && this.erase(g)) {
         n++;
       }
     }
+    // IPs, device rows and events follow the same retention as game summaries.
+    agg.purgeInsights(this.ins, now - ADMIN_RETENTION_MS);
     return n;
   }
 
@@ -183,6 +200,8 @@ export class MemoryStore implements GameStore {
       if (f.from !== undefined && g.createdAt < f.from) continue;
       if (f.to !== undefined && g.createdAt >= f.to) continue;
       if (f.activeSince !== undefined && g.updatedAt < f.activeSince) continue;
+      if (f.priced && !(g.doc.price > 0)) continue;
+      if (f.abandoned && !(g.doc.status === 'lobby' && this.now() - g.updatedAt > ABANDONED_AFTER_MS)) continue;
       if (q && !(g.doc.code.toLowerCase().includes(q) || g.doc.name.toLowerCase().includes(q) || g.doc.hostName.toLowerCase().includes(q))) continue;
       if (f.device && shortId(g.hostTokenHash) !== f.device && !g.players.some((p) => shortId(p.tokenHash) === f.device)) continue;
       if (f.status) {
@@ -227,6 +246,115 @@ export class MemoryStore implements GameStore {
     let n = 0;
     for (const at of this.data.phones.values()) if (at >= from && at < to) n++;
     return n;
+  }
+
+  // ---------------------------------------------------------------- insights (the pure code is in ../insights/aggregate.ts)
+
+  async insightsStatus(): Promise<'ok' | 'missing'> {
+    return 'ok';
+  }
+
+  async trackBatch(ctx: RequestContext, batch: CleanBatch): Promise<void> {
+    agg.applyTrack(this.ins, copy(ctx), copy(batch));
+  }
+
+  async recordParticipation(ctx: RequestContext, p: { code: string; role: 'host' | 'player'; pid: string | null; name: string }): Promise<void> {
+    if (!this.data.games.has(p.code)) return;
+    agg.applyParticipation(this.ins, copy(ctx), p);
+  }
+
+  async recordWin(tokenHash: string, amount: number): Promise<void> {
+    agg.applyWin(this.ins, tokenHash, amount);
+  }
+
+  async eventBreakdown(q: BreakdownQuery): Promise<BreakdownRow[]> {
+    return agg.eventBreakdown(this.ins.events, q);
+  }
+
+  async funnel(q: FunnelQuery): Promise<FunnelStep[]> {
+    return agg.funnel(this.ins.events, q);
+  }
+
+  async trafficTotals(from: number, to: number): Promise<TrafficTotals> {
+    return agg.trafficTotals(this.ins, from, to);
+  }
+
+  async participationBreakdown(from: number, to: number, dim: ParticipationDim): Promise<ParticipationRow[]> {
+    return agg.participationBreakdown(this.ins.participations, from, to, dim);
+  }
+
+  async retention(now: number): Promise<RetentionStats> {
+    return agg.retention(this.ins, now);
+  }
+
+  async listEvents(q: EventListQuery): Promise<{ total: number; rows: AdminEvent[] }> {
+    return agg.listEvents(this.ins.events, q);
+  }
+
+  async listDevices(q: DeviceListQuery): Promise<{ total: number; rows: AdminDevice[] }> {
+    return agg.listDevices(this.ins.devices, q);
+  }
+
+  async getDevice(id: string): Promise<{ device: AdminDevice; ips: AdminIp[] } | null> {
+    return agg.getDevice(this.ins, id);
+  }
+
+  async gameInsights(code: string): Promise<GameInsights> {
+    const ins = this.ins;
+    return {
+      participations: ins.participations.filter((p) => p.code === code).sort((a, b) => a.at - b.at || (a.tokenHash < b.tokenHash ? -1 : 1)).map((p) => agg.adminParticipation(p, ins.devices)),
+      events: ins.events.filter((e) => e.code === code).sort((a, b) => a.at - b.at || a.id - b.id).slice(0, agg.GAME_EVENTS_MAX).map(agg.adminEvent),
+    };
+  }
+
+  async gameHosts(codes: string[]): Promise<Record<string, AdminParticipation>> {
+    return agg.gameHosts(this.ins, codes);
+  }
+
+  async tableCounts(): Promise<TableCounts> {
+    const ins = this.ins;
+    let players = 0;
+    for (const g of this.data.games.values()) players += g.players.length;
+    return {
+      games: this.data.games.size, players, notify_numbers: this.data.phones.size, devices: ins.devices.length, device_ips: ins.ips.length,
+      participations: ins.participations.length, events: ins.events.length, admin_audit: ins.audit.length,
+    };
+  }
+
+  async listAudit(limit: number): Promise<AuditRow[]> {
+    return copy([...this.ins.audit].sort((a, b) => b.at - a.at || b.id - a.id).slice(0, Math.min(200, Math.max(1, limit))));
+  }
+
+  async eraseDevice(id: string): Promise<EraseResult> {
+    if (!/^[0-9a-f]{8}$/.test(id)) throw new Error('a device id is 8 hex characters');
+    const ins = this.ins;
+    const randomHash = (): string => randomBytes(32).toString('hex');
+    let games = 0, activeGames = 0;
+    for (const g of this.data.games.values()) {
+      const isHost = shortId(g.hostTokenHash) === id;
+      const seats = g.players.filter((p) => shortId(p.tokenHash) === id);
+      if (!isHost && seats.length === 0) continue;
+      // The document changes, its version does not: a move made at the same instant simply retries.
+      g.doc = agg.anonymiseDoc(g.doc, seats.map((p) => p.pid), isHost);
+      games++;
+      if (!this.expired(g) && g.erasedAt === undefined) {
+        activeGames++; // still being played: the seat (and its link to the device) stays until the game expires
+      } else {
+        for (const p of seats) p.tokenHash = randomHash();
+        if (isHost) g.hostTokenHash = randomHash();
+      }
+    }
+    const removed = agg.eraseFromInsights(ins, id);
+    const result: EraseResult = { found: games + removed.devices + removed.ips + removed.events + removed.participations > 0, ...removed, games, activeGames };
+    const { found: _found, ...detail } = result;
+    void _found;
+    ins.audit.push({ id: ins.nextAuditId++, at: this.now(), action: 'erase_device', target: id, detail });
+    return result;
+  }
+
+  /** For tests: the raw analytics rows. */
+  get insightsData(): InsightsData {
+    return this.ins;
   }
 
   /** For tests. */

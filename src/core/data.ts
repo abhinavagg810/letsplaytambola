@@ -132,7 +132,7 @@ export const RULES: readonly RuleDef[] = [
   { id: "dinner", name: "Dinner", group: "Number ranges", rule: "Every number from 60–90" },
   { id: "day", name: "Devrani (Day)", group: "Number ranges", rule: "Every number from 1–45" },
   { id: "night", name: "Jethani (Night)", group: "Number ranges", rule: "Every number from 46–90" },
-  { id: "full", name: "Full House", group: "Full ticket", rule: "All 15 numbers — add again for Second House" },
+  { id: "full", name: "Full House", group: "Full ticket", rule: "All 15 numbers" },
 ];
 
 /** Group headings in display order: Quick, Lines, Corners, Shapes, Number ranges, Full ticket. */

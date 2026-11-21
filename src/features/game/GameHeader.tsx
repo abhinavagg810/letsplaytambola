@@ -3,6 +3,7 @@
 import { Pill, toast } from '@/components';
 import type { MemberView } from '@/core';
 import { copy, gameUrl } from '@/lib/share';
+import { track } from '@/lib/track';
 import { useMuted } from '@/lib/useMuted';
 import styles from './game.module.css';
 
@@ -25,7 +26,7 @@ export function GameHeader({ game }: { game: Pick<MemberView, 'code' | 'name' | 
         <span className={styles.codePill}>
           Code <b className={styles.code}>{game.code}</b>
         </span>
-        <Pill className={styles.titlePill} onClick={() => void copyGameLink(game.code)}>
+        <Pill className={styles.titlePill} onClick={() => (track('share_header_copy', { code: game.code }), void copyGameLink(game.code))}>
           Copy link
         </Pill>
         <Pill className={styles.titlePill} onClick={() => setMuted(!muted)} aria-label={muted ? 'Sound off. Turn sound on' : 'Sound on. Turn sound off'}>

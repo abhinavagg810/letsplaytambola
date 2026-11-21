@@ -2,6 +2,7 @@
 import { useState, type JSX } from 'react';
 import type { MemberView } from '@/core';
 import { Board } from '@/components';
+import { track } from '@/lib/track';
 import { useAutoCall } from '@/lib/useAutoCall';
 import type { useGame } from '@/lib/useGame';
 import { CallerCard } from './CallerCard';
@@ -33,7 +34,7 @@ export function Live({ game, act, serverNow }: { game: MemberView; act: ReturnTy
         <div className={styles.col}>
           <CallerCard game={game} />
           {isHost ? <HostControls game={game} act={act} /> : null}
-          {you.ticket ? <MyTicket name={you.name} ticket={you.ticket} marks={you.marks ?? []} act={act} onClaim={() => setClaimOpen(true)} /> : null}
+          {you.ticket ? <MyTicket name={you.name} ticket={you.ticket} marks={you.marks ?? []} act={act} onClaim={() => (track('claim_open', { code: game.code }), setClaimOpen(true))} /> : null}
           {/* Ways to win sits under the ticket (or under the caller when there is no ticket); board and players fill the other column. */}
           <WaysToWin prizes={game.prizes} youPid={you.pid} />
         </div>

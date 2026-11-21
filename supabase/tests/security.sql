@@ -32,19 +32,21 @@ select t.ok((select count(*) = 3 from pg_class c join pg_namespace n on n.oid = 
                 and c.relname in ('games', 'players', 'notify_numbers')),
             'row level security is enabled on games, players and notify_numbers');
 select t.ok((select count(*) = 0 from pg_policies where schemaname = 'public'), 'there are no policies at all');
-select t.ok((select count(*) = 3 from pg_class c join pg_namespace n on n.oid = c.relnamespace
-              where n.nspname = 'public' and c.relkind = 'r'), 'no other tables exist in public');
+-- (The five insights tables of migration 0003 and its functions are checked in tests/insights.sql.)
 select t.ok((select count(*) = 0 from pg_class c join pg_namespace n on n.oid = c.relnamespace
-              where n.nspname = 'public' and c.relkind in ('v', 'm', 'f', 'S')), 'the admin migration added no view, materialized view or sequence');
-select t.ok((select count(*) = 6 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public'),
-            'public has exactly six functions (commit_game, purge_expired_games, admin_retention_days, admin_game_row, admin_list_games, admin_get_game)');
+              where n.nspname = 'public' and c.relkind = 'r' and not c.relrowsecurity), 'no table in public is without row level security');
+select t.ok((select count(*) = 0 from pg_class c join pg_namespace n on n.oid = c.relnamespace
+              where n.nspname = 'public' and c.relkind in ('v', 'm', 'f')), 'no migration added a view or a materialized view');
+select t.ok((select count(*) = 6 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public'
+              and p.proname in ('commit_game', 'purge_expired_games', 'admin_retention_days', 'admin_game_row', 'admin_list_games', 'admin_get_game')),
+            'the six game functions exist once each (commit_game, purge_expired_games, admin_retention_days, admin_game_row, admin_list_games, admin_get_game)');
 select t.ok((select count(*) = 0 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
               where n.nspname = 'public'
                 and (has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('authenticated', p.oid, 'execute') or has_function_privilege('public', p.oid, 'execute'))),
             'no function in public can be executed by anon, authenticated or PUBLIC');
-select t.ok((select count(*) = 6 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-              where n.nspname = 'public' and has_function_privilege('service_role', p.oid, 'execute') and not p.prosecdef),
-            'service_role can execute all six, and none is SECURITY DEFINER');
+select t.ok((select bool_and(has_function_privilege('service_role', p.oid, 'execute') and not p.prosecdef) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+              where n.nspname = 'public'),
+            'service_role can execute every function, and none is SECURITY DEFINER');
 select t.ok(public.admin_retention_days() = 90, 'ADMIN_RETENTION_DAYS is 90');
 
 -- ------------------------------------------------------------ the service role (the Next.js server) can work

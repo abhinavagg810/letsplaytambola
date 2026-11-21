@@ -170,7 +170,11 @@ export interface CreateGameInput {
 export type GameAction =
   | { type: 'join'; name: string }
   | { type: 'start' }
-  | { type: 'draw' }
+  /**
+   * Call the next number. With `after` (how many numbers the sender has seen called) the draw only happens if exactly
+   * that many have been called — so a double tap, a retry or a second host tab can never call two numbers for one request.
+   */
+  | { type: 'draw'; after?: number }
   | { type: 'setAuto'; auto: AutoSetting }
   /** Dab or un-dab `n` on your own ticket. Without `on` it toggles; with `on` it sets (safe to retry). */
   | { type: 'mark'; n: number; on?: boolean }

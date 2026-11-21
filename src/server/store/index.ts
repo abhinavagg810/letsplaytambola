@@ -7,7 +7,7 @@ export type {
   AdminGameFilter, AdminGamePage, AdminGameQuery, AdminGameRow, AdminNotifyRow,
   CommitWrite, GameStore, NewGame, PlayerWrite, StoredGame, StoredPlayer,
 } from './types';
-export { ADMIN_MAX_PAGE, ADMIN_MAX_RANGE_ROWS, ADMIN_RETENTION_DAYS, ADMIN_RETENTION_MS, CodeSpaceError } from './types';
+export { ABANDONED_AFTER_MS, ADMIN_MAX_PAGE, ADMIN_MAX_RANGE_ROWS, ADMIN_RETENTION_DAYS, ADMIN_RETENTION_MS, CodeSpaceError } from './types';
 
 const KEY = '__lpt_supabase_store_v1__';
 
