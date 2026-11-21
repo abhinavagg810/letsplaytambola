@@ -1,0 +1,1785 @@
+{
+ "generated": "2026-11-21",
+ "scope": "player-facing side (website, host setup, join, game, public API, engine, client data layer)",
+ "build": "production build (next build + next start), in-memory store, rate limits on",
+ "statuses": {
+  "passed": "ran and met the expected result",
+  "failed-fixed": "failed (or the defect was confirmed) before a fix made in this pass; passes now",
+  "failed-open": "ran; a known problem remains and is reported as open / needs decision",
+  "blocked": "could not be run in this environment",
+  "not-run": "not run, with the reason"
+ },
+ "counts": {
+  "total": 149,
+  "failed-fixed": 25,
+  "passed": 107,
+  "failed-open": 6,
+  "blocked": 7,
+  "not-run": 4
+ },
+ "cases": {
+  "WEB-01": {
+   "status": "failed-fixed",
+   "area": "Website",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Home page shows every section in the specified order with the specified copy",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "bugs": "U-04",
+   "observed": [
+    "24 pieces of copy found in order; one h1; no console errors"
+   ],
+   "evidence": [
+    "docs/qa/evidence/WEB-01-home-360.jpg"
+   ]
+  },
+  "WEB-02": {
+   "status": "passed",
+   "area": "Website",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Every link on the home page goes somewhere real",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "observed": [
+    "8 distinct links: / /#how /#features /join /host /privacy /terms /privacy#contact"
+   ],
+   "evidence": []
+  },
+  "WEB-03": {
+   "status": "passed",
+   "area": "Website",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Mobile menu: opens, lists the three items (no \"Questions\"), closes on tap, Escape and navigation",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "WEB-04": {
+   "status": "passed",
+   "area": "Website",
+   "priority": "P1",
+   "type": "functional",
+   "title": "Desktop header: logo, How it works, Features, Join a game, Host a game; sticky",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "WEB-05": {
+   "status": "passed",
+   "area": "Website",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Code box on the home page: valid code, lower case, pasted link, junk, too short, empty",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "observed": [
+    "10 inputs normalised as expected; real code opened the invite; ZZ9 → not found → Try another code → /join; empty → /join"
+   ],
+   "evidence": []
+  },
+  "WEB-06": {
+   "status": "failed-fixed",
+   "area": "Website",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Notify me: valid Indian mobile number is saved; invalid numbers get a friendly message",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "bugs": "U-06, U-07",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/WEB-06-notify-done.jpg"
+   ]
+  },
+  "WEB-07": {
+   "status": "failed-fixed",
+   "area": "Website",
+   "priority": "P1",
+   "type": "negative",
+   "title": "Notify me: the same number twice is fine; the hourly limit and a server failure show a clear message",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "bugs": "U-08",
+   "observed": [
+    "rate limits are switched off on this server: the limit message could not be shown",
+    "duplicate saves ok ×5; limit message not testable here; offline message shown"
+   ],
+   "evidence": []
+  },
+  "WEB-08": {
+   "status": "passed",
+   "area": "Website",
+   "priority": "P1",
+   "type": "functional",
+   "title": "FAQ accordion: first question open; opening another closes it; keyboard works",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "WEB-09": {
+   "status": "failed-fixed",
+   "area": "Website",
+   "priority": "P1",
+   "type": "functional",
+   "title": "Page titles, descriptions and link previews (Open Graph / Twitter)",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "bugs": "U-10",
+   "observed": [
+    "{\"/\":\"Letsplaytambola — Housie night, sorted.\",\"/host\":\"Host a game — Letsplaytambola\",\"/host/prizes\":\"Ways to win — Letsplaytambola\",\"/join\":\"Join a game — Letsplaytambola\",\"/privacy\":\"Privacy Policy — Letsplaytambola\",\"/terms\":\"Terms of Use — Letsplaytambola\",\"/g/CODE\":\"Join the Tambola game — Letsplaytambola\"}"
+   ],
+   "evidence": []
+  },
+  "WEB-10": {
+   "status": "passed",
+   "area": "Website",
+   "priority": "P1",
+   "type": "functional",
+   "title": "robots.txt and sitemap.xml",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "observed": [
+    "User-Agent: * | Allow: / | Disallow: /g/ | Disallow: /api/ | Disallow: /admin |  | Sitemap: https://letsplaytambola.com/sitemap.xml | "
+   ],
+   "evidence": []
+  },
+  "WEB-11": {
+   "status": "passed",
+   "area": "Website",
+   "priority": "P1",
+   "type": "negative",
+   "title": "Unknown addresses show the friendly 404 page with ways forward",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/WEB-11-404.jpg"
+   ]
+  },
+  "WEB-12": {
+   "status": "passed",
+   "area": "Website",
+   "priority": "P1",
+   "type": "functional",
+   "title": "Privacy and Terms describe v2 (names, device token, 24 hours, Notify-me numbers) and nothing from v1",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "observed": [
+    "privacy 10874 characters, terms 6413 characters"
+   ],
+   "evidence": []
+  },
+  "WEB-13": {
+   "status": "passed",
+   "area": "Website",
+   "priority": "P2",
+   "type": "functional",
+   "title": "Ads are off: no AdSense script, no ad slots, ads.txt harmless",
+   "how": "npm run e2e (e2e/specs/website.spec.mjs)",
+   "observed": [
+    "no third-party requests at all on / and the lobby; /ads.txt → 404"
+   ],
+   "evidence": []
+  },
+  "HOST-01": {
+   "status": "passed",
+   "area": "Host setup",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Host setup screen matches the spec; Create looks disabled until a name is typed and explains itself",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/HOST-01-host-360.jpg"
+   ]
+  },
+  "HOST-02": {
+   "status": "passed",
+   "area": "Host setup",
+   "priority": "P0",
+   "type": "edge",
+   "title": "Host and game names: 24/32-character limits, Hindi, emoji, right-to-left, and HTML are shown as plain text everywhere",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "observed": [
+    "5 name pairs created and displayed verbatim; 0 scripts executed"
+   ],
+   "evidence": [
+    "docs/qa/evidence/HOST-02-long-names-invite-390.jpg"
+   ]
+  },
+  "HOST-03": {
+   "status": "passed",
+   "area": "Host setup",
+   "priority": "P1",
+   "type": "functional",
+   "title": "Game name chips fill the field; an empty game name becomes \"Tambola Night\"",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "observed": [
+    "game ATFJA created with a blank name → \"Tambola Night\""
+   ],
+   "evidence": []
+  },
+  "HOST-04": {
+   "status": "failed-fixed",
+   "area": "Host setup",
+   "priority": "P1",
+   "type": "edge",
+   "title": "Ticket price: digits only, five digits at most; 0 and empty mean \"no price\"",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "bugs": "U-12",
+   "observed": [
+    "invite line for the top price: \"1 person in · 6 ways to win · ₹99999 ticket, pay Priya directly\""
+   ],
+   "evidence": []
+  },
+  "HOST-05": {
+   "status": "passed",
+   "area": "Host setup",
+   "priority": "P0",
+   "type": "functional",
+   "title": "\"Deal me a ticket\" off: the host gets no ticket and cannot start alone",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/HOST-05-lobby-host-no-ticket.jpg"
+   ]
+  },
+  "HOST-06": {
+   "status": "passed",
+   "area": "Host setup",
+   "priority": "P1",
+   "type": "functional",
+   "title": "The draft survives going to Ways to win and back, a refresh and back/forward; a new tab and a created game start clean",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "HOST-07": {
+   "status": "passed",
+   "area": "Host setup",
+   "priority": "P0",
+   "type": "resilience",
+   "title": "Create on a slow connection: one game only, however often the button is tapped",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "HOST-08": {
+   "status": "passed",
+   "area": "Host setup",
+   "priority": "P0",
+   "type": "resilience",
+   "title": "Create when the server fails or the phone is offline: a clear message, nothing lost, retry works",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "observed": [
+    "last toast region text: \"\""
+   ],
+   "evidence": []
+  },
+  "HOST-09": {
+   "status": "passed",
+   "area": "Host setup",
+   "priority": "P2",
+   "type": "functional",
+   "title": "The round back button returns to where the person came from, or home on a direct visit",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "PRZ-01": {
+   "status": "failed-fixed",
+   "area": "Ways to win",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Ways to win: presets select exactly their patterns; all 26 patterns in six groups with one-line rules",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "bugs": "U-04",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/PRZ-01-prizes-360.jpg"
+   ]
+  },
+  "PRZ-02": {
+   "status": "passed",
+   "area": "Ways to win",
+   "priority": "P0",
+   "type": "negative",
+   "title": "At least one way to win is needed — on the picker and on Create",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "PRZ-03": {
+   "status": "passed",
+   "area": "Ways to win",
+   "priority": "P1",
+   "type": "edge",
+   "title": "All 26 ways selected: the game is created and every screen lists all 26",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "PRZ-04": {
+   "status": "failed-fixed",
+   "area": "Ways to win",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Prize amounts: digits only up to 999999, totals shown, and a mix of typed and empty amounts is kept exactly",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "bugs": "U-12",
+   "observed": [
+    "amount typed for a deselected-then-reselected pattern came back as \"250\""
+   ],
+   "evidence": [
+    "docs/qa/evidence/PRZ-04-live-typed-amounts.jpg"
+   ]
+  },
+  "PRZ-05": {
+   "status": "passed",
+   "area": "Ways to win",
+   "priority": "P2",
+   "type": "functional",
+   "title": "Opening /host/prizes directly (bookmark, refresh) still leads back to setup",
+   "how": "npm run e2e (e2e/specs/host.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "JOIN-01": {
+   "status": "passed",
+   "area": "Join",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Join with a code (/join): the code field cleans what is typed; \"Find my game\" opens the invite",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/JOIN-01-invite-360.jpg"
+   ]
+  },
+  "JOIN-02": {
+   "status": "passed",
+   "area": "Join",
+   "priority": "P0",
+   "type": "negative",
+   "title": "Wrong, mistyped or hostile codes show \"We can’t find game …\" with a way back",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/JOIN-02-not-found-360.jpg"
+   ]
+  },
+  "JOIN-03": {
+   "status": "failed-fixed",
+   "area": "Join",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Join by link: type a name → a ticket is dealt at once; the name is remembered for next time",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "bugs": "U-14",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/JOIN-03-lobby-player-390.jpg"
+   ]
+  },
+  "JOIN-04": {
+   "status": "passed",
+   "area": "Join",
+   "priority": "P1",
+   "type": "edge",
+   "title": "Two people with the same name: the second is shown as \"Meera (2)\" on every device",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "JOIN-05": {
+   "status": "passed",
+   "area": "Join",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Same device comes back (refresh, re-opened link, second tab): same seat, same ticket",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "JOIN-06": {
+   "status": "passed",
+   "area": "Join",
+   "priority": "P1",
+   "type": "edge",
+   "title": "Clearing the browser’s storage makes a new identity (accepted: no cross-device recovery)",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [
+    "old seat stays (nobody can remove it) — recorded as a product question in the report"
+   ],
+   "evidence": []
+  },
+  "JOIN-07": {
+   "status": "passed",
+   "area": "Join",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Joining while the game is live: straight to the ticket, with numbers already called available to dab",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "JOIN-08": {
+   "status": "passed",
+   "area": "Join",
+   "priority": "P1",
+   "type": "functional",
+   "title": "A visitor opening a finished game sees \"This game has finished\" and can join when the next round opens",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/JOIN-08-finished-visitor.jpg"
+   ]
+  },
+  "JOIN-09": {
+   "status": "passed",
+   "area": "Join",
+   "priority": "P1",
+   "type": "edge",
+   "title": "A full game (100 people): the 101st sees \"This game is full\" and stays on the invite",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/JOIN-09-lobby-100-players.jpg"
+   ]
+  },
+  "JOIN-10": {
+   "status": "passed",
+   "area": "Join",
+   "priority": "P0",
+   "type": "resilience",
+   "title": "Join on a slow or broken connection: one seat only; clear message on failure; retry works",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "JOIN-11": {
+   "status": "passed",
+   "area": "Join",
+   "priority": "P2",
+   "type": "resilience",
+   "title": "A browser that blocks storage (private mode / strict in-app browser) can still host and join for that visit",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "LOB-01": {
+   "status": "passed",
+   "area": "Lobby",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Host share card: WhatsApp opens wa.me with the invite text and link; Copy link copies it; no link text, no \"Share another way\"",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [
+    "wa.me text: \"Join my Tambola game “Kitty & Co “Special” #1”! Tap the link, type your name and you’re in:\\nhttp://localhost:8501/g/CGD75\""
+   ],
+   "evidence": [
+    "docs/qa/evidence/LOB-01-lobby-host-360.jpg"
+   ]
+  },
+  "LOB-02": {
+   "status": "passed",
+   "area": "Lobby",
+   "priority": "P1",
+   "type": "negative",
+   "title": "Copy link when the browser refuses the clipboard: the link is shown so it can be copied by hand",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/LOB-02-copy-denied-toast.jpg"
+   ]
+  },
+  "LOB-03": {
+   "status": "passed",
+   "area": "Lobby",
+   "priority": "P0",
+   "type": "functional",
+   "title": "The lobby list updates live on every device as people join (no refresh)",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [
+    "time for a new joiner to show on the host: 1288, 1290, 1290 ms (polling every 1.5 s)"
+   ],
+   "evidence": [
+    "docs/qa/evidence/LOB-03-lobby-host-desktop.jpg"
+   ]
+  },
+  "LOB-04": {
+   "status": "passed",
+   "area": "Lobby",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Start the game: only the host can; one tap (or five) starts once; every device moves to the live screen",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "LOB-05": {
+   "status": "passed",
+   "area": "Lobby",
+   "priority": "P1",
+   "type": "functional",
+   "title": "Lobby survives refresh and the Back button; the title row shows code, copy and sound",
+   "how": "npm run e2e (e2e/specs/join.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "LIVE-01": {
+   "status": "passed",
+   "area": "Live",
+   "priority": "P0",
+   "type": "responsive",
+   "title": "Live layout: phone = caller, controls, ticket, ways to win, board, players; desktop = caller+controls+ticket+ways left, board+players right",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/LIVE-01-live-host-360.jpg",
+    "docs/qa/evidence/LIVE-01-live-host-desktop-1280.jpg"
+   ]
+  },
+  "LIVE-02": {
+   "status": "passed",
+   "area": "Live",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Calling a number: the ball, count, callout, \"Before\" chips and board update on every device",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [
+    "called 30, 66, 11, 45, 25, 77, 60; both screens matched the server"
+   ],
+   "evidence": [
+    "docs/qa/evidence/LIVE-02-live-player-390.jpg"
+   ]
+  },
+  "LIVE-03": {
+   "status": "passed",
+   "area": "Live",
+   "priority": "P0",
+   "type": "edge",
+   "title": "Double tap / frantic tapping on \"Call next number\" calls one number per tap that the host could see",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [
+    "burst of 6 → 1 number; three human double-taps → 6 numbers (a second tap after the first answer is a real second call); 5 taps on a slow line → 1"
+   ],
+   "evidence": []
+  },
+  "LIVE-04": {
+   "status": "passed",
+   "area": "Live",
+   "priority": "P0",
+   "type": "functional",
+   "title": "The voice caller says the right words; Sound off silences it at once and is remembered",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [
+    "6 numbers checked on the host (single digit seen: true); e.g. \"Make them wait! ... 5 and 8, 58\"; player said 1 of them (it polls), always the newest"
+   ],
+   "evidence": []
+  },
+  "LIVE-05": {
+   "status": "passed",
+   "area": "Live",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Dabbing: only called numbers; tap again to undo; the dab is kept on refresh",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [
+    "number 40: dab drawn 27 ms after the tap; undo and re-dab confirmed by the server; kept after refresh"
+   ],
+   "evidence": []
+  },
+  "LIVE-06": {
+   "status": "passed",
+   "area": "Live",
+   "priority": "P0",
+   "type": "edge",
+   "title": "Rapid tapping on the ticket ends in the right state; a dab the server refuses is rolled back with a message",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "LIVE-07": {
+   "status": "failed-fixed",
+   "area": "Live",
+   "priority": "P0",
+   "type": "usability",
+   "title": "Ticket cells are big enough to tap on small phones, and a tap near the edge never hits the neighbour",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "bugs": "U-03",
+   "observed": [
+    "smallest cell (w×h) by screen width: {\"320\":\"30.7×46.0\",\"360\":\"35.1×46.0\",\"390\":\"38.4×46.0\",\"412\":\"40.9×47.0\"}; 4 edge taps × every called number × 4 widths, none hit a neighbour"
+   ],
+   "evidence": [
+    "docs/qa/evidence/LIVE-07-ticket-360.jpg"
+   ]
+  },
+  "LIVE-08": {
+   "status": "passed",
+   "area": "Live",
+   "priority": "P0",
+   "type": "functional",
+   "title": "The 90th number ends the round for everyone; the call button cannot go past 90",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "LIVE-09": {
+   "status": "passed",
+   "area": "Live",
+   "priority": "P0",
+   "type": "resilience",
+   "title": "A phone that sleeps, loses signal or switches apps catches up when it comes back",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [
+    "caught up 26 ms after the network returned and 27 ms after the tab was shown again"
+   ],
+   "evidence": []
+  },
+  "LIVE-10": {
+   "status": "passed",
+   "area": "Live",
+   "priority": "P1",
+   "type": "performance",
+   "title": "Polling fallback (no realtime): one request about every 1.5 s, nothing piles up, updates arrive within ~2 s",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [
+    "7 polls in 12 s; a called number reached the player after 790, 1292, 1793, 1294, 793, 1303, 1290, 183 ms (average 1092 ms)"
+   ],
+   "evidence": []
+  },
+  "LIVE-11": {
+   "status": "passed",
+   "area": "Live",
+   "priority": "P1",
+   "type": "functional",
+   "title": "Ways to win and Playing show prize money: automatic split at start, a late joiner raises only open prizes",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [
+    "start 20/30/30/30/30/60 → after late joiner 20/40/40/40/40/120"
+   ],
+   "evidence": [
+    "docs/qa/evidence/LIVE-11-live-amounts-late-joiner.jpg"
+   ]
+  },
+  "LIVE-12": {
+   "status": "passed",
+   "area": "Live",
+   "priority": "P1",
+   "type": "functional",
+   "title": "One player wins several prizes: all are listed with the total",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "LIVE-13": {
+   "status": "passed",
+   "area": "Live",
+   "priority": "P2",
+   "type": "functional",
+   "title": "iPhone Safari path for the voice: speech is unlocked inside the Join / Start / Sound-on taps",
+   "how": "one-off script (not in the repo)",
+   "observed": [
+    "unlock utterances: 1 in Join, 1 in Sound on; first number then spoken: \"Key of the door! ... 2 and 1, 21\""
+   ],
+   "evidence": []
+  },
+  "AUTO-01": {
+   "status": "failed-fixed",
+   "area": "Auto-call",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Auto call: waits one full interval after being switched on, then a number every 6 seconds; Stop stops",
+   "how": "npm run e2e (e2e/specs/auto-a.spec.mjs)",
+   "bugs": "U-02",
+   "observed": [
+    "switched on 8 s after the last number: numbers at 6137, 12203, 18263 ms; none in 9 s after Stop"
+   ],
+   "evidence": []
+  },
+  "AUTO-02": {
+   "status": "failed-fixed",
+   "area": "Auto-call",
+   "priority": "P0",
+   "type": "concurrency",
+   "title": "Two (or three) host tabs with auto-call on still call at normal speed",
+   "how": "npm run e2e (e2e/specs/auto-a.spec.mjs)",
+   "bugs": "U-01",
+   "observed": [
+    "three host tabs: numbers at 4863, 10927, 17032, 22725 ms (gaps 6064, 6105, 5693); simultaneous manual taps → 1 number"
+   ],
+   "evidence": []
+  },
+  "AUTO-03": {
+   "status": "passed",
+   "area": "Auto-call",
+   "priority": "P1",
+   "type": "functional",
+   "title": "A manual call while auto is on does not cause a double: the next automatic number waits a full interval",
+   "how": "npm run e2e (e2e/specs/auto-a.spec.mjs)",
+   "observed": [
+    "next automatic number 6100 ms after the manual call"
+   ],
+   "evidence": []
+  },
+  "AUTO-04": {
+   "status": "passed",
+   "area": "Auto-call",
+   "priority": "P0",
+   "type": "resilience",
+   "title": "Host goes offline with auto-call on: calling pauses; it resumes by itself when the connection returns",
+   "how": "npm run e2e (e2e/specs/auto-b.spec.mjs)",
+   "observed": [
+    "offline 15 s: 0 numbers; after reconnecting numbers at 1220, 7311, 13054 ms"
+   ],
+   "evidence": []
+  },
+  "AUTO-05": {
+   "status": "passed",
+   "area": "Auto-call",
+   "priority": "P0",
+   "type": "resilience",
+   "title": "Host reloads or closes the page with auto-call on: calling pauses while they are away and carries on when they return",
+   "how": "npm run e2e (e2e/specs/auto-b.spec.mjs)",
+   "observed": [
+    "reload → next number after 6059 ms; tab closed 12 s → 0 numbers; reopened → next after 6131 ms"
+   ],
+   "evidence": []
+  },
+  "AUTO-06": {
+   "status": "passed",
+   "area": "Auto-call",
+   "priority": "P1",
+   "type": "resilience",
+   "title": "Host tab in the background (visibility \"hidden\") with auto-call on",
+   "how": "npm run e2e (e2e/specs/auto-b.spec.mjs)",
+   "observed": [
+    "hidden for 14 s: 2 numbers at 6075, 12215 ms — calling continues while the browser keeps the page running"
+   ],
+   "evidence": []
+  },
+  "AUTO-07": {
+   "status": "passed",
+   "area": "Auto-call",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Auto-call stops by itself when the round ends (last prize won)",
+   "how": "npm run e2e (e2e/specs/auto-b.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "CLM-01": {
+   "status": "failed-fixed",
+   "area": "Claims",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Claim sheet: lists the open prizes; a claim that is not complete gets the gentle message and nothing else happens",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "bugs": "U-04",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/CLM-01-claim-sheet-390.jpg"
+   ]
+  },
+  "CLM-02": {
+   "status": "passed",
+   "area": "Claims",
+   "priority": "P0",
+   "type": "functional",
+   "title": "A valid claim: banner on every device for 5 seconds, voice line, winner shown in Ways to win and Playing, nobody is moved away",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [
+    "banner appeared after {\"winner\":30,\"host\":848,\"other\":885} ms and left after {\"winner\":5018,\"host\":5613,\"other\":5904} ms; Top Line amount ₹40"
+   ],
+   "evidence": [
+    "docs/qa/evidence/CLM-02-win-banner-other-player.jpg"
+   ]
+  },
+  "CLM-03": {
+   "status": "passed",
+   "area": "Claims",
+   "priority": "P0",
+   "type": "concurrency",
+   "title": "Two phones claim the same prize at the same moment through the screen: one banner, one winner, the other is told who won",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [
+    "both tapped together; Asha won"
+   ],
+   "evidence": []
+  },
+  "CLM-04": {
+   "status": "passed",
+   "area": "Claims",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Dabs of numbers that were never called cannot help a claim; a host without a ticket has nothing to claim",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/CLM-04-live-host-no-ticket.jpg"
+   ]
+  },
+  "CLM-05": {
+   "status": "passed",
+   "area": "Claims",
+   "priority": "P0",
+   "type": "functional",
+   "title": "The last prize: the banner carries over to the results screen on every device",
+   "how": "npm run e2e (e2e/specs/live.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/CLM-05-results-with-banner-host.jpg"
+   ]
+  },
+  "RES-01": {
+   "status": "failed-fixed",
+   "area": "Results",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Results screen: headline, count line in normal words, payment note, winners with amounts, the right buttons for host and players",
+   "how": "npm run e2e (e2e/specs/results.spec.mjs)",
+   "bugs": "U-05",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/RES-01-results-host-360.jpg",
+    "docs/qa/evidence/RES-01-results-winner-390.jpg"
+   ]
+  },
+  "RES-02": {
+   "status": "failed-fixed",
+   "area": "Results",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Results with fewer than 90 numbers: the count is the real one, in plain words",
+   "how": "npm run e2e (e2e/specs/results.spec.mjs)",
+   "bugs": "U-05",
+   "observed": [
+    "line read: \"87 of 90 numbers called.\""
+   ],
+   "evidence": []
+  },
+  "RES-03": {
+   "status": "passed",
+   "area": "Results",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Play again: everyone returns to the lobby with a fresh ticket; nothing from the last round is replayed",
+   "how": "npm run e2e (e2e/specs/results.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/RES-03-round2-live-player.jpg"
+   ]
+  },
+  "RES-04": {
+   "status": "passed",
+   "area": "Results",
+   "priority": "P0",
+   "type": "edge",
+   "title": "Play again tapped many times (or on a slow line) starts ONE new round",
+   "how": "npm run e2e (e2e/specs/results.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "RES-05": {
+   "status": "passed",
+   "area": "Results",
+   "priority": "P1",
+   "type": "functional",
+   "title": "Results survive a refresh; \"Host my own game\" starts a separate new game and the old one is still there",
+   "how": "npm run e2e (e2e/specs/results.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "API-01": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Create a game: 201, a 5-character code from the allowed alphabet, never cached",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "code 9U6SC, cache-control \"no-store, max-age=0\""
+   ],
+   "evidence": []
+  },
+  "API-02": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "security",
+   "title": "Create and act need a device token that is a UUID",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "API-03": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "negative",
+   "title": "Create validates every field (name, game name, price, toggle, prizes, amounts)",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "20 bad bodies refused with 400 + copy; 7 boundary bodies accepted"
+   ],
+   "evidence": []
+  },
+  "API-04": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P1",
+   "type": "negative",
+   "title": "Malformed, non-object and oversized bodies are refused without a server error",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "13 bad bodies, all answered 400 bad_request, including a 2 MB body"
+   ],
+   "evidence": []
+  },
+  "API-05": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "security",
+   "title": "A visitor (not joined, or no token) gets the invite card only",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "visitor view keys: code, hostName, name, now, playerCount, price, prizes, round, status, version, you"
+   ],
+   "evidence": []
+  },
+  "API-06": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P1",
+   "type": "negative",
+   "title": "Game codes: case-insensitive; unknown, malformed and hostile codes answer 404 not_found",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "API-07": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P1",
+   "type": "negative",
+   "title": "Unknown actions and wrong HTTP methods are refused",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "API-08": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "security",
+   "title": "Only the host can start, call numbers, switch auto-call and start a new round",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "4 host-only actions × 2 non-hosts × 3 stages: all 403, version never moved"
+   ],
+   "evidence": []
+  },
+  "API-09": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P1",
+   "type": "negative",
+   "title": "Actions at the wrong time are refused with 409 and friendly copy",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "API-10": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Dabbing: only called numbers on your own ticket; undo; safe to repeat; private",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "number 5: dab/undo/dab ok; version stayed 9"
+   ],
+   "evidence": []
+  },
+  "API-11": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "security",
+   "title": "No response ever contains another player’s ticket or dabs, a device token, a token hash or the round history",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "1439 responses scanned across 5 devices and 2 rounds; 8 tickets, 5 tokens and their hashes never leaked"
+   ],
+   "evidence": []
+  },
+  "API-12": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Claims are checked on the server: not yet → gentle refusal; valid → winner; already won → refusal",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "top line 4,11,36,74,81: refused at 0/5 and 4/5 dabs and when called-but-undabbed; accepted at 5/5; repeat claims \"already won\""
+   ],
+   "evidence": []
+  },
+  "API-13": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "concurrency",
+   "title": "Two devices claiming the same prize at the same instant: exactly one wins",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "8 simultaneous pairs: always one winner (first request won 8×, second 0×)"
+   ],
+   "evidence": []
+  },
+  "API-14": {
+   "status": "failed-fixed",
+   "area": "API",
+   "priority": "P1",
+   "type": "resilience",
+   "title": "Replaying requests is harmless (join twice, draw with the same \"after\", start twice)",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "bugs": "U-01",
+   "observed": [
+    "join statuses 200/200/200/200/200; 30 concurrent draws produced exactly 5 numbers"
+   ],
+   "evidence": []
+  },
+  "API-15": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P1",
+   "type": "security",
+   "title": "Rate limits answer 429 with friendly copy (create, join, notify, view) and recover per device",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "limits hit at create 13, join 31, notify 6 (device) and 21 (address), view 241; probe status 400"
+   ],
+   "evidence": []
+  },
+  "API-16": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P1",
+   "type": "edge",
+   "title": "A game holds 100 players; the 101st is told it is full",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "100 players; member view is 12.7 KB"
+   ],
+   "evidence": []
+  },
+  "API-17": {
+   "status": "failed-fixed",
+   "area": "API",
+   "priority": "P1",
+   "type": "edge",
+   "title": "Duplicate names get \"(2)\", \"(3)\" — ignoring case, counting the host; unusual names are kept as typed",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "bugs": "U-09",
+   "observed": [
+    "duplicates numbered; Hindi, emoji, Arabic, HTML and SQL-looking names stored as plain text; blank/invisible names refused"
+   ],
+   "evidence": []
+  },
+  "API-18": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Prize amounts: ticket money is split at start; a late joiner raises only open prizes; typed amounts never change",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "A: start {\"early5\":30,\"top\":60,\"middle\":60,\"bottom\":60,\"corners\":60,\"full\":130} after late joiner; early5 stayed ₹30"
+   ],
+   "evidence": []
+  },
+  "API-19": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "functional",
+   "title": "The round ends when every prize is won, or when the 90th number is called (auto-call switches off)",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "first ten numbers of the 90: 43, 66, 34, 36, 56, 3, 38, 45, 31, 12"
+   ],
+   "evidence": []
+  },
+  "API-20": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Play again: same code and people, round +1, fresh tickets, dabs and winners cleared, joining open again",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "round 2: fresh valid tickets for both, winners and dabs cleared, same pids"
+   ],
+   "evidence": []
+  },
+  "API-21": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P0",
+   "type": "functional",
+   "title": "All 26 ways to win: refused until the pattern is complete, accepted the moment it is (independent check)",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "148 claims compared with the independent rule check; won after N numbers: {\"early5\":20,\"early7\":31,\"laddoo\":31,\"early9\":49,\"bottom\":49,\"dinner\":49,\"night\":49,\"temp\":55,\"railway\":77,\"kings\":77,\"diamond\":77,\"middle\":78,\"pyramid\":78,\"one24\":78,\"breakfast\":78,\"bamboo\":83,\"corners\":83,\"star\":83,\"six\":83,\"queens\":83,\"top\":85,\"rpyramid\":85,\"lunch\":85,\"day\":85,\"full\":85}; left open: lucky3"
+   ],
+   "evidence": []
+  },
+  "API-22": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P1",
+   "type": "functional",
+   "title": "Lucky Three (3 of the first 5 numbers called) with 100 tickets in play",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "first five 79,32,49,24,50; player #23 held 3 of them and won; 4 of 100 tickets qualified"
+   ],
+   "evidence": []
+  },
+  "API-23": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P1",
+   "type": "negative",
+   "title": "A host without a ticket can run the game but cannot dab or claim",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "API-24": {
+   "status": "failed-fixed",
+   "area": "API",
+   "priority": "P1",
+   "type": "negative",
+   "title": "Notify me accepts Indian mobile numbers only",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "bugs": "U-06, U-07",
+   "observed": [
+    "6 valid forms saved; 12 invalid forms refused with the friendly message"
+   ],
+   "evidence": []
+  },
+  "API-25": {
+   "status": "failed-fixed",
+   "area": "Security",
+   "priority": "P1",
+   "type": "security",
+   "title": "Security headers on pages and API; no framework banner",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "bugs": "U-11",
+   "observed": [
+    "10 addresses checked: frame, nosniff, referrer headers present; no X-Powered-By"
+   ],
+   "evidence": []
+  },
+  "API-26": {
+   "status": "passed",
+   "area": "Security",
+   "priority": "P1",
+   "type": "security",
+   "title": "No open redirect and no Host-header poisoning",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "6 redirect probes and 5 forged-host probes: nothing reflected"
+   ],
+   "evidence": []
+  },
+  "API-27": {
+   "status": "passed",
+   "area": "API",
+   "priority": "P1",
+   "type": "concurrency",
+   "title": "30 people tapping the invite link in the same second all get a seat",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "30 simultaneous joins in 102 ms; statuses: 200×30"
+   ],
+   "evidence": []
+  },
+  "API-28": {
+   "status": "failed-open",
+   "area": "API",
+   "priority": "P1",
+   "type": "edge",
+   "title": "What happens to a prize that only the 90th number completes (and to slow claimers)",
+   "how": "npm run e2e (e2e/specs/api.spec.mjs)",
+   "observed": [
+    "ticket had all 15 numbers dabbed before the end; claim after the 90th call → 409 \"This game has finished\""
+   ],
+   "open": [
+    "D-1: once the 90th number is called the round ends at once — a prize completed by that number, or one a slow player has not claimed yet, can never be claimed. Matches the written spec; needs a product decision (e.g. keep claims open until the host taps \"Finish\")"
+   ],
+   "evidence": []
+  },
+  "SEC-01": {
+   "status": "failed-open",
+   "area": "Security",
+   "priority": "P2",
+   "type": "security",
+   "title": "Per-address rate limits rely on the X-Forwarded-For header",
+   "how": "one-off script (not in the repo)",
+   "observed": [
+    "25 of 25 requests accepted with rotating X-Forwarded-For"
+   ],
+   "open": [
+    "per-address rate limits can be bypassed by sending a made-up X-Forwarded-For header when the app is NOT behind a proxy that overwrites it (fine on Vercel; matters only if self-hosted). Per-device limits are trivially bypassed too (a new random token) — rate limiting is a speed bump, as the code comments say"
+   ],
+   "evidence": []
+  },
+  "SEC-02": {
+   "status": "passed",
+   "area": "Security",
+   "priority": "P1",
+   "type": "security",
+   "title": "Game codes cannot be guessed in bulk: what a stranger learns from a code",
+   "how": "one-off script (not in the repo)",
+   "observed": [
+    "300 guesses from one device: {\"404\":240,\"429\":60} (blocked after 240 in a minute); 0 real games found; 31^5 = 28629151 codes"
+   ],
+   "evidence": []
+  },
+  "ADS-01": {
+   "status": "passed",
+   "area": "Ads",
+   "priority": "P0",
+   "type": "functional",
+   "title": "With AdSense switched on (test ids), ad slots exist only in the lobby and on results — never on the live game or elsewhere",
+   "how": "one-off script (not in the repo)",
+   "observed": [
+    "{\"lobby (host)\":1,\"live (host)\":0,\"results (host)\":1,\"lobby (player)\":1,\"live (player)\":0,\"results (player)\":1,\"home (visitor)\":0,\"host (visitor)\":0,\"prizes (visitor)\":0,\"join (visitor)\":0,\"invite (visitor)\":0,\"finished (visitor)\":0,\"privacy (visitor)\":0}"
+   ],
+   "evidence": [
+    "docs/qa/evidence/ADS-01-lobby-with-ad-slot.jpg"
+   ]
+  },
+  "RSP-01": {
+   "status": "passed",
+   "area": "Responsive",
+   "priority": "P0",
+   "type": "responsive",
+   "title": "No sideways scrolling and nothing cut off on any screen at 320–1920px and on a phone held sideways",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "observed": [
+    "176 screen × width combinations checked, no sideways overflow"
+   ],
+   "evidence": [
+    "docs/qa/evidence/RSP-01-live-player-landscape.jpg",
+    "docs/qa/evidence/RSP-01-live-player-1280.jpg",
+    "docs/qa/evidence/RSP-01-done-host-1280.jpg"
+   ]
+  },
+  "RSP-02": {
+   "status": "passed",
+   "area": "Responsive",
+   "priority": "P0",
+   "type": "responsive",
+   "title": "Worst case content: 24-letter names, 32-letter game name, all 26 prizes, wide letters — at 320px and 360px",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "observed": [],
+   "evidence": [
+    "docs/qa/evidence/RSP-02-long-names-26-prizes-live-320.jpg",
+    "docs/qa/evidence/RSP-02-long-names-results-320.jpg"
+   ]
+  },
+  "RSP-03": {
+   "status": "failed-fixed",
+   "area": "Responsive",
+   "priority": "P1",
+   "type": "usability",
+   "title": "Tap targets are at least 44px on a phone (ticket cells: 44px tall) on every screen",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "bugs": "U-03, U-13",
+   "observed": [
+    "16 screens + claim sheet measured at 360px"
+   ],
+   "evidence": []
+  },
+  "RSP-04": {
+   "status": "failed-open",
+   "area": "Responsive",
+   "priority": "P1",
+   "type": "usability",
+   "title": "Text is at least 15px (small-caps labels 12px) and every input is 16px or more (no zoom jump on iPhone)",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "observed": [],
+   "open": [
+    "12px text in the app-store badges on the home page — /: \"Coming soon on\" 12px | \"Coming soon on the\" 12px"
+   ],
+   "evidence": []
+  },
+  "RSP-05": {
+   "status": "passed",
+   "area": "Responsive",
+   "priority": "P1",
+   "type": "usability",
+   "title": "Typing with the phone keyboard up: the field stays visible and the sticky button does not sit on top of it",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "RSP-06": {
+   "status": "passed",
+   "area": "Responsive",
+   "priority": "P2",
+   "type": "responsive",
+   "title": "Phones with a home bar / notch: sticky bars and the bottom sheet leave room (safe-area), and screens use the dynamic viewport height",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "observed": [
+    "env(safe-area-inset-bottom) appears 4× in the CSS of /host"
+   ],
+   "evidence": []
+  },
+  "RSP-07": {
+   "status": "passed",
+   "area": "Responsive",
+   "priority": "P1",
+   "type": "responsive",
+   "title": "Phone held sideways (760×360): the game is playable — claim sheet scrolls, header does not eat the screen",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "observed": [
+    "landscape: header 69.5px; sheet 306px tall with 25 options; last option \"Full House\" tapped"
+   ],
+   "evidence": []
+  },
+  "A11Y-01": {
+   "status": "passed",
+   "area": "Accessibility",
+   "priority": "P0",
+   "type": "accessibility",
+   "title": "A whole game with the keyboard only: host, join, start, call, dab, claim, play again",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "observed": [
+    "focus order on /host: Let’s playTAMB90LA → How it works → Features → Join a game → Host a game → Back → hostName → gameName → Kitty Party → Diwali Night → Family Sunday → Teej Special → price → Deal me a ticketPlay w → Ways to winClassic · 6 → Create game & get link"
+   ],
+   "evidence": []
+  },
+  "A11Y-02": {
+   "status": "passed",
+   "area": "Accessibility",
+   "priority": "P1",
+   "type": "accessibility",
+   "title": "Keyboard focus is always visible",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "observed": [
+    "268 focus stops checked across 11 screens"
+   ],
+   "evidence": []
+  },
+  "A11Y-03": {
+   "status": "passed",
+   "area": "Accessibility",
+   "priority": "P1",
+   "type": "accessibility",
+   "title": "Structure for screen readers: one h1, ordered headings, landmarks, named controls, live regions",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "A11Y-04": {
+   "status": "passed",
+   "area": "Accessibility",
+   "priority": "P1",
+   "type": "accessibility",
+   "title": "What a screen reader hears on the ticket, the board and the ball",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "A11Y-05": {
+   "status": "failed-open",
+   "area": "Accessibility",
+   "priority": "P1",
+   "type": "accessibility",
+   "title": "Text contrast on plum, marigold, pink, paper and green meets WCAG AA",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "observed": [],
+   "open": [
+    "contrast below WCAG AA on /: \"COMING SOON\" 3.23:1 (12px/500)",
+    "contrast below WCAG AA on /host: \"Create game & get link\" 2.64:1 (21px/800)",
+    "contrast below WCAG AA on invite: \"Join game\" 2.64:1 (21px/800)",
+    "contrast below WCAG AA on lobby (host): \"Share on WhatsApp\" 2.69:1 (19px/800)"
+   ],
+   "evidence": []
+  },
+  "A11Y-06": {
+   "status": "passed",
+   "area": "Accessibility",
+   "priority": "P2",
+   "type": "accessibility",
+   "title": "Reduced motion is respected",
+   "how": "npm run e2e (e2e/specs/layout.spec.mjs)",
+   "observed": [],
+   "evidence": []
+  },
+  "A11Y-07": {
+   "status": "failed-open",
+   "area": "Accessibility",
+   "priority": "P1",
+   "type": "accessibility",
+   "title": "axe-core automated accessibility scan of every screen (WCAG 2.1 A + AA rules)",
+   "how": "one-off script (not in the repo)",
+   "observed": [
+    "16 screens scanned, up to 47 rules applicable per screen; violations: color-contrast (serious)"
+   ],
+   "open": [
+    "axe color-contrast (serious): /: <span >9/15 · NEEDS 6</span> ; <span style=\"transform:rotate(-1deg)\">23</span> ; <span style=\"transform:rotate(0deg)\">12</span> (+62 more) || /host: <button type=\"submit\" style=\"--btn-h:62px\">Create game &amp; get link</button> || invite: <button type=\"submit\" style=\"--btn-h: 64px;\">Join game</button> || lobby host: <button type=\"button\" style=\"--btn-h: 60px;\">Share on WhatsApp</button>"
+   ],
+   "evidence": []
+  },
+  "PERF-01": {
+   "status": "passed",
+   "area": "Performance",
+   "priority": "P1",
+   "type": "performance",
+   "title": "Download size of each page on a cold visit (compressed)",
+   "how": "one-off script (not in the repo)",
+   "observed": [
+    "KB over the network (total / js / css / fonts / html): / 278/163/12/79/19 · /host 294/165/12/95/6 · /host/prizes 294/165/12/95/7 · /join 284/172/12/79/5 · /g/CODE 326/188/12/79/10 · /privacy 288/168/12/79/14 · /terms 284/168/12/79/10; font cache-control: public, max-age=31536000, immutable"
+   ],
+   "evidence": []
+  },
+  "PERF-02": {
+   "status": "failed-open",
+   "area": "Performance",
+   "priority": "P1",
+   "type": "performance",
+   "title": "Lighthouse (mobile) on /, /host and /join",
+   "how": "one-off script (not in the repo)",
+   "observed": [
+    "home: perf 97, a11y 96, best 100, seo 100, LCP 1.1 s, TBT 208 ms, CLS 0.000 | host: perf 100, a11y 96, best 100, seo 100, LCP 0.9 s, TBT 60 ms, CLS 0.000 | join: perf 98, a11y 100, best 100, seo 100, LCP 0.9 s, TBT 173 ms, CLS 0.000"
+   ],
+   "open": [
+    "Lighthouse accessibility on home: color-contrast (the contrast items reported as U-13/U-14/U-15)",
+    "Lighthouse accessibility on host: color-contrast (the contrast items reported as U-13/U-14/U-15)"
+   ],
+   "evidence": []
+  },
+  "PERF-03": {
+   "status": "passed",
+   "area": "Performance",
+   "priority": "P0",
+   "type": "performance",
+   "title": "A 30-device game with auto-call for 60 seconds: response times and errors",
+   "how": "one-off script (not in the repo)",
+   "observed": [
+    "1198 GETs p50 4 ms, p95 13 ms, max 26 ms; 159 POSTs p50 4 ms, p95 7 ms, max 24 ms; 15 numbers called, 1 prizes won; largest view 6.2 KB; errors: 0"
+   ],
+   "evidence": []
+  },
+  "PERF-04": {
+   "status": "passed",
+   "area": "Performance",
+   "priority": "P1",
+   "type": "performance",
+   "title": "Memory store with 200 games at once (10 players each, in play)",
+   "how": "one-off script (not in the repo)",
+   "observed": [
+    "200 games × 10 players × 30 numbers built in 16.3 s (~503 requests/s); view p50 2.5 ms, max 7.8 ms (baseline avg 2.1 ms); server memory null → null MB"
+   ],
+   "evidence": []
+  },
+  "PERF-05": {
+   "status": "passed",
+   "area": "Performance",
+   "priority": "P1",
+   "type": "performance",
+   "title": "A full house of 100 players on screen: the live game on a phone stays usable",
+   "how": "one-off script (not in the repo)",
+   "observed": [
+    "live screen ready in 275 ms; dab painted in 9 ms; next number shown after 1933 ms; page is 8136px tall (the 100-name list is long but below the ticket and board); view 12.8 KB"
+   ],
+   "evidence": [
+    "docs/qa/evidence/PERF-05-live-100-players-360.jpg"
+   ]
+  },
+  "UNIT-01": {
+   "status": "passed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Tickets: 2,000 generated tickets obey every rule",
+   "how": "npm test (src/core/__tests__/ticket.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-02": {
+   "status": "passed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "The 26 pattern checks, each with a winning and a losing ticket, and the seed data",
+   "how": "npm test (src/core/__tests__/patterns.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-03": {
+   "status": "passed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Engine: create, join, start, draw, auto, mark, claim, new round, permissions, views",
+   "how": "npm test (src/core/__tests__/engine.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-04": {
+   "status": "passed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Prize money: automatic split, late joiner, amounts typed by the host",
+   "how": "npm test (src/core/__tests__/prizeMoney.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-05": {
+   "status": "passed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Server: compare-and-swap commits, retries, simultaneous claims, rate-limit windows, token hashing",
+   "how": "npm test (src/server/__tests__/server.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-06": {
+   "status": "passed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "edge",
+   "title": "Expired game: unusable 24 hours after the last activity; tickets and dabs erased",
+   "how": "npm test (src/server/__tests__/server.test.ts (fake clock))",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-07": {
+   "status": "passed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Browser data layer: optimistic dabs, rollback, never going back to an older version, action queue",
+   "how": "npm test (src/lib/__tests__/useGame.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-08": {
+   "status": "passed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Share helpers: link, WhatsApp text, code from a pasted link",
+   "how": "npm test (src/lib/__tests__/lib.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-09": {
+   "status": "failed-fixed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Regression U-01: draw with \"after\" calls one number per step",
+   "how": "npm test (src/core/__tests__/qa-regressions.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-10": {
+   "status": "failed-fixed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Regression U-02: auto-call delay",
+   "how": "npm test (src/lib/__tests__/autoCall.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-11": {
+   "status": "failed-fixed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Regression U-09: names with invisible or text-flipping characters",
+   "how": "npm test (src/core/__tests__/qa-regressions.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-12": {
+   "status": "failed-fixed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Regression U-06/U-07: Indian mobile numbers",
+   "how": "npm test (src/core/__tests__/qa-regressions.test.ts + src/server/__tests__/server.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-13": {
+   "status": "passed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Voice text for all 90 numbers against the callout seed data",
+   "how": "npm test (src/core/__tests__/qa-regressions.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-14": {
+   "status": "failed-fixed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Regression U-12: pasted prices with paise",
+   "how": "npm test (src/features/host/__tests__/draft.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "UNIT-15": {
+   "status": "failed-fixed",
+   "area": "Rules & data (unit)",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Regression U-04: Full House rule text",
+   "how": "npm test (src/core/__tests__/qa-regressions.test.ts)",
+   "observed": [],
+   "evidence": []
+  },
+  "NR-01": {
+   "status": "blocked",
+   "area": "Devices",
+   "priority": "P0",
+   "type": "usability",
+   "title": "Real Android phones (Chrome and the WhatsApp in-app browser): whole game, keyboard, back button, share sheet",
+   "how": "not executed",
+   "observed": [
+    "No physical devices in the test environment. Covered as far as possible by emulated Android Chrome (360 and 412 px, touch, Android user agent)."
+   ],
+   "evidence": []
+  },
+  "NR-02": {
+   "status": "blocked",
+   "area": "Devices",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Real iPhone (Safari): the voice actually speaking after Join/Start; the notch and home bar",
+   "how": "not executed",
+   "observed": [
+    "No iPhone and no WebKit engine available. The code path iOS needs (speech unlocked inside the tap) is verified in LIVE-13 and LIVE-04; whether the phone then speaks must be heard on a real iPhone."
+   ],
+   "evidence": []
+  },
+  "NR-03": {
+   "status": "blocked",
+   "area": "Share",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Real WhatsApp: tapping \"Share on WhatsApp\" opens the chat picker; the link preview shows the picture and title",
+   "how": "not executed",
+   "observed": [
+    "WhatsApp is not available here. Verified instead: the exact wa.me address and text (LOB-01) and the preview tags and picture of the game page (WEB-09)."
+   ],
+   "evidence": []
+  },
+  "NR-04": {
+   "status": "blocked",
+   "area": "Production",
+   "priority": "P0",
+   "type": "functional",
+   "title": "Supabase store and Realtime ping (instant updates, 8-second safety polling, several server instances)",
+   "how": "not executed",
+   "observed": [
+    "No Supabase project in the test environment; everything was run on the in-memory store with 1.5 s polling. The database is covered by the other engineer’s SQL tests and the later admin pass."
+   ],
+   "evidence": []
+  },
+  "NR-05": {
+   "status": "blocked",
+   "area": "Production",
+   "priority": "P1",
+   "type": "security",
+   "title": "The deployed site on Vercel: headers at the CDN, rate limits behind Vercel’s proxy, cold starts, share links on the real domain",
+   "how": "not executed",
+   "observed": [
+    "No deployment available. Headers, links and limits were verified on a local production build (next start)."
+   ],
+   "evidence": []
+  },
+  "NR-06": {
+   "status": "not-run",
+   "area": "Browsers",
+   "priority": "P1",
+   "type": "functional",
+   "title": "Safari/WebKit and Firefox engines",
+   "how": "not executed",
+   "observed": [
+    "Only Chromium is installed in the test environment and the brief forbids downloading browsers. iPhone and Android were emulated on Chromium (user agent, screen, touch)."
+   ],
+   "evidence": []
+  },
+  "NR-07": {
+   "status": "not-run",
+   "area": "Network",
+   "priority": "P1",
+   "type": "resilience",
+   "title": "Slow 3G / patchy mobile data in the field",
+   "how": "not executed",
+   "observed": [
+    "Simulated only: requests delayed by 1.5–2.5 s, failed, and the device taken offline and back (HOST-07/08, JOIN-10, LIVE-06/09, AUTO-04). Real radio conditions were not available."
+   ],
+   "evidence": []
+  },
+  "NR-08": {
+   "status": "blocked",
+   "area": "Accessibility",
+   "priority": "P1",
+   "type": "accessibility",
+   "title": "Real screen readers (TalkBack, VoiceOver) reading a live game",
+   "how": "not executed",
+   "observed": [
+    "Not available. Roles, names and live regions were verified in the page (A11Y-03, A11Y-04, A11Y-07)."
+   ],
+   "evidence": []
+  },
+  "NR-09": {
+   "status": "blocked",
+   "area": "Live",
+   "priority": "P0",
+   "type": "resilience",
+   "title": "Host’s phone screen locks or the browser goes to the background on a real phone with auto-call on",
+   "how": "not executed",
+   "observed": [
+    "A headless browser does not freeze background pages the way phones do. Verified instead: closing/reloading/offline (AUTO-04, AUTO-05) and a hidden tab that keeps running (AUTO-06)."
+   ],
+   "evidence": []
+  },
+  "NR-10": {
+   "status": "not-run",
+   "area": "Responsive",
+   "priority": "P2",
+   "type": "responsive",
+   "title": "Android \"Font size: Largest\" system setting",
+   "how": "not executed",
+   "observed": [
+    "Cannot be emulated. Page zoom to 200 % was covered by testing at 640 px and 320 px widths (RSP-01), and pinch-zoom is not blocked (WEB-09)."
+   ],
+   "evidence": []
+  },
+  "NR-11": {
+   "status": "not-run",
+   "area": "Security",
+   "priority": "P1",
+   "type": "security",
+   "title": "Names and game names shown in the admin panel (HTML injection there)",
+   "how": "not executed",
+   "observed": [
+    "The admin side is being rebuilt and is tested in the next pass. On the player side all such names render as plain text (HOST-02, API-17)."
+   ],
+   "evidence": []
+  }
+ }
+}

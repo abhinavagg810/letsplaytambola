@@ -523,7 +523,8 @@ const cases = [
       p.page.on('request', (r) => { if (r.method() === 'GET' && r.url().includes('/api/games/')) { gets++; inflight++; maxInflight = Math.max(maxInflight, inflight); } });
       p.page.on('requestfinished', (r) => { if (r.method() === 'GET' && r.url().includes('/api/games/')) inflight--; });
       await sleep(12000);
-      check(gets >= 6 && gets <= 10, `${gets} polls in 12 s`);
+      const polls12 = gets;
+      check(polls12 >= 6 && polls12 <= 10, `${polls12} polls in 12 s`);
       equal(maxInflight, 1, 'requests in flight at once');
       const delays = [];
       for (let i = 1; i <= 8; i++) {
@@ -535,7 +536,7 @@ const cases = [
       }
       const avg = Math.round(delays.reduce((a, b) => a + b, 0) / delays.length);
       check(Math.max(...delays) <= 2200 && avg <= 1300, `delays ${delays} (avg ${avg})`);
-      t.note(`${gets} polls in 12 s; a called number reached the player after ${delays.join(', ')} ms (average ${avg} ms)`);
+      t.note(`${polls12} polls in 12 s; a called number reached the player after ${delays.join(', ')} ms (average ${avg} ms)`);
     },
   },
   {
