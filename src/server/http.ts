@@ -1,4 +1,5 @@
 // Request / response helpers shared by the API routes.
+import { BAD_MOBILE } from '@/core';
 import type { EngineErrorCode } from '@/core';
 
 export const NO_STORE = { 'Cache-Control': 'no-store, max-age=0' } as const;
@@ -11,7 +12,7 @@ export const HTTP_COPY = {
   tooMany: 'Too many tries — please wait a minute and try again',
   busy: 'The game is busy — please try again',
   server: 'Something went wrong on our side — please try again',
-  badPhone: 'Type your 10-digit WhatsApp number',
+  badPhone: BAD_MOBILE,
 } as const;
 
 /** Error codes in API responses: the engine's, plus the server's own. */

@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:sql": "bash supabase/tests/run.sh",
-    "smoke": "node scripts/smoke-api.mjs"
+    "smoke": "node scripts/smoke-api.mjs",
+    "e2e": "node e2e/run.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",

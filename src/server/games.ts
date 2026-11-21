@@ -1,7 +1,7 @@
 // The game service: load → engine → compare-and-swap commit → retry on conflict.
 // Every rule lives in src/core; this file only works out who is asking and persists the result.
 import { randomInt } from 'node:crypto';
-import { applyAction, createGame, isGameCode, projectView } from '@/core';
+import { applyAction, createGame, isGameCode, isIndianMobile, mobileDigits, projectView } from '@/core';
 import type { Actor, CreateGameInput, GameAction, GameState, GameView } from '@/core';
 import { HTTP_COPY, serviceError, statusFor } from './http';
 import type { ServiceResult } from './http';
@@ -41,14 +41,15 @@ export function normaliseCodeParam(raw: string): string {
   return raw.trim().toUpperCase();
 }
 
-export async function createGameForDevice(tokenHash: string, input: unknown, deps: Deps = {}): Promise<ServiceResult<{ code: string }>> {
+/** `hostPid` / `hostName` are for the server's own bookkeeping (insights); the route sends only the code to the browser. */
+export async function createGameForDevice(tokenHash: string, input: unknown, deps: Deps = {}): Promise<ServiceResult<{ code: string; hostPid: string | null; hostName: string }>> {
   const store = deps.store ?? getStore();
   const rng = deps.rng ?? secureRng;
   const made = createGame(input as CreateGameInput, 'XXXXX', { now: (deps.now ?? Date.now)(), rng });
   if (!made.ok) return serviceError(statusFor(made.code), made.code, made.error);
   const players: PlayerWrite[] = made.touched.map((pid) => ({ ...made.state.players[pid], rev: null, tokenHash }));
   const code = await store.create({ doc: made.state.doc, hostTokenHash: tokenHash, players }, rng);
-  return { ok: true, code };
+  return { ok: true, code, hostPid: made.state.doc.hostPid, hostName: made.state.doc.hostName };
 }
 
 export async function viewGame(rawCode: string, tokenHash: string | null, deps: Deps = {}): Promise<ServiceResult<{ game: GameView }>> {
@@ -106,8 +107,10 @@ export async function actOnGame(
 }
 
 export async function saveNotifyNumber(phone: unknown, deps: Deps = {}): Promise<ServiceResult<object>> {
-  const digits = typeof phone === 'string' ? phone.replace(/[\s-]/g, '') : '';
-  if (!/^[0-9]{10}$/.test(digits)) return serviceError(400, 'invalid', HTTP_COPY.badPhone);
+  // Only digits, spaces, dashes, brackets and a leading + may be typed; a +91 / 0 in front is dropped.
+  const typed = typeof phone === 'string' && phone.length <= 24 && /^[\s+()0-9-]*$/.test(phone) ? phone : '';
+  const digits = mobileDigits(typed);
+  if (!isIndianMobile(digits)) return serviceError(400, 'invalid', HTTP_COPY.badPhone);
   await (deps.store ?? getStore()).saveNotifyNumber(digits);
   return { ok: true };
 }

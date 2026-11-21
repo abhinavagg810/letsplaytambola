@@ -6,6 +6,7 @@ import { AdSlot } from '@/components/AdSlot';
 import { ruleDesc, rupees, type MemberView } from '@/core';
 import { inviteText, whatsappUrl } from '@/lib/share';
 import { unlockSpeech } from '@/lib/speech';
+import { track } from '@/lib/track';
 import type { UseGame } from '@/lib/useGame';
 import { copyGameLink } from './GameHeader';
 import styles from './game.module.css';
@@ -17,6 +18,7 @@ export function Lobby({ game, act }: { game: MemberView; act: UseGame['act'] }) 
   const [starting, setStarting] = useState(false);
 
   function shareOnWhatsApp() {
+    track('share_whatsapp', { code: game.code });
     window.open(whatsappUrl(inviteText(game.name, game.code)), '_blank', 'noopener');
   }
 
@@ -48,7 +50,7 @@ export function Lobby({ game, act }: { game: MemberView; act: UseGame['act'] }) 
                 Share on WhatsApp
               </Button>
               <div className={styles.shareRow}>
-                <Pill size={50} onClick={() => void copyGameLink(game.code)}>
+                <Pill size={50} onClick={() => (track('share_copy', { code: game.code }), void copyGameLink(game.code))}>
                   Copy link
                 </Pill>
               </div>

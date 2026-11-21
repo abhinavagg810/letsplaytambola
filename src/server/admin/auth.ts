@@ -88,6 +88,7 @@ export function verifySessionToken(token: unknown, now: number = Date.now(), env
   const given = Buffer.from(token.slice(dot + 1), 'base64url');
   const expected = sign(payload, key);
   if (given.length !== expected.length || !timingSafeEqual(given, expected)) return null;
+  if (isRevoked(token, now)) return null;
   try {
     const data: unknown = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
     const exp = (data as { exp?: unknown } | null)?.exp;
@@ -96,6 +97,40 @@ export function verifySessionToken(token: unknown, now: number = Date.now(), env
   } catch {
     return null;
   }
+}
+
+// ---------------------------------------------------------------- signed-out sessions
+// A session is a signed expiry time, so on its own it would stay usable until it expires even after "Sign out"
+// (someone who copied the cookie could replay it). Signing out therefore puts the token on a small in-memory list
+// until its expiry. Like the rate limiter this is per server instance: on a host with several instances it is a
+// best effort — to end every session everywhere for certain, change ADMIN_PASSWORD or ADMIN_SESSION_SECRET.
+
+const REVOKED_KEY = '__lpt_admin_revoked_v1__';
+function revokedTokens(): Map<string, number> {
+  const g = globalThis as unknown as Record<string, Map<string, number> | undefined>;
+  return (g[REVOKED_KEY] ??= new Map());
+}
+const tokenId = (token: string): string => sha256(token).toString('base64url');
+
+function isRevoked(token: string, now: number): boolean {
+  const exp = revokedTokens().get(tokenId(token));
+  return exp !== undefined && exp > now;
+}
+
+/** Sign-out: this token is refused from now on (it is forgotten again once it would have expired anyway). */
+export function revokeSessionToken(token: unknown, now: number = Date.now(), env: Env = process.env): boolean {
+  const session = verifySessionToken(token, now, env);
+  if (!session || typeof token !== 'string') return false;
+  const map = revokedTokens();
+  for (const [k, exp] of map) if (exp <= now) map.delete(k);
+  if (map.size >= 5000) map.clear(); // cannot grow without limit; only reachable with thousands of valid sign-ins
+  map.set(tokenId(token), session.exp);
+  return true;
+}
+
+/** For tests. */
+export function resetRevokedSessions(): void {
+  revokedTokens().clear();
 }
 
 // ---------------------------------------------------------------- brute-force protection

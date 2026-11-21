@@ -4,13 +4,17 @@ import { isGameCode, rupees } from '@/core';
 import type { GameEvent } from '@/core';
 import { Board } from '@/components/Board';
 import { AdminOff } from '@/features/admin/AdminOff';
-import { DeviceLink, PageHead, Panel, StatusPill } from '@/features/admin/bits';
-import { RefreshButton } from '@/features/admin/RefreshButton';
-import styles from '@/features/admin/admin.module.css';
+import { DeviceLink, DeviceText, Fact, PageHead, Panel, Place, StatusPill, When, num, Empty } from '@/features/admin/bits';
+import { Copy, CsvButton } from '@/features/admin/client';
+import styles from '@/features/admin/ui.module.css';
+import { propsText } from '@/server/admin/exports';
 import { requireAdmin } from '@/server/admin/guard';
+import { eventLabel, sourceLabel } from '@/server/admin/labels';
 import { priceText } from '@/server/admin/queries';
 import { gameFacts, roundsOf, winsOf } from '@/server/admin/stats';
 import { formatDuration, formatIst, formatIstTime } from '@/server/admin/time';
+import { placeLabel } from '@/server/client-info';
+import { uaSummary } from '@/server/insights/ua';
 import { getStore } from '@/server/store';
 
 export const metadata: Metadata = { title: 'Play detail' };
@@ -25,53 +29,49 @@ function eventText(e: GameEvent): { text: string; win?: boolean } {
   }
 }
 
-function Fact({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className={styles.fact}>
-      <dt>{label}</dt>
-      <dd>{children}</dd>
-    </div>
-  );
-}
-
 export default async function AdminGameDetailPage({ params }: PageProps<'/admin/games/[code]'>) {
   const admin = await requireAdmin();
   if (admin.off) return <AdminOff />;
   const { now } = admin;
 
   const code = decodeURIComponent((await params).code).trim().toUpperCase();
-  const row = isGameCode(code) ? await getStore().adminGetGame(code) : null;
-  const crumb = { href: '/admin/games', label: 'All plays' };
-  if (!row) {
-    return (
-      <>
-        <PageHead title="No such play" sub={`There is no game with the code ${code.slice(0, 12)}. It may be older than 90 days.`} crumb={crumb} />
-      </>
-    );
+  const store = getStore();
+  const [row, insights] = isGameCode(code) ? await Promise.all([store.adminGetGame(code), store.gameInsights(code)]) : [null, null];
+  if (!row || !insights) {
+    return <PageHead title="No such play" sub={`There is no game with the code ${code.slice(0, 12)}. It may be older than 90 days.`} />;
   }
   const { doc } = row;
   const g = gameFacts(row, now);
   const rounds = roundsOf(doc);
   const past = rounds.filter((r) => !r.current);
-  const open = !g.expired && g.status !== 'done';
   const hostHasTicket = !!doc.hostPid && doc.players.some((p) => p.pid === doc.hostPid);
-  const events = [...doc.events].reverse();
+  const byDevice = new Map(insights.participations.map((p) => [p.device, p]));
+  const hostPart = byDevice.get(row.hostDevice);
+
+  const firstStart = rounds.find((r) => r.started && r.startedAt !== null)?.startedAt ?? null;
+  const firstJoin = doc.players.filter((p) => p.pid !== doc.hostPid).map((p) => p.joinedAt).sort((a, b) => a - b)[0] ?? null;
+  const count = (name: string): number => insights.events.filter((e) => e.name === name).length;
+  const shares = { whatsapp: count('share_whatsapp'), copy: count('share_copy'), header: count('share_header_copy') };
+  const invitesSeen = new Set(insights.events.filter((e) => e.name === 'page_view' && e.props.page === 'game_invite').map((e) => e.device ?? e.session)).size;
+
+  // One timeline: what happened in the game (from its document: the latest 30) and what people did around it (analytics events).
+  const timeline = [
+    ...doc.events.map((e) => ({ at: e.at, key: `g${e.seq}`, kind: 'Game', ...eventText(e), who: '' as string | null })),
+    ...insights.events.map((e) => ({ at: e.at, key: `e${e.id}`, kind: 'Activity', text: `${eventLabel(e.name)}${Object.keys(e.props).length ? ` (${propsText(e.props)})` : ''}`, win: false, who: e.device })),
+  ].sort((a, b) => b.at - a.at);
+
+  const people = [
+    ...(!hostHasTicket ? [{ key: 'host', name: doc.hostName, role: 'Host (no ticket)', joinedAt: g.createdAt, wins: null as ReturnType<typeof winsOf> | null, device: row.hostDevice }] : []),
+    ...doc.players.map((p) => ({ key: p.pid, name: p.name, role: p.pid === doc.hostPid ? 'Host' : 'Player', joinedAt: p.joinedAt, wins: winsOf(doc, p.pid), device: row.devices[p.pid] ?? '' })),
+  ];
 
   return (
     <>
       <PageHead
         title={doc.name}
-        crumb={crumb}
-        sub={
-          <>
-            <span className={styles.mono}>{g.code}</span> · hosted by {doc.hostName}
-          </>
-        }
+        sub={<>Game <Copy text={g.code} /> · hosted by {doc.hostName}{hostPart ? <> from <Place p={hostPart} /></> : null}</>}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <StatusPill status={g.status} />
-          {open ? <RefreshButton /> : null}
-        </div>
+        <StatusPill status={g.status} />
       </PageHead>
 
       {g.expired ? (
@@ -89,17 +89,80 @@ export default async function AdminGameDetailPage({ params }: PageProps<'/admin/
           <Fact label="Players">{g.players}</Fact>
           <Fact label="Numbers called">{g.called} of 90</Fact>
           <Fact label="Prizes won">{g.prizesWon} of {g.prizesTotal}</Fact>
-          <Fact label="Recorded pot">{g.pot > 0 ? `${rupees(g.pot)} (recorded only)` : '—'}</Fact>
-          <Fact label="Created">{formatIst(g.createdAt)}</Fact>
-          <Fact label="Started">{g.startedAt ? formatIst(g.startedAt) : g.status === 'lobby' || (g.status === 'expired' && doc.status === 'lobby') ? 'Not started' : '—'}</Fact>
-          <Fact label="Finished">{doc.status === 'done' ? formatIst(g.finishedAt) : 'Not finished'}</Fact>
-          <Fact label="Last activity">{formatIst(g.updatedAt)}</Fact>
-          <Fact label={doc.status === 'done' ? 'Duration' : 'Duration so far'}>{formatDuration(g.durationMs)}</Fact>
+          <Fact label="Recorded prize money">{g.pot > 0 ? `${rupees(g.pot)} (recorded only)` : '—'}</Fact>
+          <Fact label="Created"><When ms={g.createdAt} now={now} /></Fact>
+          <Fact label="First person joined">{firstJoin ? <><When ms={firstJoin} now={now} /> <span className={styles.sub}>{formatDuration(Math.max(0, firstJoin - g.createdAt))} after it was created</span></> : 'Nobody joined'}</Fact>
+          <Fact label="Time in lobby">{firstStart !== null ? formatDuration(Math.max(0, firstStart - g.createdAt)) : doc.status === 'lobby' ? `${formatDuration(Math.max(0, g.updatedAt - g.createdAt))} so far — not started` : '—'}</Fact>
+          <Fact label="Started">{g.startedAt ? <When ms={g.startedAt} now={now} /> : doc.status === 'lobby' ? 'Not started' : '—'}</Fact>
+          <Fact label="Finished">{doc.status === 'done' ? <When ms={g.finishedAt} now={now} /> : 'Not finished'}</Fact>
+          <Fact label={doc.status === 'done' ? 'Game length' : 'Game length so far'}>{formatDuration(g.durationMs)}</Fact>
+          <Fact label="Last activity"><When ms={g.updatedAt} now={now} /></Fact>
+          <Fact label="Host device"><DeviceText d={hostPart} /></Fact>
+          <Fact label="Host source">{hostPart?.source ? sourceLabel(hostPart.source) : <span className={styles.dim}>Unknown</span>}</Fact>
+          <Fact label="Host IP address">{hostPart?.ip ? <Copy text={hostPart.ip} /> : <span className={styles.dim}>Unknown</span>}</Fact>
         </dl>
       </Panel>
 
+      <Panel title="Sharing" sub="Share taps on this game, and how many different visitors opened its invite page.">
+        <div className={styles.steps}>
+          <div className={styles.stepStat}><b>{num(shares.whatsapp)}</b><span>“Share on WhatsApp” taps</span></div>
+          <div className={styles.stepStat}><b>{num(shares.copy + shares.header)}</b><span>“Copy link” taps ({num(shares.copy)} in the lobby, {num(shares.header)} in the header)</span></div>
+          <div className={styles.stepStat}><b>{num(invitesSeen)}</b><span>visitors saw the invite page</span></div>
+          <div className={styles.stepStat}><b>{num(doc.players.filter((p) => p.pid !== doc.hostPid).length)}</b><span>people joined</span></div>
+        </div>
+      </Panel>
+
+      <Panel
+        title="People"
+        sub="Where and on what each person created or joined the game. The place is the approximate location of their internet connection. Tickets and dabs are never shown here."
+        action={<CsvButton file={`play-${g.code}-people`} table={{
+          head: ['Name', 'Role', 'Joined (IST)', 'Prizes won', 'Amount (INR)', 'Location', 'IP address', 'Device', 'Source', 'Device id'],
+          rows: people.map((p) => { const part = byDevice.get(p.device); return [p.name, p.role, formatIst(p.joinedAt), p.wins?.labels.join(', ') ?? '', p.wins?.amount ?? 0, part ? placeLabel(part) : '', part?.ip ?? '', part ? uaSummary({ ...part, device: part.deviceType }) : '', part?.source ?? '', p.device]; }),
+        }} />}
+      >
+        {people.length === 0 ? <Empty title="Nobody has joined yet" /> : (
+          <div className={styles.tableScroll} style={{ maxHeight: 520 }}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Joined at</th>
+                  <th scope="col">Prizes won</th>
+                  <th scope="col" className={styles.num}>Amount</th>
+                  <th scope="col">Location</th>
+                  <th scope="col">IP address</th>
+                  <th scope="col">Device</th>
+                  <th scope="col">Source</th>
+                  <th scope="col">Device id</th>
+                </tr>
+              </thead>
+              <tbody>
+                {people.map((p) => {
+                  const part = byDevice.get(p.device);
+                  return (
+                    <tr key={p.key}>
+                      <th scope="row">{p.name}</th>
+                      <td>{p.role}</td>
+                      <td><When ms={p.joinedAt} now={now} short /></td>
+                      <td className={styles.wrap}>{p.wins?.count ? p.wins.labels.join(', ') : <span className={styles.dim}>—</span>}</td>
+                      <td className={styles.num}>{priceText(p.wins?.amount ?? 0)}</td>
+                      <td><Place p={part} stacked /></td>
+                      <td>{part?.ip ? <Copy text={part.ip} /> : <span className={styles.dim}>Unknown</span>}</td>
+                      <td><DeviceText d={part} /></td>
+                      <td>{part?.source ? sourceLabel(part.source) : <span className={styles.dim}>Unknown</span>}</td>
+                      <td><DeviceLink id={p.device} /></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Panel>
+
       <Panel title="Ways to win" sub={g.round > 1 ? `Round ${g.round}` : undefined}>
-        <div className={`${styles.tableWrap} ${styles.tableWrapFlat}`}>
+        <div className={styles.tableScroll}>
           <table className={styles.table}>
             <thead>
               <tr>
@@ -115,7 +178,7 @@ export default async function AdminGameDetailPage({ params }: PageProps<'/admin/
                   <th scope="row">{p.label}</th>
                   <td>{p.winnerName ?? <span className={styles.dim}>Not won</span>}</td>
                   <td className={styles.num}>{priceText(p.amount)}</td>
-                  <td>{p.wonAt ? formatIst(p.wonAt) : <span className={styles.dim}>—</span>}</td>
+                  <td>{p.wonAt ? <When ms={p.wonAt} now={now} short /> : <span className={styles.dim}>—</span>}</td>
                 </tr>
               ))}
             </tbody>
@@ -123,57 +186,11 @@ export default async function AdminGameDetailPage({ params }: PageProps<'/admin/
         </div>
       </Panel>
 
-      <Panel title="Players" sub="A device is a browser on a phone or computer, shown as a short anonymous id. Tickets and dabs are never shown here.">
-        {doc.players.length === 0 && hostHasTicket ? <p className={styles.empty}>Nobody has joined yet.</p> : (
-          <div className={`${styles.tableWrap} ${styles.tableWrapFlat}`}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th scope="col">Name</th>
-                  <th scope="col">Role</th>
-                  <th scope="col">Joined at</th>
-                  <th scope="col">Prizes won</th>
-                  <th scope="col" className={styles.num}>Amount</th>
-                  <th scope="col">Device</th>
-                </tr>
-              </thead>
-              <tbody>
-                {!hostHasTicket ? (
-                  <tr>
-                    <th scope="row">{doc.hostName}</th>
-                    <td>Host (no ticket)</td>
-                    <td>{formatIst(g.createdAt)}</td>
-                    <td><span className={styles.dim}>—</span></td>
-                    <td className={styles.num}>—</td>
-                    <td><DeviceLink id={row.hostDevice} /></td>
-                  </tr>
-                ) : null}
-                {doc.players.map((p) => {
-                  const w = winsOf(doc, p.pid);
-                  return (
-                    <tr key={p.pid}>
-                      <th scope="row">{p.name}</th>
-                      <td>{p.pid === doc.hostPid ? 'Host' : 'Player'}</td>
-                      <td>{formatIst(p.joinedAt)}</td>
-                      <td className={styles.wrap}>{w.count ? w.labels.join(', ') : <span className={styles.dim}>—</span>}</td>
-                      <td className={styles.num}>{priceText(w.amount)}</td>
-                      <td><DeviceLink id={row.devices[p.pid] ?? ''} /></td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Panel>
-
       <div className={styles.grid2}>
         <Panel title="Numbers called" sub={g.called ? `${g.called} of 90, in the order they were called` : undefined}>
-          {g.called === 0 ? <p className={styles.empty}>No number has been called{g.round > 1 ? ' in this round' : ''}.</p> : (
+          {g.called === 0 ? <Empty title={`No number has been called${g.round > 1 ? ' in this round' : ''}`} /> : (
             <ol className={styles.calledList} aria-label="Numbers in call order">
-              {doc.called.map((n) => (
-                <li key={n} className={styles.calledNum}>{n}</li>
-              ))}
+              {doc.called.map((n) => <li key={n} className={styles.calledNum}>{n}</li>)}
             </ol>
           )}
         </Panel>
@@ -186,7 +203,7 @@ export default async function AdminGameDetailPage({ params }: PageProps<'/admin/
 
       {past.length ? (
         <Panel title="Earlier rounds" sub="Remembered when the host chose to play again">
-          <div className={`${styles.tableWrap} ${styles.tableWrapFlat}`}>
+          <div className={styles.tableScroll}>
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -202,8 +219,8 @@ export default async function AdminGameDetailPage({ params }: PageProps<'/admin/
                 {past.map((r) => (
                   <tr key={r.round}>
                     <th scope="row">{r.round}</th>
-                    <td>{formatIst(r.startedAt)}</td>
-                    <td>{formatIst(r.finishedAt)}</td>
+                    <td><When ms={r.startedAt} now={now} short /></td>
+                    <td><When ms={r.finishedAt} now={now} short /></td>
                     <td className={styles.num}>{r.called}</td>
                     <td className={styles.num}>{r.players}</td>
                     <td className={styles.wrap}>
@@ -217,23 +234,25 @@ export default async function AdminGameDetailPage({ params }: PageProps<'/admin/
         </Panel>
       ) : null}
 
-      <Panel title="Timeline" sub="The latest 30 events of the game, newest first">
-        {events.length === 0 ? <p className={styles.empty}>Nothing has happened yet.</p> : (
+      <Panel
+        title="Timeline"
+        sub="Newest first. “Game” lines come from the game itself (its latest 30 events); “Activity” lines are what people tapped and saw around it."
+        action={<CsvButton file={`play-${g.code}-timeline`} table={{ head: ['Time (IST)', 'Kind', 'What', 'Device id'], rows: timeline.map((t) => [formatIst(t.at), t.kind, t.text, t.who ?? '']) }} />}
+      >
+        {timeline.length === 0 ? <Empty title="Nothing has happened yet" /> : (
           <ol className={styles.timeline}>
-            {events.map((e) => {
-              const t = eventText(e);
-              return (
-                <li key={e.seq}>
-                  <time className={styles.timelineTime} dateTime={new Date(e.at).toISOString()} title={formatIst(e.at)}>{formatIstTime(e.at)}</time>
-                  <span className={t.win ? styles.eventWin : undefined}>{t.text}</span>
-                </li>
-              );
-            })}
+            {timeline.map((t) => (
+              <li key={t.key}>
+                <time className={styles.timelineTime} dateTime={new Date(t.at).toISOString()} title={formatIst(t.at)}>{formatIstTime(t.at).replace(' IST', '')}</time>
+                <span className={styles.tag}>{t.kind}</span>
+                <span className={t.win ? styles.eventWin : undefined}>{t.win ? '★ ' : ''}{t.text}{t.who ? <> · <DeviceLink id={t.who} /></> : null}</span>
+              </li>
+            ))}
           </ol>
         )}
       </Panel>
 
-      <p className={styles.dim} style={{ fontSize: 15 }}>
+      <p className={styles.dim} style={{ fontSize: 15 }} data-noprint>
         <Link href={`/api/admin/games/${g.code}`} prefetch={false}>This play as JSON</Link>
       </p>
     </>

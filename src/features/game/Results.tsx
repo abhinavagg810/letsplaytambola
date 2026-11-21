@@ -36,7 +36,7 @@ export function Results({ game, act }: { game: MemberView; act: ReturnType<typeo
         <div className={styles.main}>
           <h2 className={styles.title}>That’s the game!</h2>
           <p className={styles.note}>
-            {game.called.length} OF 90 CALLED. Settle any prize money between yourselves — the app never handles payments.
+            {game.called.length} of 90 numbers called. Settle any prize money between yourselves — the app never handles payments.
           </p>
           {isHost ? (
             <Button size={64} flat block fontSize={20} onClick={playAgain}>

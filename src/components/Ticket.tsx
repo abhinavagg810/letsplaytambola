@@ -38,7 +38,7 @@ export function Ticket({ ticket, marked, onCell, title, headerRight, hint, bare,
   const isMarked = (n: number) => (!marked ? false : 'has' in marked ? marked.has(n) : marked.includes(n));
   const cells = ticket.flat();
   return (
-    <div className={cx(styles.ticket, bare && styles.bare, className)} style={style}>
+    <div className={cx(styles.ticket, bare && styles.bare, onCell && styles.playable, className)} style={style}>
       {!bare && (title || headerRight) ? (
         <div className={styles.header}>
           <span className={styles.title}>{title}</span>

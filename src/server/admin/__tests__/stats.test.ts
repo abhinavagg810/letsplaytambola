@@ -372,11 +372,13 @@ describe('plays filter and export', () => {
   const now = Date.UTC(2026, 10, 12, 16, 11);
 
   it('cleans up what is typed in the address bar', () => {
-    expect(parseGamesFilter({}, now)).toEqual({ q: '', status: '', from: '', to: '', sort: 'created', dir: 'desc', page: 1 });
+    expect(parseGamesFilter({}, now)).toEqual({ q: '', quick: '', status: '', from: '', to: '', sort: 'created', dir: 'desc', page: 1 });
     expect(parseGamesFilter({ q: '  kitty ', status: 'live', from: '2026-11-01', to: '2026-11-10', sort: 'players', dir: 'asc', page: '3' }, now))
-      .toEqual({ q: 'kitty', status: 'live', from: '2026-11-01', to: '2026-11-10', sort: 'players', dir: 'asc', page: 3 });
+      .toEqual({ q: 'kitty', quick: '', status: 'live', from: '2026-11-01', to: '2026-11-10', sort: 'players', dir: 'asc', page: 3 });
+    expect(parseGamesFilter({ quick: 'priced' }, now).quick).toBe('priced');
+    expect(parseGamesFilter({ quick: 'everything' }, now).quick).toBe('');
     expect(parseGamesFilter({ status: 'nope', sort: 'drop table', dir: 'sideways', page: '-4', from: 'x', to: '2026-02-31' }, now))
-      .toEqual({ q: '', status: '', from: '', to: '', sort: 'created', dir: 'desc', page: 1 });
+      .toEqual({ q: '', quick: '', status: '', from: '', to: '', sort: 'created', dir: 'desc', page: 1 });
     // swapped dates are put in order; dates outside the 90 days are pulled in
     expect(parseGamesFilter({ from: '2026-11-10', to: '2026-11-01' }, now)).toMatchObject({ from: '2026-11-01', to: '2026-11-10' });
     expect(parseGamesFilter({ from: '2020-01-01', to: '2030-01-01' }, now)).toMatchObject({ from: '2026-08-14', to: '2026-11-12' });
@@ -411,7 +413,7 @@ describe('plays filter and export', () => {
     const text = gamesCsv(rows, w.now());
     const lines = text.trimEnd().split('\r\n');
     expect(lines).toHaveLength(131);
-    expect(lines[0]).toBe('Created (IST),Code,Game name,Host,Status,Players,Numbers called,Round,Ticket price (INR),Prizes won,Prizes total,Recorded pot (INR),Last activity (IST)');
+    expect(lines[0]).toBe('Created (IST),Code,Game name,Host,Status,Players,Numbers called,Round,Ticket price (INR),Prizes won,Prizes total,Recorded pot (INR),Last activity (IST),Host location,Host device,Host source,Host device id');
     expect(lines[130]).toContain(",'=cmd(),Lobby,1,0,1,0,0,1,0,");
     expect(lines[129]).toContain(',"Tea, ""cake"" & more",Priya,Lobby,');
     expect(lines[128]).toContain(',Game 2,Priya,Lobby,1,0,1,100,0,1,0,');

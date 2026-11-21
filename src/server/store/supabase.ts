@@ -5,6 +5,11 @@ import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { GAME_TTL_MS, genCode } from '@/core';
 import type { GameDoc, Ticket } from '@/core';
+import type { CleanBatch } from '../insights/events';
+import type {
+  AdminDevice, AdminEvent, AdminIp, AdminParticipation, AuditRow, BreakdownQuery, BreakdownRow, DeviceListQuery, EraseResult, EventListQuery,
+  FunnelQuery, FunnelStep, GameInsights, ParticipationDim, ParticipationRow, RequestContext, RetentionStats, TableCounts, TrafficTotals,
+} from '../insights/types';
 import { ADMIN_MAX_PAGE, ADMIN_MAX_RANGE_ROWS, ADMIN_RETENTION_DAYS, CodeSpaceError } from './types';
 import type {
   AdminGameFilter, AdminGamePage, AdminGameQuery, AdminGameRow, AdminNotifyRow,
@@ -46,8 +51,9 @@ export class SupabaseStore implements GameStore {
   private readonly db: SupabaseClient;
   private lastPurge = 0;
 
-  constructor(url: string, serviceRoleKey: string) {
-    this.db = createClient(url, serviceRoleKey, {
+  /** `client` is for tests only: a stand-in for the Supabase client. */
+  constructor(url: string, serviceRoleKey: string, client?: Pick<SupabaseClient, 'rpc' | 'from'>) {
+    this.db = (client as SupabaseClient | undefined) ?? createClient(url, serviceRoleKey, {
       // A server has no browser session to keep.
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     });
@@ -159,7 +165,11 @@ export class SupabaseStore implements GameStore {
       p_desc: desc,
       p_limit: limit,
       p_offset: offset,
+      // Added by migration 0003; left out unless used, so the plain list keeps working before that migration is run.
+      ...(f.priced ? { p_priced: true } : {}),
+      ...(f.abandoned ? { p_abandoned: true } : {}),
     });
+    if (error && (f.priced || f.abandoned) && SupabaseStore.notInstalled(error)) throw new Error('This filter needs supabase/migrations/0003_insights.sql — run it first');
     if (error) throw new Error(`admin_list_games failed: ${error.code ?? ''} ${error.message}`);
     const page = data as { total?: number; rows?: AdminGameRow[] } | null;
     return { total: Number(page?.total ?? 0), rows: (page?.rows ?? []).map(adminRow) };
@@ -196,6 +206,161 @@ export class SupabaseStore implements GameStore {
       .gte('created_at', new Date(from).toISOString()).lt('created_at', new Date(to).toISOString());
     if (error) throw new Error(`count notify numbers failed: ${error.code ?? ''} ${error.message}`);
     return count ?? 0;
+  }
+
+  // ---------------------------------------------------------------- insights
+  // Everything goes through the functions of supabase/migrations/0003_insights.sql; each returns ONE json value whose
+  // keys already match the TypeScript shapes, so this adapter only passes arguments through.
+  //
+  // If that migration has not been run yet, the functions do not exist. Then: writes are dropped quietly (a player's
+  // request never fails or waits because of analytics), reads return "nothing", and insightsStatus() says 'missing'
+  // so the admin can show "run migration 0003" instead of crashing.
+
+  private insightsState: { status: 'ok' | 'missing'; until: number } | null = null;
+
+  /** True for "that function / table does not exist": PostgREST's schema-cache misses and Postgres' undefined_function / undefined_table. */
+  private static notInstalled(error: { code?: string; message?: string } | null): boolean {
+    if (!error) return false;
+    return error.code === 'PGRST202' || error.code === 'PGRST205' || error.code === '42883' || error.code === '42P01';
+  }
+
+  private markInsights(status: 'ok' | 'missing'): void {
+    // Re-check a missing migration every minute (the owner may be running it right now); trust "ok" for longer.
+    this.insightsState = { status, until: Date.now() + (status === 'ok' ? 10 * 60_000 : 60_000) };
+  }
+
+  private insightsKnownMissing(): boolean {
+    return !!this.insightsState && this.insightsState.status === 'missing' && this.insightsState.until > Date.now();
+  }
+
+  async insightsStatus(): Promise<'ok' | 'missing'> {
+    if (this.insightsState && this.insightsState.until > Date.now()) return this.insightsState.status;
+    const { error } = await this.db.rpc('insights_version');
+    if (error && !SupabaseStore.notInstalled(error)) throw new Error(`insights_version failed: ${error.code ?? ''} ${error.message}`);
+    this.markInsights(error ? 'missing' : 'ok');
+    return error ? 'missing' : 'ok';
+  }
+
+  /** An insights read: the function's json, or `fallback` when the migration has not been run. Other errors are thrown. */
+  private async insRead<T>(fn: string, args: Record<string, unknown>, fallback: T): Promise<T> {
+    if (this.insightsKnownMissing()) return fallback;
+    const { data, error } = await this.db.rpc(fn, args);
+    if (error) {
+      if (SupabaseStore.notInstalled(error)) {
+        this.markInsights('missing');
+        return fallback;
+      }
+      throw new Error(`${fn} failed: ${error.code ?? ''} ${error.message}`);
+    }
+    return (data ?? fallback) as T;
+  }
+
+  /** An insights write: never throws. */
+  private async insWrite(fn: string, args: Record<string, unknown>): Promise<void> {
+    if (this.insightsKnownMissing()) return;
+    try {
+      const { error } = await this.db.rpc(fn, args);
+      if (!error) return;
+      if (SupabaseStore.notInstalled(error)) {
+        if (!this.insightsKnownMissing()) console.warn('[insights] not recording: run supabase/migrations/0003_insights.sql (see supabase/README.md)');
+        this.markInsights('missing');
+        return;
+      }
+      console.warn(`[insights] ${fn} failed: ${error.code ?? ''} ${error.message}`);
+    } catch (e) {
+      console.warn(`[insights] ${fn} failed:`, e instanceof Error ? e.message : e);
+    }
+  }
+
+  async trackBatch(ctx: RequestContext, batch: CleanBatch): Promise<void> {
+    await this.insWrite('track_batch', { p_ctx: ctx, p_session: batch.session, p_source: batch.source, p_events: batch.events });
+  }
+
+  async recordParticipation(ctx: RequestContext, p: { code: string; role: 'host' | 'player'; pid: string | null; name: string }): Promise<void> {
+    await this.insWrite('record_participation', { p_ctx: ctx, p_code: p.code, p_role: p.role, p_pid: p.pid, p_name: p.name });
+  }
+
+  async recordWin(tokenHash: string, amount: number): Promise<void> {
+    await this.insWrite('record_win', { p_token_hash: tokenHash, p_amount: Math.max(0, Math.floor(amount) || 0) });
+  }
+
+  eventBreakdown(q: BreakdownQuery): Promise<BreakdownRow[]> {
+    return this.insRead('admin_event_breakdown', {
+      p_from: iso(q.from), p_to: iso(q.to), p_dim: q.dim, p_names: q.names ?? null, p_device_type: q.deviceType ?? null,
+      p_source: q.source ?? null, p_code: q.code ?? null, p_limit: q.limit ?? 500,
+    }, []);
+  }
+
+  funnel(q: FunnelQuery): Promise<FunnelStep[]> {
+    return this.insRead('admin_funnel', {
+      p_from: iso(q.from), p_to: iso(q.to), p_steps: q.steps, p_device_type: q.deviceType ?? null, p_source: q.source ?? null, p_code: q.code ?? null,
+    }, q.steps.map((step) => ({ step, any: 0, kept: 0 })));
+  }
+
+  trafficTotals(from: number, to: number): Promise<TrafficTotals> {
+    return this.insRead('admin_traffic_totals', { p_from: iso(from), p_to: iso(to) },
+      { visitors: 0, sessions: 0, events: 0, pageViews: 0, newDevices: 0, returningDevices: 0, timedSessions: 0, sessionMs: 0 });
+  }
+
+  participationBreakdown(from: number, to: number, dim: ParticipationDim): Promise<ParticipationRow[]> {
+    return this.insRead('admin_participation_breakdown', { p_from: iso(from), p_to: iso(to), p_dim: dim }, []);
+  }
+
+  retention(now: number): Promise<RetentionStats> {
+    const none = { eligible: 0, returned: 0 };
+    return this.insRead('admin_retention', { p_now: iso(now) }, { cohorts: [], d1: none, d7: none, d30: none, hosts: 0, returningHosts: 0 });
+  }
+
+  listEvents(q: EventListQuery): Promise<{ total: number; rows: AdminEvent[] }> {
+    return this.insRead('admin_list_events', {
+      p_from: iso(q.from), p_to: iso(q.to), p_name: q.name ?? null, p_device: q.device ?? null, p_code: q.code ?? null,
+      p_session: q.session ?? null, p_limit: q.limit, p_offset: q.offset,
+    }, { total: 0, rows: [] });
+  }
+
+  listDevices(q: DeviceListQuery): Promise<{ total: number; rows: AdminDevice[] }> {
+    return this.insRead('admin_list_devices', {
+      p_search: q.search?.trim() || null, p_played: q.played === true, p_sort: q.sort ?? 'lastSeen', p_desc: q.dir !== 'asc', p_limit: q.limit, p_offset: q.offset,
+    }, { total: 0, rows: [] });
+  }
+
+  getDevice(id: string): Promise<{ device: AdminDevice; ips: AdminIp[] } | null> {
+    return this.insRead<{ device: AdminDevice; ips: AdminIp[] } | null>('admin_get_device', { p_device: id }, null);
+  }
+
+  gameInsights(code: string): Promise<GameInsights> {
+    return this.insRead('admin_game_insights', { p_code: code }, { participations: [], events: [] });
+  }
+
+  gameHosts(codes: string[]): Promise<Record<string, AdminParticipation>> {
+    if (codes.length === 0) return Promise.resolve({});
+    return this.insRead('admin_game_hosts', { p_codes: codes }, {});
+  }
+
+  async tableCounts(): Promise<TableCounts> {
+    const counts = await this.insRead<TableCounts | null>('admin_table_counts', {}, null);
+    if (counts) return counts;
+    // Before migration 0003: count the three original tables directly.
+    const n = async (table: string, col: string): Promise<number> => {
+      const { count, error } = await this.db.from(table).select(col, { count: 'exact', head: true });
+      if (error) throw new Error(`count ${table} failed: ${error.code ?? ''} ${error.message}`);
+      return count ?? 0;
+    };
+    const [games, players, notify_numbers] = await Promise.all([n('games', 'code'), n('players', 'pid'), n('notify_numbers', 'phone')]);
+    return { games, players, notify_numbers, devices: 0, device_ips: 0, participations: 0, events: 0, admin_audit: 0 };
+  }
+
+  listAudit(limit: number): Promise<AuditRow[]> {
+    return this.insRead('admin_list_audit', { p_limit: limit }, []);
+  }
+
+  async eraseDevice(id: string): Promise<EraseResult> {
+    const { data, error } = await this.db.rpc('admin_erase_device', { p_device: id });
+    if (error) {
+      if (SupabaseStore.notInstalled(error)) throw new Error('Run supabase/migrations/0003_insights.sql first');
+      throw new Error(`admin_erase_device failed: ${error.code ?? ''} ${error.message}`);
+    }
+    return data as EraseResult;
   }
 }
 

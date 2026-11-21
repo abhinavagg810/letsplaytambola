@@ -52,9 +52,10 @@ it('covers every pattern id in docs/design_handoff/data/winning-patterns.json', 
   expect(seed).toHaveLength(26);
   for (const p of seed) expect(covered.has(p.id), `no test for pattern "${p.id}"`).toBe(true);
   expect(covered.size).toBe(seed.length);
-  // and the shipped rule list is the seed data, in the same order
+  // and the shipped rule list is the seed data, in the same order — with one deliberate difference: the seed's
+  // Full House rule ends "— add again for Second House", which v2 does not support (a pattern can be picked once).
   expect(RULES.map(({ id, name, group, rule }) => ({ id, name, group, rule }))).toEqual(
-    seed.map(({ id, name, group, rule }) => ({ id, name, group, rule })),
+    seed.map(({ id, name, group, rule }) => ({ id, name, group, rule: id === 'full' ? 'All 15 numbers' : rule })),
   );
 });
 

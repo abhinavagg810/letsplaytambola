@@ -1,5 +1,10 @@
 // Storage contract. Two adapters: memory (local dev, zero setup) and supabase (production).
 import type { GameDoc, PlayerState } from '@/core';
+import type { CleanBatch } from '../insights/events';
+import type {
+  AdminDevice, AdminIp, AdminEvent, AdminParticipation, AuditRow, BreakdownQuery, BreakdownRow, DeviceListQuery, EraseResult, EventListQuery,
+  FunnelQuery, FunnelStep, GameInsights, ParticipationDim, ParticipationRow, RequestContext, RetentionStats, TableCounts, TrafficTotals,
+} from '../insights/types';
 
 /** A player's private row as stored. `tokenHash` never leaves the server. */
 export interface StoredPlayer extends PlayerState {
@@ -43,7 +48,13 @@ export interface AdminGameFilter {
   device?: string;
   /** Only games with activity at or after this time. */
   activeSince?: number;
+  /** Only games with a ticket price. */
+  priced?: boolean;
+  /** Only games left in the lobby: never started (or waiting for another round) and idle for more than ABANDONED_AFTER_MS. */
+  abandoned?: boolean;
 }
+/** A lobby with no activity for this long counts as abandoned. */
+export const ABANDONED_AFTER_MS = 60 * 60_000;
 export interface AdminGameQuery extends AdminGameFilter {
   sort?: 'created' | 'players' | 'activity';
   dir?: 'asc' | 'desc';
@@ -124,6 +135,33 @@ export interface GameStore {
   adminListNotifyNumbers(page: { limit: number; offset: number }): Promise<{ total: number; rows: AdminNotifyRow[] }>;
   /** How many "Notify me" numbers were saved in [from, to). */
   adminCountNotifyNumbers(from: number, to: number): Promise<number>;
+
+  // ---- insights: first-party analytics (src/server/insights). Writes never throw into a player's request;
+  // reads are only ever called behind requireAdmin(). Devices appear as short ids; IPs only in these admin reads.
+  /** 'missing' = the database has not been given supabase/migrations/0003_insights.sql yet (the public game still works). */
+  insightsStatus(): Promise<'ok' | 'missing'>;
+  /** Store one accepted POST /api/t. */
+  trackBatch(ctx: RequestContext, batch: CleanBatch): Promise<void>;
+  /** A game was created (host) or joined (player) from this request. */
+  recordParticipation(ctx: RequestContext, p: { code: string; role: 'host' | 'player'; pid: string | null; name: string }): Promise<void>;
+  /** This device won a prize worth `amount` rupees (recorded only). */
+  recordWin(tokenHash: string, amount: number): Promise<void>;
+
+  eventBreakdown(q: BreakdownQuery): Promise<BreakdownRow[]>;
+  funnel(q: FunnelQuery): Promise<FunnelStep[]>;
+  trafficTotals(from: number, to: number): Promise<TrafficTotals>;
+  participationBreakdown(from: number, to: number, dim: ParticipationDim): Promise<ParticipationRow[]>;
+  retention(now: number): Promise<RetentionStats>;
+  listEvents(q: EventListQuery): Promise<{ total: number; rows: AdminEvent[] }>;
+  listDevices(q: DeviceListQuery): Promise<{ total: number; rows: AdminDevice[] }>;
+  getDevice(id: string): Promise<{ device: AdminDevice; ips: AdminIp[] } | null>;
+  gameInsights(code: string): Promise<GameInsights>;
+  /** code → the host's participation (place, device, source). */
+  gameHosts(codes: string[]): Promise<Record<string, AdminParticipation>>;
+  tableCounts(): Promise<TableCounts>;
+  listAudit(limit: number): Promise<AuditRow[]>;
+  /** Delete everything tied to a short device id and anonymise its names in stored games. Writes an audit line. */
+  eraseDevice(id: string): Promise<EraseResult>;
 }
 
 /** No free code found after many tries (practically impossible: 28 million codes). */

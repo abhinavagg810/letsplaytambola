@@ -1,6 +1,7 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import { trackToast } from '@/lib/track';
 import styles from './Toast.module.css';
 
 /** How long a toast stays up (README: 2.4 seconds). */
@@ -27,6 +28,7 @@ function emit() {
  */
 export function toast(message: string): void {
   if (timer) clearTimeout(timer);
+  trackToast(message); // usage statistics: the kind of message, never its text
   current = { id: ++seq, message };
   emit();
   timer = setTimeout(() => {

@@ -159,6 +159,17 @@ const topNani = row(nani.you.ticket, 0);
 while (![...topMeera, ...topNani].every((n) => host.called.includes(n))) {
   host = (await must(act(code, 'host', { type: 'draw' }), 'draw')).game;
 }
+if (host.status !== 'live') {
+  // About one run in ten, one of the two top lines needs the 90th number and the round ends first. That is the luck
+  // of the draw, not a failure: deal a fresh game (at most three times).
+  const attempt = Number(process.env.SMOKE_ATTEMPT || 1);
+  if (attempt < 3) {
+    console.log(`\nA top line needed the 90th number — starting again with a new game (attempt ${attempt + 1}).\n`);
+    const { spawnSync } = await import('node:child_process');
+    const again = spawnSync(process.execPath, [new URL(import.meta.url).pathname], { stdio: 'inherit', env: { ...process.env, SMOKE_ATTEMPT: String(attempt + 1) } });
+    process.exit(again.status ?? 1);
+  }
+}
 ok(host.status === 'live' && new Set(host.called).size === host.called.length, `drew ${host.called.length} numbers, no repeats, until both top lines were out`);
 const versionBeforeMarks = host.version;
 for (const n of topMeera) meera = (await must(act(code, 'meera', { type: 'mark', n }), 'meera marks')).game;

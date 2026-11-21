@@ -105,7 +105,7 @@ toast(`${n} hasn’t been called yet`);
 
 ## Game pieces
 
-**`Ticket`** — props: `ticket: number[][]` (3×9, 0 = blank), `marked?: Set<number> | number[]`, `onCell?(n)` (number cells become buttons; you decide dab / toast), `title?`, `headerRight?` (Claim pill slot), `hint?`, `bare?` (lobby preview: no header/shadow, radius 16), `tilt?`, `className?`, `style?`.
+**`Ticket`** — props: `ticket: number[][]` (3×9, 0 = blank), `marked?: Set<number> | number[]`, `onCell?(n)` (number cells become buttons; you decide dab / toast), `title?`, `headerRight?` (Claim pill slot), `hint?`, `bare?` (lobby preview: no header/shadow, radius 16), `tilt?`, `className?`, `style?`. With `onCell` on a phone (≤ 480px) the ticket uses 10px of the page margin on each side, a 4px frame and 19px+ numbers, and below 400px the cells are a fixed 46px tall — so every number is a ≥ 44px-tall tap target even at 320px.
 CSS variables for fine-tuning: `--ticket-radius`, `--ticket-pad`, `--ticket-head-pad`, `--cell-ratio`, `--cell-font`, `--dab-size`, `--dab-color`, `--dab-nudge`.
 
 ```tsx

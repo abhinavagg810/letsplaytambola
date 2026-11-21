@@ -16,10 +16,28 @@ Easiest way — the SQL editor:
 3. You should see "Success. No rows returned". Under **Table Editor** there are now three tables: `games`, `players`, `notify_numbers`.
    Each shows "RLS enabled" with no policies — that is on purpose: nobody can read them except our own server.
 4. **New query** again. Open `supabase/migrations/0002_admin.sql`, copy **all** of it, paste it in, press **Run**. "Success. No rows returned" again.
+5. **New query** once more. Open `supabase/migrations/0003_insights.sql`, copy **all** of it, paste it in, press **Run**. Under **Table Editor** there are now eight tables.
 
-Or, with the Supabase CLI: `supabase link --project-ref <your-project-ref>` then `supabase db push` (runs both files).
+Or, with the Supabase CLI: `supabase link --project-ref <your-project-ref>` then `supabase db push` (runs all three files).
 
-Run each file only once, in order. (To start again from scratch: `drop table public.players, public.games, public.notify_numbers cascade; drop function if exists public.commit_game, public.purge_expired_games, public.admin_retention_days, public.admin_list_games, public.admin_get_game;` and run both files again.)
+Run each file only once, in order: `0001`, `0002`, `0003`. (To start again from scratch — this deletes every game and every record — run
+`drop schema public cascade; create schema public; grant usage on schema public to anon, authenticated, service_role;` and then the three files again.)
+
+### Already have a project? Run `0003_insights.sql` once
+This adds what the admin's analytics need: the IP address and approximate location of visitors, device details, usage
+events, and the "Erase a device" action. Do it when you deploy the version of the site that has them — before or after, either order is safe:
+1. Supabase dashboard → your project → **SQL Editor → New query**.
+2. Open `supabase/migrations/0003_insights.sql` from this repo, copy **all** of it, paste it in, press **Run**.
+3. You should see "Success. No rows returned". If you see `relation "devices" already exists`, it has been run before — nothing to do.
+4. Check it: run `select public.insights_version();` — it answers `3`. Under **Table Editor** there are five new tables
+   (`devices`, `device_ips`, `participations`, `events`, `admin_audit`), each showing "RLS enabled" with no policies.
+5. Open `/admin` on the site: within a minute the notice "Run migration 0003 to switch the analytics on" is gone. Recording starts now; nothing older is filled in.
+6. If you scheduled the hourly clean-up (step 5 below), leave it as it is: the same line now also deletes analytics rows older than 90 days.
+
+**If the site is deployed before this file is run:** games keep working exactly as before. The analytics are simply not
+recorded; every admin page shows the notice above and its visitor / place / device / event sections are empty, while the
+game numbers are complete. "Erase a device" and two quick filters of the Plays table say they need the migration.
+Games being played while you run the file are not affected (it only adds tables and functions, and replaces two functions in place).
 
 ### Already have a project from before the admin panel? Run `0002_admin.sql` once
 If your project was set up with only `0001_init.sql`, do this **before** you deploy the version of the site that has the admin panel:
@@ -89,14 +107,16 @@ WhatsApp numbers typed on the website's "Coming soon" section are in the `notify
 
 ## How it is kept safe
 - Browsers never talk to the database. Everything goes through the website's own server routes, which use the service_role key.
-- All three tables have row level security switched on with **no policies**, and all rights are removed from the `anon` and `authenticated` roles, so the public (anon) key can read and write nothing.
+- All eight tables have row level security switched on with **no policies**, and all rights are removed from the `anon` and `authenticated` roles, so the public (anon) key can read and write nothing.
+- IP addresses, places, device details and usage events (`devices`, `device_ips`, `participations`, `events`) are written by the server after it has answered, and read only through the `admin_*` functions for the admin panel. They are deleted 90 days after they were last touched (`purge_insights`, run by `purge_expired_games`). One device can be erased on request from the admin (**Data & privacy → Erase a device**, `admin_erase_device`), which leaves a line in `admin_audit`.
 - A player's ticket and dabs are in the `players` table and are only ever sent to the device that owns them. Device tokens are stored only as SHA-256 hashes.
 - 24 hours after a game's last activity its tickets and dabs are erased. The rest (names typed, numbers called, winners, times, and the device hashes) is kept 90 days for the admin panel and then deleted. The retention is the `p_retention_days` argument of `purge_expired_games` (default 90) and `admin_retention_days()`; keep them in step with `ADMIN_RETENTION_DAYS` in `src/server/store/types.ts`.
 - The admin pages read through three functions (`admin_list_games`, `admin_get_game`, `admin_game_row`) that never return a ticket, dabs or a full device hash — only the first 8 characters of the hash. Like every other function they can be run by the service role only.
 - Writes go through one database function, `commit_game`, which refuses a write if the game changed in the meantime — so when two people claim the same prize at the same instant, exactly one wins.
 
 ## Tests (for developers)
-`npm run test:sql` applies the migration to a throwaway database on a local PostgreSQL 16 and checks that:
+`npm run test:sql` applies the migrations to a throwaway database on a local PostgreSQL 16 and checks (`tests/security.sql`, `tests/insights.sql`, `tests/insights_parity.sql` — the last one is generated: `UPDATE_PARITY=1 npx vitest run src/server/insights/__tests__/parity.test.ts`) that:
+the analytics tables are locked down like the rest; `track_batch`, `record_participation` and `record_win` store what the server sends; rows older than 90 days are purged; erasing a device removes its rows and its names; every `admin_*` aggregate returns exactly what the TypeScript version returns for the same seeded data; and
 anon and authenticated can neither read nor change any table nor call any function (the admin ones included); the service role can;
 a stale version is rejected; the purge erases tickets and dabs at 24 hours but keeps the document, and deletes the game after 90 days;
 an expired game cannot be written to and its code is not reused; the admin functions filter, sort and page correctly and return
