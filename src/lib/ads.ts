@@ -3,7 +3,9 @@
 // Ads appear only before the game starts (lobby) and after it ends (results).
 
 /** AdSense publisher id, e.g. "ca-pub-1234567890123456". Empty = ads off everywhere. */
-export const ADSENSE_CLIENT = (process.env.NEXT_PUBLIC_ADSENSE_CLIENT || '').trim();
+// Forgiving: accepts "ca-pub-123…", "pub-123…" or just the digits, with stray spaces or quotes.
+const digits = (process.env.NEXT_PUBLIC_ADSENSE_CLIENT || '').replace(/["'\s]/g, '').replace(/^(ca-)?pub-/i, '');
+export const ADSENSE_CLIENT = /^\d{10,20}$/.test(digits) ? `ca-pub-${digits}` : '';
 export const ADS_ON = /^ca-pub-\d{10,20}$/.test(ADSENSE_CLIENT);
 
 /** Ad unit ids created in AdSense (Ads → By ad unit → Display ads). A placement with no id shows nothing. */
