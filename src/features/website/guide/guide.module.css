@@ -1,0 +1,342 @@
+/* The content pages (/about, /contact, /how-to-play, /ways-to-win, /tambola-number-calls).
+   Built on the legal pages' reading layout (../legal.module.css); this file adds what guides need. */
+
+.head {
+  padding-top: 28px;
+}
+
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  margin-bottom: 18px;
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.crumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crumbs li + li::before {
+  content: '›';
+  color: var(--text-dim);
+}
+
+.crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--text-soft);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 3px;
+}
+
+.crumbs a:hover {
+  color: var(--text);
+}
+
+.crumbs [aria-current='page'] {
+  color: var(--text-muted);
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--marigold);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* Links inside the reading text: clearly links, in the site's teal. */
+.content a:not([class]),
+.body a:not([class]),
+.wideBody a:not([class]) {
+  color: var(--teal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.body {
+  max-width: 1128px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.wideBody {
+  max-width: calc(var(--content) + 48px);
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.h3 {
+  font-size: 21px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+/* ── Steps ─────────────────────────────────────────────── */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 4px;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.stepBall {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 800;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.18);
+}
+
+.stepText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 6px;
+}
+
+/* ── A picture with its caption (sample ticket) ────────── */
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 520px;
+  margin: 6px 0;
+}
+
+.caption {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* ── Small cards in a grid (what makes it different, columns of a ticket) ── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px;
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.cardTitle {
+  font-size: 19px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.cardBody {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+/* ── Links to other pages ─────────────────────────────── */
+.linkList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 10px;
+}
+
+.linkCard,
+.linkCard:hover {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 44px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 18px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.linkCard:hover {
+  border-color: var(--marigold);
+}
+
+.linkTitle {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.linkTitle::after {
+  content: ' →';
+  color: var(--marigold);
+}
+
+.linkSub {
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+/* ── FAQ (same look as the home page's) ─────────────────── */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.faqItem {
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.faqQ {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 14px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faqQ::-webkit-details-marker {
+  display: none;
+}
+
+.faqQ:focus-visible {
+  outline-offset: -3px;
+  border-radius: 20px;
+}
+
+.faqQ::after {
+  content: '+';
+  flex-shrink: 0;
+  font-size: 24px;
+  color: var(--marigold);
+}
+
+.faqItem[open] .faqQ::after {
+  content: '−';
+}
+
+.faqA {
+  padding: 0 20px 18px;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+/* ── Closing band ─────────────────────────────────────── */
+.band {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+  padding: 32px 28px;
+  border-radius: 28px;
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+.bandCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 300px;
+}
+
+.bandTitle {
+  font-size: clamp(28px, 4vw, 38px);
+  line-height: 1.05;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.bandBody {
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+@media (max-width: 480px) {
+  .band {
+    padding: 26px 20px;
+  }
+
+  .band > a {
+    width: 100%;
+  }
+}
+
+/* Paper: no frame, dark text on white, links show where they go. */
+@media print {
+  .crumbs,
+  .actions,
+  .band {
+    display: none !important;
+  }
+
+  .head,
+  .head * {
+    color: #000 !important;
+  }
+
+  .head {
+    padding-top: 0;
+    padding-bottom: 12pt;
+  }
+}
+
+/* ── About ─────────────────────────────────────────────── */
+.aboutGrid {
+  max-width: 820px;
+}
+
+.moreSection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px 0;
+}
+
+.moreTitle {
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 800;
+}

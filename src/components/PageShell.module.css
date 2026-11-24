@@ -15,3 +15,12 @@
   flex: 1;
   width: 100%;
 }
+
+/* Paper: white page, dark text (pages that are meant to be printed, like the number calls, style their own parts). */
+@media print {
+  .shell {
+    min-height: 0;
+    background: #fff;
+    color: #000;
+  }
+}

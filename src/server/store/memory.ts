@@ -3,6 +3,7 @@
 // One process only — on serverless hosts use the Supabase store.
 import { randomBytes } from 'node:crypto';
 import { GAME_TTL_MS, genCode } from '@/core';
+import type { ContactInput } from '@/lib/contact';
 import * as agg from '../insights/aggregate';
 import type { CleanBatch } from '../insights/events';
 import type {
@@ -11,9 +12,17 @@ import type {
 } from '../insights/types';
 import { ABANDONED_AFTER_MS, ADMIN_MAX_PAGE, ADMIN_MAX_RANGE_ROWS, ADMIN_RETENTION_MS, CodeSpaceError } from './types';
 import type {
-  AdminGameFilter, AdminGamePage, AdminGameQuery, AdminGameRow, AdminNotifyRow,
-  CommitWrite, GameStore, NewGame, PlayerWrite, StoredGame, StoredPlayer,
+  AdminContactMessage, AdminGameFilter, AdminGamePage, AdminGameQuery, AdminGameRow, AdminNotifyRow,
+  CommitWrite, ContactListQuery, ContactPage, GameStore, NewGame, PlayerWrite, StoredGame, StoredPlayer,
 } from './types';
+
+/** A contact-form message as stored: the message, and the request it came with (headers only). */
+interface StoredContact extends ContactInput {
+  id: number;
+  createdAt: number;
+  readAt: number | null;
+  ctx: RequestContext;
+}
 
 /** A stored game plus the memory store's own bookkeeping. */
 interface MemoryGame extends StoredGame {
@@ -29,6 +38,8 @@ interface MemoryData {
   lastSweep?: number;
   /** First-party analytics rows (src/server/insights). */
   insights?: InsightsData;
+  /** Contact-form messages (created on first use, like `insights`). */
+  contact?: { rows: StoredContact[]; nextId: number };
 }
 
 const KEY = '__lpt_memory_store_v2__';
@@ -46,6 +57,10 @@ export class MemoryStore implements GameStore {
   /** The analytics rows (created on first use: data kept across a dev hot reload may predate them). */
   private get ins(): InsightsData {
     return (this.data.insights ??= agg.newInsightsData());
+  }
+
+  private get contact(): { rows: StoredContact[]; nextId: number } {
+    return (this.data.contact ??= { rows: [], nextId: 1 });
   }
 
   private expired(g: MemoryGame): boolean {
@@ -94,6 +109,8 @@ export class MemoryStore implements GameStore {
     }
     // IPs, device rows and events follow the same retention as game summaries.
     agg.purgeInsights(this.ins, now - ADMIN_RETENTION_MS);
+    // So do contact-form messages (counted from when they were received), as purge_contact() in 0004_contact.sql.
+    this.contact.rows = this.contact.rows.filter((m) => m.createdAt >= now - ADMIN_RETENTION_MS);
     return n;
   }
 
@@ -350,6 +367,68 @@ export class MemoryStore implements GameStore {
     void _found;
     ins.audit.push({ id: ins.nextAuditId++, at: this.now(), action: 'erase_device', target: id, detail });
     return result;
+  }
+
+  // ---------------------------------------------------------------- contact form
+
+  async contactStatus(): Promise<'ok' | 'missing'> {
+    return 'ok';
+  }
+
+  async saveContactMessage(ctx: RequestContext, msg: ContactInput): Promise<'ok' | 'missing'> {
+    const c = this.contact;
+    c.rows.push({ ...copy(msg), id: c.nextId++, createdAt: this.now(), readAt: null, ctx: copy(ctx) });
+    return 'ok';
+  }
+
+  /** The admin's view of a message. Built field by field: the full device hash, the raw user agent and the coordinates stay here. */
+  private contactRow(m: StoredContact): AdminContactMessage {
+    const x = m.ctx;
+    return {
+      id: m.id, createdAt: m.createdAt, topic: m.topic, name: m.name, replyTo: m.replyTo, message: m.message, page: m.page, readAt: m.readAt,
+      device: x.tokenHash ? shortId(x.tokenHash) : null, ip: x.ip, country: x.country, region: x.region, city: x.city,
+      deviceType: x.deviceType, os: x.os, osVersion: x.osVersion, browser: x.browser, browserVersion: x.browserVersion, inApp: x.inApp, language: x.language,
+    };
+  }
+
+  async adminListContactMessages(q: ContactListQuery): Promise<ContactPage> {
+    this.purgeExpired();
+    const needle = q.search?.trim().toLowerCase();
+    const all = this.contact.rows;
+    const rows = all
+      .filter((m) => (!q.topic || m.topic === q.topic)
+        && (!q.status || (q.status === 'unread') === (m.readAt === null))
+        && (!needle || [m.name, m.replyTo, m.message].some((f) => !!f && f.toLowerCase().includes(needle))))
+      .sort((a, b) => b.createdAt - a.createdAt || b.id - a.id);
+    const limit = Math.min(ADMIN_MAX_PAGE, Math.max(1, Math.floor(q.limit)));
+    const offset = Math.max(0, Math.floor(q.offset));
+    return { total: rows.length, unread: all.filter((m) => m.readAt === null).length, rows: rows.slice(offset, offset + limit).map((m) => this.contactRow(m)) };
+  }
+
+  async adminCountUnreadContact(): Promise<number> {
+    return this.contact.rows.filter((m) => m.readAt === null).length;
+  }
+
+  async adminSetContactRead(id: number, read: boolean): Promise<boolean> {
+    const m = this.contact.rows.find((r) => r.id === id);
+    if (!m) return false;
+    m.readAt = read ? (m.readAt ?? this.now()) : null;
+    return true;
+  }
+
+  async adminDeleteContactMessage(id: number): Promise<boolean> {
+    const c = this.contact;
+    const m = c.rows.find((r) => r.id === id);
+    if (!m) return false;
+    c.rows = c.rows.filter((r) => r.id !== id);
+    // The audit line says what was done, never what the message said.
+    this.ins.audit.push({ id: this.ins.nextAuditId++, at: this.now(), action: 'delete_message', target: String(id), detail: { topic: m.topic } });
+    return true;
+  }
+
+  /** For tests: the raw contact rows. */
+  get contactRows(): (ContactInput & { id: number; createdAt: number; readAt: number | null; ctx: RequestContext })[] {
+    return copy(this.contact.rows);
   }
 
   /** For tests: the raw analytics rows. */

@@ -37,6 +37,9 @@
 
 .link,
 .link:hover {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* a full-height target; looks the same */
   color: var(--text-soft);
   text-decoration: none;
   font-size: 16px;
@@ -72,6 +75,24 @@
   font-weight: 700;
 }
 
+/* Features and About join the desktop row only where there is room for them. */
+.roomy {
+  display: none;
+}
+
+@media (min-width: 1040px) {
+  .roomy {
+    display: inline-flex;
+  }
+}
+
+/* A long menu stays usable on a short phone screen. */
+.menu {
+  max-height: calc(100dvh - var(--header-h));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 @media (min-width: 860px) {
   .wide {
     display: flex;
@@ -79,6 +100,12 @@
 
   .narrow,
   .menu {
+    display: none;
+  }
+}
+
+@media print {
+  .header {
     display: none;
   }
 }

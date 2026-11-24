@@ -10,7 +10,7 @@ import { ADMIN_RETENTION_DAYS, getStore } from '@/server/store';
 
 export const metadata: Metadata = { title: 'Data & privacy' };
 
-const TABLES: [keyof TableCounts, string, string, string][] = [
+const TABLES: [keyof TableCounts | 'contact_messages', string, string, string][] = [
   ['games', 'Games', 'The public game document: names typed, numbers called, winners, prizes, times.', `Stops working 24 hours after the last activity; the summary is deleted ${ADMIN_RETENTION_DAYS} days after it.`],
   ['players', 'Tickets', 'One row per person per game: the ticket, the dabs and a scrambled device code.', `Ticket and dabs erased at 24 hours; the row goes with its game at ${ADMIN_RETENTION_DAYS} days.`],
   ['devices', 'Devices', 'One row per browser: first and last seen, latest IP address and approximate place, device and browser, how it first arrived, lifetime counts.', `Deleted ${ADMIN_RETENTION_DAYS} days after it was last seen.`],
@@ -18,7 +18,8 @@ const TABLES: [keyof TableCounts, string, string, string][] = [
   ['participations', 'Game records', 'Per device per game: IP address, place and device at the moment the game was created or joined.', `Deleted after ${ADMIN_RETENTION_DAYS} days, or with its game.`],
   ['events', 'Events', 'Usage events from a fixed list: page views, button taps, funnel steps, shares, claims.', `Deleted after ${ADMIN_RETENTION_DAYS} days.`],
   ['notify_numbers', 'Notify-me numbers', 'WhatsApp numbers left for the app launch message.', 'Kept until the launch message is sent or the person asks for removal.'],
-  ['admin_audit', 'Audit lines', 'What was done from this page: device id and counts only.', 'Kept.'],
+  ['contact_messages', 'Messages', 'What people sent with the Contact page form: topic, the name and reply-to they typed (optional), the message, and the IP address, place and device of the request.', `Deleted ${ADMIN_RETENTION_DAYS} days after it arrived, or sooner from the Messages page.`],
+  ['admin_audit', 'Audit lines', 'What was done in the admin: erased devices (device id and counts) and deleted messages (message number and topic).', 'Kept.'],
 ];
 
 export default async function AdminPrivacyPage({ searchParams }: PageProps<'/admin/privacy'>) {
@@ -28,7 +29,9 @@ export default async function AdminPrivacyPage({ searchParams }: PageProps<'/adm
   const raw = (await searchParams).device;
   const device = (Array.isArray(raw) ? raw[0] ?? '' : raw ?? '').trim().toLowerCase();
   const store = getStore();
-  const [counts, audit] = await Promise.all([store.tableCounts(), store.listAudit(100)]);
+  const [tableCounts, audit, messages] = await Promise.all([store.tableCounts(), store.listAudit(100), store.adminListContactMessages({ limit: 1, offset: 0 }).catch(() => ({ total: 0 }))]);
+  // Contact messages (migration 0004) are counted on their own: the table counts above come from migration 0003.
+  const counts: Record<string, number> = { ...tableCounts, contact_messages: messages.total };
 
   return (
     <>
@@ -86,8 +89,8 @@ export default async function AdminPrivacyPage({ searchParams }: PageProps<'/adm
                 {audit.map((a) => (
                   <tr key={a.id}>
                     <td><When ms={a.at} now={now} /></td>
-                    <th scope="row">{a.action === 'erase_device' ? 'Erased a device' : a.action}</th>
-                    <td className={styles.mono}>{a.target}</td>
+                    <th scope="row">{a.action === 'erase_device' ? 'Erased a device' : a.action === 'delete_message' ? 'Deleted a message' : a.action}</th>
+                    <td className={styles.mono}>{a.action === 'delete_message' ? `message #${a.target}` : a.target}</td>
                     <td className={styles.num}>{num(Number(a.detail.devices ?? 0))}</td>
                     <td className={styles.num}>{num(Number(a.detail.ips ?? 0))}</td>
                     <td className={styles.num}>{num(Number(a.detail.events ?? 0))}</td>

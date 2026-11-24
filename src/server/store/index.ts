@@ -4,6 +4,7 @@ import { SupabaseStore } from './supabase';
 import type { GameStore } from './types';
 
 export type {
+  AdminContactMessage, ContactListQuery, ContactPage,
   AdminGameFilter, AdminGamePage, AdminGameQuery, AdminGameRow, AdminNotifyRow,
   CommitWrite, GameStore, NewGame, PlayerWrite, StoredGame, StoredPlayer,
 } from './types';

@@ -1,5 +1,5 @@
 import { PageShell } from '@/components/PageShell';
-import { CONTACT_EMAIL_PLACEHOLDER, LEGAL_LAST_UPDATED, type LegalSection } from './legal';
+import { CONTACT_EMAIL, LEGAL_LAST_UPDATED, type LegalSection } from './legal';
 import styles from './legal.module.css';
 
 export interface LegalPageProps {
@@ -17,8 +17,8 @@ function withEmail(text: string) {
     i === 0
       ? [part]
       : [
-          <a key={i} href={`mailto:${CONTACT_EMAIL_PLACEHOLDER}`}>
-            {CONTACT_EMAIL_PLACEHOLDER}
+          <a key={i} href={`mailto:${CONTACT_EMAIL}`}>
+            {CONTACT_EMAIL}
           </a>,
           part,
         ],

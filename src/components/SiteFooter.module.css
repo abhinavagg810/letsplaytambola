@@ -8,22 +8,67 @@
 .inner {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 20px;
+  align-items: flex-start;
+  gap: 28px 48px;
   flex-wrap: wrap;
   max-width: calc(var(--content) + 2 * var(--gutter));
   margin: 0 auto;
-  padding: 32px var(--gutter);
+  padding: 36px var(--gutter);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1 1 260px;
+  min-width: 0;
+  max-width: 360px;
+}
+
+.logo {
+  display: flex;
+  align-items: flex-end;
+  height: 45.9px; /* matches the design's footer height */
+}
+
+.note {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-foot);
+}
+
+/* Three groups side by side; on a narrow phone two columns, then the third under them. */
+.groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px 28px;
+  flex: 2 1 480px;
+  min-width: 0;
+  max-width: 620px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.groupTitle {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--marigold);
+  padding-bottom: 4px;
 }
 
 .links {
   display: flex;
-  gap: 0 20px;
-  flex-wrap: wrap;
-  font-size: 15px;
+  flex-direction: column;
+  font-size: 16px;
 }
 
-/* Each link is a 44px tap target (the text itself is only 24px tall). */
+/* Each link is a 44px tap target. */
 .links a {
   display: inline-flex;
   align-items: center;
@@ -37,13 +82,8 @@
   color: var(--text);
 }
 
-.note {
-  font-size: 15px;
-  color: var(--text-foot);
-}
-
-.logo {
-  display: flex;
-  align-items: flex-end;
-  height: 45.9px; /* matches the design's footer height */
+@media print {
+  .footer {
+    display: none;
+  }
 }

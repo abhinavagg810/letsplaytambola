@@ -3,11 +3,10 @@ import type { ReactNode } from 'react';
 import { Toaster } from '@/components/Toast';
 import { baloo, balooExt, mono } from '@/fonts';
 import { ADSENSE_CLIENT, ADS_ON } from '@/lib/ads';
+import { SITE_URL } from '@/lib/site';
 import { TrackPageViews } from '@/lib/TrackPageViews';
 import './globals.css';
 
-/** Public address of the site. Set NEXT_PUBLIC_SITE_URL on Vercel; the default is the planned domain. */
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://letsplaytambola.com';
 const DESCRIPTION =
   'Play Tambola (Housie) online with family and friends. Host a game, share one link on WhatsApp, and everyone plays by typing their name. Free, no sign-up, no download.';
 

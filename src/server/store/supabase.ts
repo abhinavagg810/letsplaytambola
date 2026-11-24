@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { GAME_TTL_MS, genCode } from '@/core';
 import type { GameDoc, Ticket } from '@/core';
+import type { ContactInput } from '@/lib/contact';
 import type { CleanBatch } from '../insights/events';
 import type {
   AdminDevice, AdminEvent, AdminIp, AdminParticipation, AuditRow, BreakdownQuery, BreakdownRow, DeviceListQuery, EraseResult, EventListQuery,
@@ -12,8 +13,8 @@ import type {
 } from '../insights/types';
 import { ADMIN_MAX_PAGE, ADMIN_MAX_RANGE_ROWS, ADMIN_RETENTION_DAYS, CodeSpaceError } from './types';
 import type {
-  AdminGameFilter, AdminGamePage, AdminGameQuery, AdminGameRow, AdminNotifyRow,
-  CommitWrite, GameStore, NewGame, PlayerWrite, StoredGame,
+  AdminContactMessage, AdminGameFilter, AdminGamePage, AdminGameQuery, AdminGameRow, AdminNotifyRow,
+  CommitWrite, ContactListQuery, ContactPage, GameStore, NewGame, PlayerWrite, StoredGame,
 } from './types';
 
 /** The purge also runs from the app (at most this often per server instance), so it does not depend on pg_cron. */
@@ -362,6 +363,97 @@ export class SupabaseStore implements GameStore {
     }
     return data as EraseResult;
   }
+
+  // ---------------------------------------------------------------- contact form
+  // Through the functions of supabase/migrations/0004_contact.sql. Before that file has been run they do not exist: then a
+  // message is NOT stored and saveContactMessage says 'missing' (the form tells the person to email instead), the admin reads
+  // return nothing and contactStatus() says 'missing' so the Messages page can show "run migration 0004".
+
+  private contactState: { status: 'ok' | 'missing'; until: number } | null = null;
+
+  private markContact(status: 'ok' | 'missing'): void {
+    this.contactState = { status, until: Date.now() + (status === 'ok' ? 10 * 60_000 : 60_000) };
+  }
+
+  async contactStatus(): Promise<'ok' | 'missing'> {
+    if (this.contactState && this.contactState.until > Date.now()) return this.contactState.status;
+    const { error } = await this.db.rpc('contact_version');
+    if (error && !SupabaseStore.notInstalled(error)) throw new Error(`contact_version failed: ${error.code ?? ''} ${error.message}`);
+    this.markContact(error ? 'missing' : 'ok');
+    return error ? 'missing' : 'ok';
+  }
+
+  async saveContactMessage(ctx: RequestContext, msg: ContactInput): Promise<'ok' | 'missing'> {
+    // Always try: the owner may have just run the migration, and a message is worth one extra round trip.
+    const { error } = await this.db.rpc('save_contact_message', {
+      p_ctx: ctx, p_topic: msg.topic, p_name: msg.name, p_reply_to: msg.replyTo, p_message: msg.message, p_page: msg.page,
+    });
+    if (!error) {
+      this.markContact('ok');
+      return 'ok';
+    }
+    if (SupabaseStore.notInstalled(error)) {
+      console.warn('[contact] message NOT stored: run supabase/migrations/0004_contact.sql (see supabase/README.md)');
+      this.markContact('missing');
+      return 'missing';
+    }
+    throw new Error(`save_contact_message failed: ${error.code ?? ''} ${error.message}`);
+  }
+
+  /** A contact read: the function's json, or `fallback` when migration 0004 has not been run. Other errors are thrown. */
+  private async contactRead<T>(fn: string, args: Record<string, unknown>, fallback: T): Promise<T> {
+    const { data, error } = await this.db.rpc(fn, args);
+    if (error) {
+      if (SupabaseStore.notInstalled(error)) {
+        this.markContact('missing');
+        return fallback;
+      }
+      throw new Error(`${fn} failed: ${error.code ?? ''} ${error.message}`);
+    }
+    return (data ?? fallback) as T;
+  }
+
+  async adminListContactMessages(q: ContactListQuery): Promise<ContactPage> {
+    await this.purgeIfDue();
+    const page = await this.contactRead<{ total?: number; unread?: number; rows?: AdminContactMessage[] } | null>('admin_list_contact', {
+      p_topic: q.topic ?? null, p_search: q.search?.trim() || null, p_status: q.status ?? null,
+      p_limit: Math.min(ADMIN_MAX_PAGE, Math.max(1, Math.floor(q.limit))), p_offset: Math.max(0, Math.floor(q.offset)),
+    }, null);
+    return { total: Number(page?.total ?? 0), unread: Number(page?.unread ?? 0), rows: (page?.rows ?? []).map((r) => contactRow(r as AdminContactMessage & Record<string, unknown>)) };
+  }
+
+  async adminCountUnreadContact(): Promise<number> {
+    return Number(await this.contactRead<number>('admin_contact_unread', {}, 0)) || 0;
+  }
+
+  async adminSetContactRead(id: number, read: boolean): Promise<boolean> {
+    const { data, error } = await this.db.rpc('admin_set_contact_read', { p_id: id, p_read: read });
+    if (error) {
+      if (SupabaseStore.notInstalled(error)) throw new Error('Run supabase/migrations/0004_contact.sql first');
+      throw new Error(`admin_set_contact_read failed: ${error.code ?? ''} ${error.message}`);
+    }
+    return data === true;
+  }
+
+  async adminDeleteContactMessage(id: number): Promise<boolean> {
+    const { data, error } = await this.db.rpc('admin_delete_contact', { p_id: id });
+    if (error) {
+      if (SupabaseStore.notInstalled(error)) throw new Error('Run supabase/migrations/0004_contact.sql first');
+      throw new Error(`admin_delete_contact failed: ${error.code ?? ''} ${error.message}`);
+    }
+    return data === true;
+  }
+}
+
+/** Copy exactly the admin fields of a contact message out of what the database returned. */
+function contactRow(r: Partial<AdminContactMessage> & Record<string, unknown>): AdminContactMessage {
+  const t = (v: unknown): string | null => (typeof v === 'string' ? v : null);
+  return {
+    id: Number(r.id), createdAt: Number(r.createdAt), topic: (t(r.topic) ?? 'other') as AdminContactMessage['topic'], name: t(r.name), replyTo: t(r.replyTo),
+    message: t(r.message) ?? '', page: t(r.page), readAt: r.readAt === null || r.readAt === undefined ? null : Number(r.readAt), device: t(r.device),
+    ip: t(r.ip), country: t(r.country), region: t(r.region), city: t(r.city), deviceType: t(r.deviceType), os: t(r.os), osVersion: t(r.osVersion),
+    browser: t(r.browser), browserVersion: t(r.browserVersion), inApp: t(r.inApp), language: t(r.language),
+  };
 }
 
 /** Copy exactly the admin fields out of what the database returned (belt and braces: nothing else can ride along). */

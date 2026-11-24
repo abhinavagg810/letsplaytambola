@@ -1,0 +1,236 @@
+/* /tambola-number-calls: the 90 calls, grouped by tens; prints on a few sheets. */
+
+.printBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  padding: 0 22px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-button-sm);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.printBtn:hover {
+  border-color: var(--text-soft);
+}
+
+.introGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 0 40px;
+}
+
+.h2 {
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.1;
+  font-weight: 800;
+  margin: 32px 0 16px;
+}
+
+.indian {
+  padding: 4px 0 8px;
+}
+
+.indianList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 12px;
+}
+
+.indianItem {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.ball {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--pink);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 800;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+}
+
+.indianCall {
+  display: block;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.indianNote {
+  display: block;
+  margin-top: 4px;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--text-soft);
+}
+
+.decades {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.decade {
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.decadeTitle {
+  padding: 14px 16px 6px;
+  text-align: left;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--marigold);
+}
+
+.table thead th {
+  padding: 6px 12px;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.table tbody th,
+.table td {
+  padding: 9px 12px;
+  border-top: 1px solid var(--surface-2);
+  vertical-align: top;
+  text-align: left;
+}
+
+.table tbody th {
+  width: 56px;
+}
+
+.num {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--marigold);
+  font-weight: 800;
+  font-size: 17px;
+}
+
+.call {
+  font-weight: 700;
+}
+
+.flag {
+  display: block;
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.said {
+  width: 34%;
+  color: var(--text-soft);
+  font-size: 15px;
+}
+
+.tips {
+  margin-top: 16px;
+}
+
+/* ── Paper: a compact black-on-white list ───────────────── */
+@media print {
+  .printBtn,
+  .introGrid,
+  .indian,
+  .tips {
+    display: none !important;
+  }
+
+  .h2 {
+    margin: 0 0 8pt;
+    font-size: 16pt;
+    color: #000;
+  }
+
+  .decades {
+    display: block;
+    columns: 3;
+    column-gap: 14pt;
+  }
+
+  .decade {
+    break-inside: avoid;
+    margin-bottom: 8pt;
+    border: 1px solid #999;
+    border-radius: 6pt;
+    background: #fff;
+  }
+
+  .table {
+    font-size: 9pt;
+    color: #000;
+  }
+
+  .decadeTitle {
+    padding: 4pt 6pt 2pt;
+    font-size: 11pt;
+    color: #000;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tbody th,
+  .table td {
+    padding: 2pt 5pt;
+    border-top: 1px solid #ddd;
+  }
+
+  .num {
+    min-width: 0;
+    height: auto;
+    padding: 0;
+    background: none;
+    color: #000;
+    font-size: 9pt;
+  }
+
+  .flag {
+    display: none;
+  }
+
+  .said {
+    color: #333;
+    font-size: 8pt;
+  }
+}

@@ -30,7 +30,8 @@ const istClock = (ms: number): string => {
   return `${h % 12 === 0 ? 12 : h % 12}:${String(d.getUTCMinutes()).padStart(2, '0')}:${String(d.getUTCSeconds()).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'}`;
 };
 
-export function AdminChrome({ email, minDay, maxDay, children }: { email: string; minDay: string; maxDay: string; children: ReactNode }) {
+/** `badges`: a count to show beside a section, by its href (e.g. unread messages). */
+export function AdminChrome({ email, minDay, maxDay, badges, children }: { email: string; minDay: string; maxDay: string; badges?: Record<string, number>; children: ReactNode }) {
   const pathname = usePathname() ?? '/admin';
   const search = useSearchParams();
   const router = useRouter();
@@ -126,9 +127,15 @@ export function AdminChrome({ email, minDay, maxDay, children }: { email: string
         <div key={group.title} className={styles.navGroup}>
           <div className={styles.navGroupTitle}>{group.title}</div>
           {group.items.map((item) => (
-            <Link key={item.href} href={navHref(item)} prefetch={false} className={styles.navItem} aria-current={section?.href === item.href ? 'page' : undefined} title={item.label} onClick={onNavigate}>
+            <Link key={item.href} href={navHref(item)} prefetch={false} className={styles.navItem} aria-current={section?.href === item.href ? 'page' : undefined} title={badges?.[item.href] ? `${item.label} — ${badges[item.href]} unread` : item.label} onClick={onNavigate}>
               <Icon d={item.icon} />
               <span className={styles.navLabel}>{item.label}</span>
+              {badges?.[item.href] ? (
+                <span className={styles.navBadge}>
+                  {badges[item.href] > 99 ? '99+' : badges[item.href]}
+                  <span className="visually-hidden"> unread</span>
+                </span>
+              ) : null}
             </Link>
           ))}
         </div>

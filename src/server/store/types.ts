@@ -1,5 +1,6 @@
 // Storage contract. Two adapters: memory (local dev, zero setup) and supabase (production).
 import type { GameDoc, PlayerState } from '@/core';
+import type { ContactInput, ContactTopic } from '@/lib/contact';
 import type { CleanBatch } from '../insights/events';
 import type {
   AdminDevice, AdminIp, AdminEvent, AdminParticipation, AuditRow, BreakdownQuery, BreakdownRow, DeviceListQuery, EraseResult, EventListQuery,
@@ -83,6 +84,48 @@ export interface AdminGameRow {
 export interface AdminGamePage { total: number; rows: AdminGameRow[] }
 export interface AdminNotifyRow { phone: string; createdAt: number }
 
+/** One message sent with the contact form, as the admin sees it. Every text field is what the person typed: render it as text. */
+export interface AdminContactMessage {
+  id: number;
+  createdAt: number;
+  topic: ContactTopic;
+  name: string | null;
+  replyTo: string | null;
+  message: string;
+  /** The site page the person came from. */
+  page: string | null;
+  /** When the admin marked it as read; null = unread. */
+  readAt: number | null;
+  /** Short device id (first 8 hex characters of the token hash), or null when the request had no device token. */
+  device: string | null;
+  ip: string | null;
+  country: string | null;
+  region: string | null;
+  city: string | null;
+  deviceType: string | null;
+  os: string | null;
+  osVersion: string | null;
+  browser: string | null;
+  browserVersion: string | null;
+  inApp: string | null;
+  language: string | null;
+}
+export interface ContactListQuery {
+  topic?: ContactTopic;
+  /** Matches the name, reply-to or message (case-insensitive, anywhere). */
+  search?: string;
+  status?: 'read' | 'unread';
+  limit: number;
+  offset: number;
+}
+export interface ContactPage {
+  /** Messages that match the query. */
+  total: number;
+  /** Unread messages in all (any topic, any search). */
+  unread: number;
+  rows: AdminContactMessage[];
+}
+
 export interface PlayerWrite extends PlayerState {
   /** null = a new row (a join; `tokenHash` required). A number = update only if the row still has this rev. */
   rev: number | null;
@@ -162,6 +205,19 @@ export interface GameStore {
   listAudit(limit: number): Promise<AuditRow[]>;
   /** Delete everything tied to a short device id and anonymise its names in stored games. Writes an audit line. */
   eraseDevice(id: string): Promise<EraseResult>;
+
+  // ---- contact form (/contact). 'missing' = the database has not been given supabase/migrations/0004_contact.sql yet.
+  contactStatus(): Promise<'ok' | 'missing'>;
+  /** Store one message with the request's IP / place / device. 'missing' = not stored (migration 0004 not run). Other failures throw. */
+  saveContactMessage(ctx: RequestContext, msg: ContactInput): Promise<'ok' | 'missing'>;
+  /** Admin: one page of messages, newest first (limit capped at ADMIN_MAX_PAGE). Empty when 0004 is missing. */
+  adminListContactMessages(q: ContactListQuery): Promise<ContactPage>;
+  /** Admin: how many messages are unread (0 when 0004 is missing). */
+  adminCountUnreadContact(): Promise<number>;
+  /** Admin: mark as read (true) or unread (false). False when there is no such message. */
+  adminSetContactRead(id: number, read: boolean): Promise<boolean>;
+  /** Admin: delete one message for good and write an audit line. False when there is no such message. */
+  adminDeleteContactMessage(id: number): Promise<boolean>;
 }
 
 /** No free code found after many tries (practically impossible: 28 million codes). */

@@ -32,6 +32,7 @@ export const NAV: NavGroup[] = [
       { href: '/admin/players', label: 'Players', icon: 'M7.5 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2 17c0-3 2.5-5 5.5-5s5.5 2 5.5 5M13.5 9a2.5 2.5 0 1 0-1-4.8M15 12c1.8.5 3 2 3 4.5', ranged: false },
       { href: '/admin/events', label: 'Events', icon: 'M4 5h12M4 10h12M4 15h8', ranged: true },
       { href: '/admin/notify', label: 'Notify me', icon: 'M5 14V9a5 5 0 0 1 10 0v5l1.5 2h-13zM8.5 17.5a1.6 1.6 0 0 0 3 0', ranged: false },
+      { href: '/admin/messages', label: 'Messages', icon: 'M3 5h14v10H3zM3.5 5.5 10 11l6.5-5.5', ranged: false },
     ],
   },
   {

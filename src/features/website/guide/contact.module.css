@@ -1,0 +1,230 @@
+/* /contact: details on the left, the form on the right (stacked on phones). */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 28px;
+  }
+
+  .formCard {
+    position: sticky;
+    top: 90px;
+  }
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px;
+  border-radius: 24px;
+  background: var(--surface);
+  min-width: 0;
+}
+
+.cardTitle {
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.text {
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+.text b {
+  color: var(--text);
+}
+
+.email,
+.email:hover {
+  color: var(--marigold);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+.list b {
+  color: var(--text);
+}
+
+.small {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.info a:not([class]),
+.form a:not([class]),
+.failed a {
+  color: var(--teal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── Form ─────────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.optional {
+  margin-left: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.select,
+.textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-input);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.select {
+  height: 56px;
+  padding: 0 44px 0 18px;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--marigold) 50%), linear-gradient(135deg, var(--marigold) 50%, transparent 50%);
+  background-position: calc(100% - 24px) 50%, calc(100% - 18px) 50%;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+  color-scheme: dark;
+}
+
+.textarea {
+  min-height: 160px;
+  padding: 14px 18px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.select:focus-visible,
+.textarea:focus-visible {
+  border-color: var(--marigold);
+  outline: 3px solid var(--marigold-40);
+  outline-offset: 0;
+}
+
+.select[aria-invalid='true'],
+.textarea[aria-invalid='true'] {
+  border-color: var(--pink);
+}
+
+.textarea::placeholder {
+  color: var(--text-dim);
+}
+
+.count {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.count[data-over='true'] {
+  color: var(--pink-soft);
+  font-weight: 700;
+}
+
+.error {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--pink-soft);
+}
+
+/* The honeypot: off screen, out of the tab order, hidden from screen readers. */
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.failed {
+  padding: 14px 16px;
+  border: 1.5px solid var(--pink);
+  border-radius: 16px;
+  background: rgba(250, 74, 152, 0.12);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.failed:focus {
+  outline: none;
+}
+
+.sent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0 4px;
+}
+
+.sent:focus {
+  outline: none;
+}
+
+.tick {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: var(--ink);
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.sentTitle {
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 800;
+}

@@ -24,7 +24,9 @@ Read before writing anything. v1 (Expo app with accounts) lives on the git branc
 ## Architecture (decided)
 ```
 src/
-  app/                    routes: / , /host , /host/prizes , /join , /g/[code] , /privacy , /terms , not-found
+  app/                    routes: / , /host , /host/prizes , /join , /g/[code] , /privacy , /terms , not-found ,
+                          content pages /about , /contact , /how-to-play , /ways-to-win , /tambola-number-calls (src/features/website/guide)
+    api/contact/route.ts          POST contact-form message (docs/API.md)
     api/games/route.ts            POST create
     api/games/[code]/route.ts     GET  view for this device
     api/games/[code]/act/route.ts POST one action

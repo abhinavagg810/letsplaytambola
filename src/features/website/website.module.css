@@ -914,6 +914,25 @@
   text-wrap: pretty;
 }
 
+.moreLink,
+.moreLink:hover {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 44px;
+  color: var(--teal);
+  font-size: 17px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.moreLink::after {
+  content: '→';
+  margin-left: 6px;
+  text-decoration: none;
+}
+
 .chips {
   display: flex;
   gap: 8px;
@@ -1129,6 +1148,22 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.faqMore {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+.faqMore a {
+  display: inline-block;
+  padding: 10px 0;
+  margin: -10px 0;
+  color: var(--teal);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .faqItem {

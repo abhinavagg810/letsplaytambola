@@ -225,8 +225,16 @@ function trafficNumbers(from, to) {
     const ret = [...hd.values()].filter((s) => s.size >= 2).length;
     eq(k['Returning hosts'].value, pct(ret, hd.size), 'returning hosts');
     const coh = dump['/retention|7d'].tables[0].rows;
-    eq(coh[coh.length - 1].slice(1, 3), ['5', '100%'], 'this week cohort (hand: B, D, E, F, G)');
-    eq(coh[coh.length - 2].slice(1, 4), ['2', '100%', '100%'], 'last week cohort (hand: A, C — both active again this week)');
+    // Cohorts depend on the weekday the suite runs (Monday-based IST weeks), so recompute them from the raw data.
+    const week = (day) => Math.floor((day + 3) / 7), thisWeek = week(today);
+    const cohort = (w, k) => {
+      const members = ins.devices.filter((d) => week(dayIdx(d.firstSeen)) === w);
+      const act = members.filter((d) => [...(active.get(d.tokenHash) || [])].some((x) => week(x) === w + k)).length;
+      return [String(members.length), members.length ? pct(act, members.length) : '—'];
+    };
+    eq(coh[coh.length - 1].slice(1, 3), cohort(thisWeek, 0), 'this week cohort');
+    const [lastSize] = cohort(thisWeek - 1, 0);
+    if (lastSize !== '0') eq(coh[coh.length - 2].slice(1, 4), [...cohort(thisWeek - 1, 0), cohort(thisWeek - 1, 1)[1]], 'last week cohort');
   });
   // ---- players / devices
   await R.run('DATA-13', 'Players: page total = CSV rows = raw device rows; "only devices that played"; lifetime counters; a device with two names; a host who never played', async () => {

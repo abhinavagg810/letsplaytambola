@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
 import { Avatar } from '@/components/Avatar';
 import { Ball } from '@/components/Ball';
@@ -388,6 +389,9 @@ function WaysToWin() {
             From Early Five and Laddoo to Pyramid, Breakfast-Lunch-Dinner and Full House — pick with one tap. Every rule is explained on screen, and every claim is checked
             instantly.
           </p>
+          <Link href="/ways-to-win" className={styles.moreLink}>
+            See all 26 with pictures
+          </Link>
         </div>
         <ul className={styles.chips}>
           {RULES.map((r, i) => (
@@ -449,6 +453,10 @@ function Faq() {
           </details>
         ))}
       </div>
+      <p className={styles.faqMore}>
+        New to Tambola? Read <Link href="/how-to-play">how to play</Link>, the <Link href="/tambola-number-calls">90 number calls</Link> — or{' '}
+        <Link href="/contact">ask us</Link>.
+      </p>
     </section>
   );
 }

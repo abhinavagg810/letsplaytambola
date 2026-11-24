@@ -7,11 +7,11 @@
 \pset format unaligned
 
 -- ------------------------------------------------------------ shape
-select t.ok((select count(*) = 8 from pg_class c join pg_namespace n on n.oid = c.relnamespace
+select t.ok((select count(*) = 9 from pg_class c join pg_namespace n on n.oid = c.relnamespace
               where n.nspname = 'public' and c.relkind = 'r' and c.relrowsecurity),
-            'row level security is enabled on all eight tables');
-select t.ok((select count(*) = 8 from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind = 'r'),
-            'public has exactly eight tables (games, players, notify_numbers, devices, device_ips, participations, events, admin_audit)');
+            'row level security is enabled on all nine tables');
+select t.ok((select count(*) = 9 from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind = 'r'),
+            'public has exactly nine tables (games, players, notify_numbers, devices, device_ips, participations, events, admin_audit, contact_messages — the last from 0004)');
 select t.ok((select count(*) = 0 from pg_policies where schemaname = 'public'), 'there are still no policies at all');
 select t.ok((select count(*) = 0 from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind in ('v', 'm', 'f')),
             'no view, materialized view or foreign table');

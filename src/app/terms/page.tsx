@@ -1,7 +1,7 @@
 // ⚠ DRAFT LEGAL TEXT — NOT REVIEWED BY A LAWYER.
 // Written for v2 (no accounts) from the product facts in docs/design_handoff/README.md and docs/BUILD_NOTES.md.
 // Have a qualified lawyer review it before launch, and replace the placeholders:
-//   • the contact email (CONTACT_EMAIL_PLACEHOLDER in src/features/website/legal.ts)
+//   • the contact email: set NEXT_PUBLIC_CONTACT_EMAIL (CONTACT_EMAIL in src/lib/site.ts; the fallback is a placeholder) and make sure the mailbox works
 //   • the legal name of the business that runs the site (section "about")
 //   • the city whose courts have jurisdiction (section "law")
 // "{email}" in the text is replaced by a mail link.

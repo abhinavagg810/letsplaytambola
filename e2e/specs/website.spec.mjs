@@ -55,8 +55,8 @@ const cases = [
   },
   {
     id: 'WEB-03', area: 'Website', priority: 'P0', type: 'functional',
-    title: 'Mobile menu: opens, lists the three items (no "Questions"), closes on tap, Escape and navigation',
-    steps: 'At 360px: tap Menu; read the rows; tap Close; open again and press Escape; open and tap "Join a game with a code"; open and tap "How it works"', expected: 'Rows "Join a game with a code", "How it works", "Features" (≥ 54px tall); aria-expanded follows; navigation closes the menu; How it works scrolls to the section',
+    title: 'Mobile menu: opens, lists the home sections, the guides, About and Contact, closes on tap, Escape and navigation',
+    steps: 'At 360px: tap Menu; read the rows; tap Close; open again and press Escape; open and tap "Join a game with a code"; open and tap "How it works"', expected: 'Rows "Join a game with a code", "How it works", "Features", "How to play", "Ways to win", "Number calls", "About us", "Contact" (≥ 54px tall); aria-expanded follows; navigation closes the menu; How it works scrolls to the section',
     run: async (t) => {
       const page = await t.device('android');
       await go(page, '/');
@@ -65,7 +65,7 @@ const cases = [
       equal(await menu.getAttribute('aria-expanded'), 'false', 'closed at first');
       await menu.click();
       const rows = page.locator('#site-menu a');
-      equal(await rows.allInnerTexts(), ['Join a game with a code', 'How it works', 'Features'], 'menu rows');
+      equal(await rows.allInnerTexts(), ['Join a game with a code', 'How it works', 'Features', 'How to play', 'Ways to win', 'Number calls', 'About us', 'Contact'], 'menu rows');
       for (const box of await rows.evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height))) check(box >= 54, `menu row is ${box}px tall`);
       equal(await page.getByRole('button', { name: 'Close' }).getAttribute('aria-expanded'), 'true', 'aria-expanded when open');
       await page.getByRole('button', { name: 'Close' }).click();
@@ -88,14 +88,14 @@ const cases = [
   },
   {
     id: 'WEB-04', area: 'Website', priority: 'P1', type: 'functional',
-    title: 'Desktop header: logo, How it works, Features, Join a game, Host a game; sticky',
-    steps: 'At 1280px read the header links; scroll down 2000px; click each', expected: 'Four items + logo; no Menu button; header stays at the top; pills are 44px tall; each link lands on the right place',
+    title: 'Desktop header: logo, How it works, Features, How to play, About, Join a game, Host a game; sticky',
+    steps: 'At 1280px read the header links; scroll down 2000px; click each', expected: 'Six items + logo; no Menu button; header stays at the top; pills are 44px tall; each link lands on the right place',
     run: async (t) => {
       const page = await t.device('desktop');
       await go(page, '/');
       await hydrated(page);
       const nav = page.getByRole('navigation', { name: 'Main' });
-      equal(await nav.getByRole('link').allInnerTexts(), ['How it works', 'Features', 'Join a game', 'Host a game'], 'nav items');
+      equal(await nav.getByRole('link').allInnerTexts(), ['How it works', 'Features', 'How to play', 'About', 'Join a game', 'Host a game'], 'nav items');
       check(!(await page.getByRole('button', { name: 'Menu' }).isVisible()), 'the Menu button shows on desktop');
       for (const name of ['Join a game', 'Host a game']) {
         const h = await nav.getByRole('link', { name }).evaluate((e) => e.getBoundingClientRect().height);
@@ -290,7 +290,7 @@ const cases = [
       for (const line of ['User-Agent: *', 'Allow: /', 'Disallow: /g/', 'Disallow: /api/', 'Disallow: /admin', 'Sitemap: ']) check(robots.includes(line), `robots.txt lacks "${line}":\n${robots}`);
       const xml = await (await fetch(BASE + '/sitemap.xml')).text();
       const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname).sort();
-      equal(locs, ['/', '/host', '/join', '/privacy', '/terms'], 'sitemap addresses');
+      equal(locs, ['/', '/about', '/contact', '/host', '/how-to-play', '/join', '/privacy', '/tambola-number-calls', '/terms', '/ways-to-win'], 'sitemap addresses');
       t.note(robots.replace(/\n/g, ' | '));
     },
   },
@@ -314,7 +314,7 @@ const cases = [
   {
     id: 'WEB-12', area: 'Website', priority: 'P1', type: 'functional',
     title: 'Privacy and Terms describe v2 (names, device token, 24 hours, Notify-me numbers) and nothing from v1',
-    steps: 'Read /privacy and /terms', expected: 'They mention: the name you type, a device token, deletion after 24 hours, Notify-me phone numbers, no payments. They do NOT mention OTP, Google/Apple sign-in, contacts, friends lists. Footer "Contact" → /privacy#contact exists',
+    steps: 'Read /privacy and /terms', expected: 'They mention: the name you type, a device token, deletion after 24 hours, Notify-me phone numbers, no payments. They do NOT mention OTP, Google/Apple sign-in, contacts, friends lists. /privacy#contact exists; footer "Contact" → /contact',
     run: async (t) => {
       const page = await t.device('android');
       await go(page, '/privacy');
@@ -322,6 +322,7 @@ const cases = [
       for (const must of [/name/i, /device/i, /24 hours/i, /WhatsApp|mobile number|phone number/i]) check(must.test(privacy), `privacy page does not mention ${must}`);
       for (const mustNot of [/\bOTP\b/i, /Google sign|Apple sign|sign in with/i, /upload(ed)? your contacts|access to your contacts|address book/i, /friends list/i]) check(!mustNot.test(privacy), `privacy page still mentions ${mustNot} (v1)`);
       equal(await page.locator('#contact').count(), 1, '#contact anchor');
+      equal(await page.locator('footer').getByRole('link', { name: 'Contact', exact: true }).getAttribute('href'), '/contact', 'footer Contact link');
       await go(page, '/terms');
       const terms = await text(page);
       for (const must of [/real money|payments|never handles/i, /entertainment/i]) check(must.test(terms), `terms page does not mention ${must}`);

@@ -10,8 +10,9 @@ const NARROW_PAD = { padding: '0 16px' };
 
 /**
  * The shared sticky header (every page).
- * Desktop (≥ 860px): logo · How it works · Features · "Join a game" outline pill · "Host a game" marigold pill.
- * Mobile: logo · "Host" pill · "Menu" pill that opens the list under the header.
+ * Desktop (≥ 860px): logo · How it works · Features · How to play · About · "Join a game" outline pill · "Host a game" marigold pill
+ * (Features and About from 1040px, so the row never crowds; both are also in the footer).
+ * Mobile: logo · "Host" pill · "Menu" pill that opens the list under the header: join, the home sections, the guides, About, Contact.
  * No props. See docs/COMPONENTS.md.
  */
 export function SiteHeader() {
@@ -37,8 +38,14 @@ export function SiteHeader() {
           <Link href="/#how" className={styles.link}>
             How it works
           </Link>
-          <Link href="/#features" className={styles.link}>
+          <Link href="/#features" className={`${styles.link} ${styles.roomy}`}>
             Features
+          </Link>
+          <Link href="/how-to-play" className={styles.link}>
+            How to play
+          </Link>
+          <Link href="/about" className={`${styles.link} ${styles.roomy}`}>
+            About
           </Link>
           <Pill href="/join" variant="outline-light">
             Join a game
@@ -66,6 +73,21 @@ export function SiteHeader() {
           </Link>
           <Link href="/#features" className={styles.row} onClick={close}>
             Features
+          </Link>
+          <Link href="/how-to-play" className={styles.row} onClick={close}>
+            How to play
+          </Link>
+          <Link href="/ways-to-win" className={styles.row} onClick={close}>
+            Ways to win
+          </Link>
+          <Link href="/tambola-number-calls" className={styles.row} onClick={close}>
+            Number calls
+          </Link>
+          <Link href="/about" className={styles.row} onClick={close}>
+            About us
+          </Link>
+          <Link href="/contact" className={styles.row} onClick={close}>
+            Contact
           </Link>
         </nav>
       ) : null}

@@ -439,7 +439,9 @@ const cases = [
           const f = await s.page.evaluate(() => {
             const e = document.activeElement;
             if (!e || e === document.body) return null;
-            const st = getComputedStyle(e);
+            // A control drawn inside a box (the +91 phone field) shows its ring on that box (:focus-within): read the box then.
+            const box = e.tagName === 'INPUT' && getComputedStyle(e).outlineStyle === 'none' && e.parentElement?.matches(':focus-within') ? e.parentElement : e;
+            const st = getComputedStyle(box);
             const r = e.getBoundingClientRect();
             return { key: `${e.tagName}:${(e.getAttribute('aria-label') || e.textContent || e.getAttribute('name') || '').trim().slice(0, 24)}:${Math.round(r.top + window.scrollY)}`, outline: st.outlineStyle !== 'none' ? parseFloat(st.outlineWidth) : 0, shadow: st.boxShadow !== 'none' && /\d+px \d+px \d+px [1-9]/.test(st.boxShadow), visible: r.width > 0 && r.height > 0 };
           });

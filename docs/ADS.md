@@ -10,7 +10,7 @@ Ads are **off** until `NEXT_PUBLIC_ADSENSE_CLIENT` is set. Nothing about the sit
 | Results | Under the Play again / Host my own buttons with a gap, above the winners on phones | `NEXT_PUBLIC_ADSENSE_SLOT_RESULTS` |
 
 **Owner's rule: no ads during the game.** There is no placement on the live game screen and none may be added.
-Also none on the home page, host setup, ways to win, join pages, legal pages or admin.
+Also none on the home page, host setup, ways to win, join pages, legal pages, the content pages (/about, /contact, /how-to-play, /ways-to-win, /tambola-number-calls) or admin.
 Keep **Auto ads switched off** in AdSense — Auto ads place themselves anywhere, including the live game.
 
 **Ad views in the admin:** Admin → Engagement → "Ad views" counts an ad as seen when at least half of it is on screen

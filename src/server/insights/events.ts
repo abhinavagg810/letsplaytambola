@@ -2,6 +2,7 @@
 // not listed for its event, or has the wrong type, length or value, is dropped. Nothing free-form is ever stored.
 // Pure (no I/O) so it is unit-tested and shared by POST /api/t and the tests.
 import { isGameCode } from '@/core';
+import { CONTACT_TOPIC_IDS } from '@/lib/contact';
 
 type Spec =
   | { t: 'enum'; v: readonly string[] }
@@ -14,10 +15,10 @@ const str = (max: number, re?: RegExp): Spec => ({ t: 'str', max, re });
 const int = (min: number, max: number): Spec => ({ t: 'int', min, max });
 const bool: Spec = { t: 'bool' };
 
-export const PAGES = ['home', 'host', 'host_prizes', 'join', 'privacy', 'terms', 'game_invite', 'game_finished', 'game_lobby', 'game_live', 'game_results', 'not_found', 'other'] as const;
+export const PAGES = ['home', 'host', 'host_prizes', 'join', 'privacy', 'terms', 'about', 'contact', 'how_to_play', 'guide_ways', 'number_calls', 'game_invite', 'game_finished', 'game_lobby', 'game_live', 'game_results', 'not_found', 'other'] as const;
 export const ROLES = ['host', 'player', 'visitor'] as const;
 /** Why a create / join / claim was refused: the API's own error codes. */
-export const REASONS = ['forbidden', 'invalid', 'state', 'not_yet', 'taken', 'full', 'no_token', 'bad_request', 'not_found', 'rate_limited', 'busy', 'server', 'network', 'other'] as const;
+export const REASONS = ['forbidden', 'invalid', 'state', 'not_yet', 'taken', 'full', 'no_token', 'bad_request', 'not_found', 'rate_limited', 'busy', 'server', 'network', 'unavailable', 'other'] as const;
 /** Classes of message shown in a toast. The text itself is never sent. */
 export const TOAST_CLASSES = ['need_name', 'need_prize', 'need_code', 'no_players', 'not_yet', 'taken', 'not_called', 'not_on_ticket', 'network', 'rate_limited', 'server', 'not_found', 'finished', 'full', 'host_only', 'copy_failed', 'notify_failed', 'info', 'other'] as const;
 
@@ -54,6 +55,8 @@ export const EVENTS: Record<string, Record<string, Spec>> = {
   game_start: {}, first_call: {}, auto_on: {}, auto_off: {}, mute_on: {}, mute_off: {},
   claim_open: {}, claim_valid: { prize: str(16, /^[a-z0-9]+$/), called: int(0, 90) }, claim_invalid: { prize: str(16, /^[a-z0-9]+$/), reason: en('not_yet', 'taken', 'other') },
   new_round: {}, results_seen: { role: en(...ROLES) }, host_own_tap: {},
+  // the contact form (/contact): the topic chosen, or why sending failed — never what was typed
+  contact_sent: { topic: en(...CONTACT_TOPIC_IDS) }, contact_failed: { reason: en(...REASONS) },
   // ads: an ad slot was at least half on screen for a second (once per slot per page view)
   ad_seen: { slot: en('lobby_player', 'lobby_host', 'results') },
   // problems

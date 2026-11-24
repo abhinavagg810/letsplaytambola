@@ -1,0 +1,197 @@
+/* /ways-to-win: jump list, pattern cards with a mini ticket each. */
+
+.jump {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 14px;
+  padding: 18px;
+  border-radius: 24px;
+  background: var(--surface);
+}
+
+.jumpGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.jumpHead,
+.jumpHead:hover {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--marigold);
+  text-decoration: none;
+}
+
+.jumpList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.jumpLink,
+.jumpLink:hover {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.jumpLink:hover {
+  border-color: var(--marigold);
+}
+
+.howTo {
+  margin: 24px 0 0;
+  padding: 16px 18px;
+  border: 1px solid var(--marigold-40);
+  border-radius: 18px;
+  background: var(--marigold-14);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.howTo b {
+  color: var(--marigold);
+}
+
+.group {
+  padding-top: 40px;
+  scroll-margin-top: 90px;
+}
+
+.groupHead {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.groupTitle {
+  font-size: clamp(30px, 4vw, 40px);
+  line-height: 1.05;
+  font-weight: 800;
+}
+
+.groupIntro {
+  max-width: 720px;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 24px;
+  background: var(--surface);
+  scroll-margin-top: 90px;
+}
+
+.card:target {
+  outline: 3px solid var(--marigold);
+}
+
+.cardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cardTitle {
+  font-size: 24px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.level {
+  padding: 3px 10px;
+  border: 1.5px solid var(--teal);
+  border-radius: 999px;
+  color: var(--teal);
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.level[data-level='Medium'] {
+  border-color: var(--marigold);
+  color: var(--marigold);
+}
+
+.level[data-level='Takes longer'] {
+  border-color: var(--pink-soft);
+  color: var(--pink-soft);
+}
+
+.rule {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.ruleLabel {
+  margin-right: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.figure .mini {
+  /* A deeper pink than a live ticket's dab, so the white numbers pass contrast at this small size. */
+  --dab-color: #d0206f;
+  --cell-font: 16px;
+  --dab-size: 82%;
+}
+
+.caption {
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.text {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+@media print {
+  .jump {
+    display: none;
+  }
+
+  .card {
+    break-inside: avoid;
+  }
+}

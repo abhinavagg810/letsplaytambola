@@ -25,6 +25,7 @@ tiles), the time the numbers were loaded, **Refresh** and **Sign out**. The rang
 | `/admin/players/ID` — **Player detail** | Everything about one device: activity, where and on what, how it first arrived, every IP address seen, names used, games, and its session and event history. Buttons: its events, **Erase this device**. |
 | `/admin/events` — **Events** | Every usage event of the period: filter by event, device, game; 50 per page; **Export CSV**. |
 | `/admin/notify` — **Notify me** | The WhatsApp numbers left on the website, with the date. **Export CSV**. |
+| `/admin/messages` — **Messages** | What people sent with the form on `/contact`, newest first: received (IST, with "how long ago" on hover), unread / read, topic, name, reply-to (with a copy button), a preview of the message, place and device. **Read all** opens the full message with the page they came from, IP address, language, device id and a "Write back by email" link. Quick filters (Unread, each topic), search (name, email / phone, words in the message), status filter, **Mark read / Mark unread**, **Delete…** (asks first; leaves an audit line with the message number and topic only), **Export CSV**. The sidebar shows the number of unread messages. Names and messages are what people typed: they are always shown as plain text. |
 | `/admin/privacy` — **Data & privacy** | Rows stored per table and how long each is kept, who can see what, **Erase a device**, and the audit list of erases. |
 
 Every chart has a **Chart / Table** switch and a **CSV** button with the same numbers; every table has an export. The pages
@@ -78,7 +79,8 @@ not found), `cta_host`, `cta_join`, `cta_code`, `cta_notify`, `host_name_typed`,
 `share_header_copy`, `join_name_typed`, `join_tap`, `join_ok`, `join_failed` (+ reason), `game_not_found`, `game_start`,
 `first_call`, `auto_on` / `auto_off`, `mute_on` / `mute_off`, `claim_open`, `claim_valid` (+ prize, numbers called),
 `claim_invalid` (+ prize, reason), `new_round`, `results_seen` (+ role), `host_own_tap`, `toast` (the *kind* of message
-shown — never its text), `offline` / `online`. Nothing a person types is recorded, and never a ticket or a dab.
+shown — never its text), `offline` / `online`, `contact_sent` (+ topic), `contact_failed` (+ reason). Page views also cover the
+content pages (about, contact, how to play, ways to win guide, number calls). Nothing a person types is recorded, and never a ticket or a dab.
 
 ## Switch it on
 
@@ -104,8 +106,8 @@ every admin API answers 404.
 
 ### On Vercel
 1. Run the SQL files your Supabase project has not had yet, once each, in the Supabase **SQL Editor**:
-   `supabase/migrations/0002_admin.sql` (the admin panel) and `supabase/migrations/0003_insights.sql` (IP / location,
-   devices, events). The exact steps are in `supabase/README.md`.
+   `supabase/migrations/0002_admin.sql` (the admin panel), `supabase/migrations/0003_insights.sql` (IP / location,
+   devices, events) and `supabase/migrations/0004_contact.sql` (the contact form and Messages). The exact steps are in `supabase/README.md`.
 2. Vercel → your project → **Settings → Environment Variables**.
 3. Add `ADMIN_EMAIL` with your email. Environment: **Production**.
 4. Add `ADMIN_PASSWORD` with your password. Tick **Sensitive** (Vercel then never shows the value again). Environment: **Production**.
@@ -129,7 +131,8 @@ Delete `ADMIN_EMAIL` or `ADMIN_PASSWORD` and redeploy.
 | Up to 90 days after the last activity | A **summary** stays for the admin: game name, the names people typed, numbers called, who won what, ticket price, times, and an anonymous device identifier per seat. The game's code is not given to a new game during this time. |
 | After 90 days | The summary and the device identifiers are **deleted for good**. |
 | IP addresses, places, device rows, events | Kept **90 days** after they were last touched (a device: after it was last seen; an event: after it happened), then **deleted for good** by the same clean-up. |
-| Audit lines (erases) | Kept. They hold a short device id and counts only. |
+| Contact-form messages | Kept **90 days** after they arrived, then **deleted for good** by the same clean-up (`purge_contact`, run by `purge_expired_games`). Delete one sooner from **Messages**. |
+| Audit lines (erases, deleted messages) | Kept. They hold a short device id and counts, or a message number and topic — never what a message said. |
 
 The 90 days is one constant: `ADMIN_RETENTION_DAYS` in `src/server/store/types.ts`, matched by `admin_retention_days()` and
 the defaults of `purge_expired_games(p_retention_days)` and `purge_insights(p_retention_days)` in `supabase/migrations/`.
@@ -176,7 +179,7 @@ To remove a Notify-me number: `delete from public.notify_numbers where phone = '
 - **Every admin page and every admin API route checks the cookie on the server on every request.** A check in front of the
   pages (`src/proxy.ts`) additionally turns a signed-out visit into a real redirect to the sign-in page; it is a
   convenience, not the lock.
-- **CSRF:** every state-changing route (sign in, sign out, refresh, erase a device) accepts JSON only and requires an
+- **CSRF:** every state-changing route (sign in, sign out, refresh, erase a device, mark / delete a message) accepts JSON only and requires an
   `Origin` header that matches the site. Everything else in the admin is read-only.
 - **IP addresses and places are admin-only.** They are written after the response has been sent and are never part of any
   public page or API answer; `npm test` serialises every public view and response and checks for them.
@@ -200,6 +203,8 @@ All need the session cookie, except sign-in. All answer `404` when the admin is 
 | `GET /api/admin/games/CODE` | One play as JSON: the public game document, short device ids, computed facts, and `insights` (people's IP / place / device, usage events). No tickets, no dabs. |
 | `GET /api/admin/games.csv?…` | The same filter as a CSV file, every page, up to 5,000 rows. |
 | `GET /api/admin/notify.csv` | The Notify-me numbers as a CSV file. |
+| `POST /api/admin/messages` `{ "action": "read" / "unread" / "delete", "id": 12 }` | Mark a contact message read / unread, or delete it (with an audit line). `200 { ok }` · `404` no such message · `409` migration 0004 not run. JSON + same-origin only. |
+| `GET /api/admin/messages.csv?topic=&q=&status=` | The Messages filter as a CSV file, up to 5,000 rows. Every cell a spreadsheet could read as a formula is defused with a leading `'`. |
 | `GET /api/admin/players.csv?q=&played=&sort=&dir=` | The devices table as a CSV file (with latest IP address and location), up to 5,000 rows. |
 | `GET /api/admin/events.csv?range=&from=&to=&name=&device=&code=&session=` | The events explorer's filter as a CSV file, up to 5,000 rows. |
 | `POST /api/admin/refresh` `{}` | Forget the 30-second cache of aggregates. JSON + same-origin only. |
@@ -219,7 +224,16 @@ All need the session cookie, except sign-in. All answer `404` when the admin is 
 | `src/lib/track.ts`, `src/lib/TrackPageViews.tsx`, `src/app/api/t/route.ts` | The browser side of the usage events and the endpoint that takes them |
 | `src/app/admin/**`, `src/app/api/admin/**`, `src/features/admin/**` | Pages, API routes, components (`Chrome`, `charts`, `client`, `bits`) and styles (`ui.module.css`) |
 | `src/proxy.ts` | The redirect in front of the admin pages |
-| `supabase/migrations/0002_admin.sql`, `0003_insights.sql`, `supabase/tests/*` | Retention, admin SQL functions, analytics tables and aggregates, and their tests |
+| `src/lib/contact.ts`, `src/server/contact.ts`, `src/server/admin/messages.ts`, `src/app/admin/(panel)/messages`, `src/app/api/admin/messages*`, `src/features/admin/messages.tsx` | The contact form's checks, its endpoint, and Admin → Messages |
+| `supabase/migrations/0002_admin.sql`, `0003_insights.sql`, `0004_contact.sql`, `supabase/tests/*` | Retention, admin SQL functions, analytics tables and aggregates, and their tests |
+
+## If the site is deployed before migration 0004 has been run
+
+The contact form does **not** pretend to work: a message cannot be stored, so the person sees "Your message was not sent.
+Please email us instead at …" with the contact email, and what they typed stays in the form. The server log says
+`run supabase/migrations/0004_contact.sql`. **Messages** shows **"Run migration 0004 to switch the contact form on"**; Mark /
+Delete answer that they need the migration; nothing else in the admin or the games changes. Run the file
+(`supabase/README.md`) and the form works at once.
 
 ## If the site is deployed before migration 0003 has been run
 

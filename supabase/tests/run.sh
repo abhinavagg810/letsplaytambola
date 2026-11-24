@@ -37,6 +37,10 @@ sql < tests/insights.sql
 fresh
 sql < tests/helpers.sql
 sql < tests/insights_parity.sql | tail -n 1
+# The contact form (migration 0004): lock-down from pg_catalog, writes and reads as the service role, delete + audit, purge.
+fresh
+sql < tests/helpers.sql
+sql < tests/contact.sql
 # What the site meets when 0003 has NOT been run yet: the first two migrations alone must still pass their own checks.
 run -X -q -d postgres -c "drop database if exists $DB" -c "create database $DB"
 sql < tests/stub_supabase.sql
@@ -44,6 +48,11 @@ sql < migrations/0001_init.sql
 sql < migrations/0002_admin.sql
 sql -c "set role service_role" -c "select purge_expired_games()" -c "select admin_list_games()" > /dev/null
 echo "ok   migrations 0001 + 0002 alone still work (0003 not yet run)"
+# ...and the database the site meets before 0004 has been run: 0001–0003 work, and the contact functions are simply absent.
+sql < migrations/0003_insights.sql
+sql -c "set role service_role" -c "select purge_expired_games()" -c "select insights_version()" > /dev/null
+[ "$(run -X -q -At -d "$DB" -c "select to_regprocedure('public.save_contact_message(jsonb,text,text,text,text,text)') is null")" = t ] || { echo "FAILED: save_contact_message exists without 0004" >&2; exit 1; }
+echo "ok   migrations 0001–0003 alone still work (0004 not yet run)"
 # QA (docs/qa/TEST_PLAN_ADMIN.md, MIG-*): a fresh database; each migration applied a SECOND time must stop
 # with a clear "already exists" error and change nothing; then the lock-down is checked from pg_catalog, object by object.
 fresh

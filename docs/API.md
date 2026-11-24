@@ -29,6 +29,7 @@ Success: `{ ok: true, … }`. Failure: `{ ok: false, error, code }` where `error
 | `POST /api/games/:code/act` | `GameAction` | `200 { ok, game: GameView }` (the fresh view for this device) | token required |
 | `POST /api/notify` | `{ phone }` — an Indian mobile number: 10 digits starting 6–9; spaces, dashes and a leading `+91` / `0` are ignored | `200 { ok }` | token optional. Anything else: `400 invalid` "Please type a 10-digit Indian mobile number (it starts with 6, 7, 8 or 9)" |
 | `POST /api/t` | a batch of usage events (below) | `204`, no body | token optional; see “Usage events” |
+| `POST /api/contact` | `{ topic, message, name?, replyTo?, page?, website? }` | `200 { ok }` | token optional; see “Contact form” |
 
 `:code` is case-insensitive.
 
@@ -54,6 +55,7 @@ Success: `{ ok: true, … }`. Failure: `{ ok: false, error, code }` where `error
 | GET view | 240 / min | 6000 / min |
 | notify | 5 / hour | 20 / hour |
 | track (`/api/t`) | 120 / min | 1200 / min |
+| contact (`/api/contact`) | 5 / hour | 20 / hour |
 
 ## Usage events — `POST /api/t`
 First-party analytics for the operator's admin panel (`docs/ADMIN.md`). No third-party service, no cookie.
@@ -87,6 +89,32 @@ seconds, when 20 events wait, and when the tab is hidden or closed (`navigator.s
 `keepalive`). It never throws and does nothing on the server, on `/admin`, or when the request is blocked.
 `<TrackPageViews />` in the root layout starts a session and counts page views; `src/lib/api.ts` reports the funnel
 steps that go through the API (create, join, start, first call, auto-call, claims, new round) and what a game page shows.
+
+## Contact form — `POST /api/contact`
+The form on `/contact` (`src/features/website/guide/ContactForm.tsx`). Validation is shared by the browser and the server
+(`src/lib/contact.ts`); the server (`src/server/contact.ts`) checks, in this order:
+
+1. `Content-Type: application/json` (else `415`) and an `Origin` that names this site (else `403`) — the same check as the admin's CSRF guard.
+2. Rate limit, per device token and per IP address (else `429` "You have sent a few messages already — please wait an hour and try again").
+3. Body at most 8 KB in **bytes** (else `413`), valid UTF-8 JSON object (else `400 bad_request`).
+4. Honeypot: if the hidden field `website` is filled in, the answer is `200 { ok: true }` and **nothing is stored**.
+5. Fields, after trimming and removing control, zero-width and text-direction characters (new lines are kept in the message):
+
+| Field | Rule | Error (in `fields`) |
+|---|---|---|
+| `topic` | one of `help`, `feedback`, `remove`, `business`, `other` | "Please choose what your message is about" |
+| `message` | 10–2,000 characters (an emoji counts as one) | "Please write a little more — at least 10 characters" / "Please keep your message to 2,000 characters or fewer" |
+| `name` | optional, ≤ 60 | "Please keep your name to 60 letters or fewer" |
+| `replyTo` | optional, ≤ 80; an email address or a phone number with 7–15 digits | "Please type an email address or a phone number we can reply to — or leave it empty" |
+| `page` | optional: a path on this site; anything else is dropped | – |
+
+   A refusal is `400 { ok:false, code:'invalid', error:'Please check the form', fields }` — fixed sentences; the input is never echoed.
+6. Store the message with the request's IP address, place and device (headers only — `requestContext()`), and the device token's hash.
+   `200 { ok: true }` only when it was stored. If the database has not been given `supabase/migrations/0004_contact.sql`:
+   `503 { ok:false, code:'unavailable', error:'Sorry, we could not send your message just now. Please email us at <CONTACT_EMAIL> instead.' }`
+   (a database failure: the same text with `500 server`). The form then keeps what was typed and shows the email address.
+
+The browser records `contact_sent` (topic) or `contact_failed` (reason) as usage events — never what was typed.
 
 ## Types (`src/core/types.ts`)
 ```ts
@@ -279,7 +307,7 @@ Useful from `@/core`: `RULES`, `RULE_GROUPS`, `PRESETS`, `matchPreset`, `prizeSu
 | Keeps games | in the Node process (`globalThis`, survives dev hot reload, lost on restart) | Postgres (`supabase/migrations/0001_init.sql`) |
 | Good for | `npm run dev`, a game on the home Wi-Fi, tests | production / Vercel |
 
-Interface: `create` (unique code), `load` (null when missing or expired), `commit` (compare-and-swap → `'ok' | 'conflict'`), `touch`, `saveNotifyNumber`, `purge`, the admin reads, and the insights (`trackBatch`, `recordParticipation`, `recordWin`, the aggregates, `eraseDevice` — see `src/server/store/types.ts`).
+Interface: `create` (unique code), `load` (null when missing or expired), `commit` (compare-and-swap → `'ok' | 'conflict'`), `touch`, `saveNotifyNumber`, `purge`, the admin reads, the contact messages (`contactStatus`, `saveContactMessage`, `adminListContactMessages`, `adminCountUnreadContact`, `adminSetContactRead`, `adminDeleteContactMessage`), and the insights (`trackBatch`, `recordParticipation`, `recordWin`, the aggregates, `eraseDevice` — see `src/server/store/types.ts`).
 
 ## Tests
 - `npm test` — Vitest: tickets (2,000 seeded), all 26 patterns (checked against `data/winning-patterns.json`), engine flow and permissions, per-device views, the memory store and service (conflict retries, simultaneous claims, expiry), the `useGame` session logic, share helpers.
@@ -287,5 +315,5 @@ Interface: `create` (unique code), `load` (null when missing or expired), `commi
 - `npm run smoke` — plays a whole game over HTTP against a running server (`BASE_URL`, default `http://localhost:8200`).
 
 ## Admin API
-The operator's admin panel has its own routes under `/api/admin/*` (sign-in, plays / players / events as CSV, erase a device, "Notify me" CSV).
+The operator's admin panel has its own routes under `/api/admin/*` (sign-in, plays / players / events as CSV, erase a device, "Notify me" CSV, contact messages: actions and CSV).
 They need the admin session cookie and are documented in `docs/ADMIN.md`. They answer 404 when the admin is switched off.

@@ -92,7 +92,10 @@ export function flush(closing?: unknown): void {
 
 // ---------------------------------------------------------------- pages
 
-const PAGES: Record<string, string> = { '/': 'home', '/host': 'host', '/host/prizes': 'host_prizes', '/join': 'join', '/privacy': 'privacy', '/terms': 'terms' };
+const PAGES: Record<string, string> = {
+  '/': 'home', '/host': 'host', '/host/prizes': 'host_prizes', '/join': 'join', '/privacy': 'privacy', '/terms': 'terms',
+  '/about': 'about', '/contact': 'contact', '/how-to-play': 'how_to_play', '/ways-to-win': 'guide_ways', '/tambola-number-calls': 'number_calls',
+};
 let lastPage = '';
 
 /** A page view of a normal page. Game pages (/g/CODE) are counted by what they show: see trackGameView. */

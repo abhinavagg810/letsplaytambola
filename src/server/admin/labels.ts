@@ -46,6 +46,7 @@ export const screenLabel = (key: string): string => (key ? SCREEN_NAMES[key] ?? 
 
 const PAGE_NAMES: Record<string, string> = {
   home: 'Home', host: 'Host setup', host_prizes: 'Ways to win', join: 'Join with a code', privacy: 'Privacy Policy', terms: 'Terms of Use',
+  about: 'About us', contact: 'Contact us', how_to_play: 'Guide: How to play', guide_ways: 'Guide: All ways to win', number_calls: 'Guide: Number calls',
   game_invite: 'Game: invite (not joined)', game_finished: 'Game: finished (not joined)', game_lobby: 'Game: lobby', game_live: 'Game: live', game_results: 'Game: results',
   not_found: 'Game not found', other: 'Other page',
 };
@@ -60,6 +61,7 @@ const EVENT_NAMES: Record<string, string> = {
   join_name_typed: 'Join: name typed', join_tap: 'Join: “Join game” tapped', join_ok: 'Join: joined', join_failed: 'Join: failed', game_not_found: 'Join: game not found',
   game_start: 'Game: started', first_call: 'Game: first number called', auto_on: 'Game: auto-call on', auto_off: 'Game: auto-call off', mute_on: 'Sound off', mute_off: 'Sound on',
   claim_open: 'Claim: sheet opened', claim_valid: 'Claim: valid', claim_invalid: 'Claim: not valid', new_round: 'Game: new round', results_seen: 'Results seen', ad_seen: 'Ad seen',
+  contact_sent: 'Contact: message sent', contact_failed: 'Contact: sending failed',
   host_own_tap: '“Host my own game” tapped', toast: 'Message shown', offline: 'Went offline', online: 'Back online',
 };
 export const eventLabel = (name: string): string => EVENT_NAMES[name] ?? name;

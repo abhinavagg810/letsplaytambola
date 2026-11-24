@@ -34,14 +34,32 @@ npm start
 2. Import this repo in Vercel (framework: Next.js, default settings) and add the environment variables listed in `.env.example`.
 3. Deploy. Without Supabase the deployed site cannot keep games, because Vercel's servers do not share memory.
 
+## Pages
+
+| Address | What |
+|---|---|
+| `/` | Home page |
+| `/host`, `/host/prizes`, `/join`, `/g/CODE` | Host setup, ways to win picker, join with a code, the game |
+| `/how-to-play` | Guide: how to play Tambola (Housie) and how to host a game here |
+| `/ways-to-win` | Guide: all 26 patterns with a picture of each (from `src/core/data.ts` + `miniCells()`) |
+| `/tambola-number-calls` | Guide: the 90 number calls the caller uses, printable |
+| `/about` | About us: the Letsplaytambola team, Delhi, India |
+| `/contact` | Contact us: the email address and a message form (stored for Admin → Messages) |
+| `/privacy`, `/terms` | Privacy Policy and Terms of Use (draft for a lawyer's review) |
+
+The content pages are static Server Components with no ads. The contact email is one setting, `NEXT_PUBLIC_CONTACT_EMAIL`
+(`.env.example`); without it the placeholder `hello@letsplaytambola.com` is shown — make sure the mailbox you show works.
+The contact form stores messages only once `supabase/migrations/0004_contact.sql` has been run (`supabase/README.md`); before
+that it tells people their message was not sent and shows the email address instead.
+
 ## Admin panel
 
 `/admin` is a private area for the person who runs the site: an analytics dashboard (visitors, where they come from and
 where they are, devices, funnels, engagement, retention), the list of plays, play and player details with IP address and
-approximate location, an events explorer, the "Notify me" numbers, and a Data & privacy page with "Erase a device".
+approximate location, an events explorer, the "Notify me" numbers, the contact-form Messages, and a Data & privacy page with "Erase a device".
 It is switched off until you set `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
 How to switch it on, what it shows, what is captured and how it is protected: `docs/ADMIN.md`.
-With Supabase, run `supabase/migrations/0003_insights.sql` once for the analytics (`supabase/README.md`).
+With Supabase, run `supabase/migrations/0003_insights.sql` once for the analytics and `0004_contact.sql` once for the contact form (`supabase/README.md`).
 
 ## Check it
 
@@ -90,9 +108,9 @@ BASE_URL=http://localhost:3000 npm run e2e
 
 | Path | What |
 |---|---|
-| `src/app/` | Routes: `/`, `/host`, `/host/prizes`, `/join`, `/g/[code]`, `/privacy`, `/terms`, and the API under `/api` |
+| `src/app/` | Routes: `/`, `/host`, `/host/prizes`, `/join`, `/g/[code]`, the content pages above, `/privacy`, `/terms`, and the API under `/api` |
 | `src/components/` | Design system (see `docs/COMPONENTS.md`) |
-| `src/features/` | Website, host setup, join, game (join card, lobby, live, results) |
+| `src/features/` | Website (with `website/guide/`: the content pages and the contact form), host setup, join, game (join card, lobby, live, results) |
 | `src/core/` | Game rules: tickets, 26 winning patterns, engine, tests |
 | `src/server/` | Game storage (memory or Supabase), realtime ping, rate limits, admin sign-in and statistics (`admin/`) |
 | `src/lib/` | Browser helpers: device token, API client, live game hook, sharing, caller voice |

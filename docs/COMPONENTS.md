@@ -14,8 +14,8 @@ Tokens (colours, radii, shadows, fonts) are CSS variables in `src/app/globals.cs
 | Component | Props | Usage |
 |---|---|---|
 | `PageShell` | `children`, `gradient?: boolean = true` (page background glow), `footer?: boolean = true`, `className?` (for `<main>`) | `<PageShell><div style={{ maxWidth: 'var(--content-narrow)', margin: '0 auto', padding: '20px 20px 0' }}>…</div></PageShell>` |
-| `SiteHeader` **client** | none. Sticky; desktop nav ≥ 860px, "Host" + "Menu" below | included by `PageShell` |
-| `SiteFooter` | none | included by `PageShell` |
+| `SiteHeader` **client** | none. Sticky; desktop nav ≥ 860px (How it works, Features, How to play, About, Join, Host — Features and About from 1040px), "Host" + "Menu" below (the menu also lists the guides, About us and Contact) | included by `PageShell` |
+| `SiteFooter` | none. Logo + note, then three link groups: Play · Learn · About | included by `PageShell` |
 
 Layout variables: `--content` (1160px), `--content-narrow` (560px), `--gutter` (20px), `--header-h` (70px; use for `top:` of sticky/fixed things under the header).
 

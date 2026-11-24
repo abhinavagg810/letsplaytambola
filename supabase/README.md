@@ -17,11 +17,30 @@ Easiest way — the SQL editor:
    Each shows "RLS enabled" with no policies — that is on purpose: nobody can read them except our own server.
 4. **New query** again. Open `supabase/migrations/0002_admin.sql`, copy **all** of it, paste it in, press **Run**. "Success. No rows returned" again.
 5. **New query** once more. Open `supabase/migrations/0003_insights.sql`, copy **all** of it, paste it in, press **Run**. Under **Table Editor** there are now eight tables.
+6. And once more for `supabase/migrations/0004_contact.sql` (the contact form). Nine tables.
 
-Or, with the Supabase CLI: `supabase link --project-ref <your-project-ref>` then `supabase db push` (runs all three files).
+Or, with the Supabase CLI: `supabase link --project-ref <your-project-ref>` then `supabase db push` (runs all four files).
 
-Run each file only once, in order: `0001`, `0002`, `0003`. (To start again from scratch — this deletes every game and every record — run
-`drop schema public cascade; create schema public; grant usage on schema public to anon, authenticated, service_role;` and then the three files again.)
+Run each file only once, in order: `0001`, `0002`, `0003`, `0004`. (To start again from scratch — this deletes every game and every record — run
+`drop schema public cascade; create schema public; grant usage on schema public to anon, authenticated, service_role;` and then the four files again.)
+
+### Already have a project? Run `0004_contact.sql` once
+This stores the messages people send with the form on the website's **Contact** page (`/contact`), for **Admin → Messages**.
+It needs `0003_insights.sql` to have been run first. Do it when you deploy the version of the site that has the Contact page — before or after:
+1. Supabase dashboard → your project → **SQL Editor → New query**.
+2. Open `supabase/migrations/0004_contact.sql` from this repo, copy **all** of it, paste it in, press **Run**.
+3. You should see "Success. No rows returned". If you see `relation "contact_messages" already exists`, it has been run before — nothing to do.
+   If you see an error about `admin_audit` or `purge_insights`, run `0003_insights.sql` first, then this file again.
+4. Check it: run `select public.contact_version();` — it answers `4`. Under **Table Editor** there is a new table `contact_messages`
+   showing "RLS enabled" with no policies.
+5. Send yourself a test message from `/contact`, then open `/admin/messages`: it is there, and the notice
+   "Run migration 0004 to switch the contact form on" is gone (within a minute).
+6. If you scheduled the hourly clean-up (step 5 below), leave it as it is: the same line now also deletes messages older than 90 days.
+
+**If the site is deployed before this file is run:** nothing breaks and nothing is lost silently. A person who sends the form is
+told "Your message was not sent" and shown the contact email address instead (what they typed stays in the form); the server log
+says which file to run; **Admin → Messages** shows the notice above. Games and everything else work as before.
+
 
 ### Already have a project? Run `0003_insights.sql` once
 This adds what the admin's analytics need: the IP address and approximate location of visitors, device details, usage
@@ -63,7 +82,7 @@ In Supabase open **Project Settings → API** (the keys may be on a page called 
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | the **anon** key (also called the *publishable* key) |
 
 In Vercel: **Project → Settings → Environment Variables**, add the four names and values (plus
-`NEXT_PUBLIC_SITE_URL`, e.g. `https://letsplaytambola.com`), then **redeploy** — the `NEXT_PUBLIC_…`
+`NEXT_PUBLIC_SITE_URL`, e.g. `https://letsplaytambola.com`, and `NEXT_PUBLIC_CONTACT_EMAIL`, the mailbox shown on the Contact page), then **redeploy** — the `NEXT_PUBLIC_…`
 values are baked in when the site is built. For local work put the same lines in a file called `.env.local` (see `.env.example`).
 
 Never put the service_role key in a variable whose name starts with `NEXT_PUBLIC_`.
@@ -107,15 +126,19 @@ WhatsApp numbers typed on the website's "Coming soon" section are in the `notify
 
 ## How it is kept safe
 - Browsers never talk to the database. Everything goes through the website's own server routes, which use the service_role key.
-- All eight tables have row level security switched on with **no policies**, and all rights are removed from the `anon` and `authenticated` roles, so the public (anon) key can read and write nothing.
+- All nine tables have row level security switched on with **no policies**, and all rights are removed from the `anon` and `authenticated` roles, so the public (anon) key can read and write nothing.
 - IP addresses, places, device details and usage events (`devices`, `device_ips`, `participations`, `events`) are written by the server after it has answered, and read only through the `admin_*` functions for the admin panel. They are deleted 90 days after they were last touched (`purge_insights`, run by `purge_expired_games`). One device can be erased on request from the admin (**Data & privacy → Erase a device**, `admin_erase_device`), which leaves a line in `admin_audit`.
 - A player's ticket and dabs are in the `players` table and are only ever sent to the device that owns them. Device tokens are stored only as SHA-256 hashes.
 - 24 hours after a game's last activity its tickets and dabs are erased. The rest (names typed, numbers called, winners, times, and the device hashes) is kept 90 days for the admin panel and then deleted. The retention is the `p_retention_days` argument of `purge_expired_games` (default 90) and `admin_retention_days()`; keep them in step with `ADMIN_RETENTION_DAYS` in `src/server/store/types.ts`.
 - The admin pages read through three functions (`admin_list_games`, `admin_get_game`, `admin_game_row`) that never return a ticket, dabs or a full device hash — only the first 8 characters of the hash. Like every other function they can be run by the service role only.
 - Writes go through one database function, `commit_game`, which refuses a write if the game changed in the meantime — so when two people claim the same prize at the same instant, exactly one wins.
 
+- Contact-form messages (`contact_messages`) are written by the server through `save_contact_message` and read only through the
+  `admin_*contact*` functions. They are deleted 90 days after they arrive (`purge_contact`, run by `purge_expired_games`); deleting one
+  from the admin leaves a line in `admin_audit` with its number and topic only.
+
 ## Tests (for developers)
-`npm run test:sql` applies the migrations to a throwaway database on a local PostgreSQL 16 and checks (`tests/security.sql`, `tests/insights.sql`, `tests/insights_parity.sql` — the last one is generated: `UPDATE_PARITY=1 npx vitest run src/server/insights/__tests__/parity.test.ts`) that:
+`npm run test:sql` applies the migrations to a throwaway database on a local PostgreSQL 16 and checks (`tests/security.sql`, `tests/insights.sql`, `tests/insights_parity.sql`, `tests/contact.sql` — the parity one is generated: `UPDATE_PARITY=1 npx vitest run src/server/insights/__tests__/parity.test.ts`) that:
 the analytics tables are locked down like the rest; `track_batch`, `record_participation` and `record_win` store what the server sends; rows older than 90 days are purged; erasing a device removes its rows and its names; every `admin_*` aggregate returns exactly what the TypeScript version returns for the same seeded data; and
 anon and authenticated can neither read nor change any table nor call any function (the admin ones included); the service role can;
 a stale version is rejected; the purge erases tickets and dabs at 24 hours but keeps the document, and deletes the game after 90 days;

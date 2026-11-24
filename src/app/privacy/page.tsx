@@ -1,7 +1,7 @@
 // ⚠ DRAFT LEGAL TEXT — NOT REVIEWED BY A LAWYER.
 // Written for v2 (no accounts) from the product facts in docs/design_handoff/README.md and docs/BUILD_NOTES.md.
 // Have a qualified lawyer review it before launch, and replace the placeholders:
-//   • the contact email (CONTACT_EMAIL_PLACEHOLDER in src/features/website/legal.ts)
+//   • the contact email: set NEXT_PUBLIC_CONTACT_EMAIL (CONTACT_EMAIL in src/lib/site.ts; the fallback is a placeholder) and make sure the mailbox works
 //   • the Grievance Officer's name and postal address (section "contact")
 //   • the legal name of the business that runs the site
 // If the product changes (analytics, ads, new data, longer storage), this page must change with it.
@@ -15,6 +15,10 @@
 //   • browser and device details, how the visitor arrived (referrer, campaign tags), and usage events are recorded;
 //   • a per-device record is kept (first/last seen, counts) — kept 90 days, visible only to the operator, erasable on request.
 // The sections "collect", "use", "share", "storage", "retention", "rights" and "children" below describe exactly that.
+// NEW since the third draft (supabase/migrations/0004_contact.sql, src/server/contact.ts, /contact) — ask the lawyer to check:
+//   • the contact form: we store the topic, the message, the name and email / phone the person CHOOSES to type (both optional),
+//     the page they came from, and the IP address, approximate place and device details of that request; kept 90 days after it
+//     arrives (or deleted sooner from the admin), seen only by the operator; used only to read and answer the message.
 // "{email}" in the text is replaced by a mail link.
 import { ADS_ON } from '@/lib/ads';
 import type { Metadata } from 'next';
@@ -23,12 +27,12 @@ import type { LegalSection } from '@/features/website/legal';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'What Letsplaytambola collects, why, how long it is kept and how you stay in control. No sign-up; tickets and dabs are erased after 24 hours, and game summaries, IP addresses and usage records after 90 days.',
+  description: 'What Letsplaytambola collects, why, how long it is kept and how you stay in control. No sign-up; tickets and dabs are erased after 24 hours, and game summaries, IP addresses, usage records and contact messages after 90 days.',
   alternates: { canonical: '/privacy' },
 };
 
 const SUMMARY =
-  'There is nothing to sign up for. We keep the name you type, a random code that remembers your device, and the game itself. To run the site, stop misuse and understand how it is used, we also record your IP address and the approximate place it points to (city, region and country — not GPS), your browser and device details, how you arrived, and what you do on the site. Tickets and dabs are erased 24 hours after a game’s last activity; everything else is kept for up to 90 days and then deleted. Only the person who runs the site can see it. We never sell your data and we never handle money.';
+  'There is nothing to sign up for. We keep the name you type, a random code that remembers your device, the game itself, and any message you send us with the contact form. To run the site, stop misuse and understand how it is used, we also record your IP address and the approximate place it points to (city, region and country — not GPS), your browser and device details, how you arrived, and what you do on the site. Tickets and dabs are erased 24 hours after a game’s last activity; everything else is kept for up to 90 days and then deleted. Only the person who runs the site can see it. We never sell your data and we never handle money.';
 
 const SECTIONS: LegalSection[] = [
   {
@@ -47,10 +51,11 @@ const SECTIONS: LegalSection[] = [
       'A device token. When you first use the site, your browser creates a long random code and keeps it on your device. It tells the game “this is the host” or “this is Meera’s ticket” when you come back or refresh. It does not contain your name, number or anything else about you. Our servers keep only a scrambled (hashed) copy of it.',
       'Game data. The game’s name, the optional ticket price the host notes, the ways to win, each player’s ticket and dabs, the numbers called and who won what.',
       'A phone number, only if you ask for the app launch message. If you type your mobile number in “Notify me”, we keep that number.',
+      'Messages you send us. If you use the form on our Contact page, we keep what you choose to write: the topic, your message, and — only if you type them — your name and an email address or phone number for our reply. We also note the page of our site you came from and, as for every request, the IP address, approximate location and device details of that request.',
       'Your IP address and approximate location. Every request your browser makes carries an IP address (the address of your internet connection). We record it, together with the city, region, country, postal code, time zone and approximate map coordinates (latitude and longitude) it points to. This is worked out from the IP address by our hosting provider; it is approximate, it can be wrong, and it is never your GPS position or your home address.',
       'Browser and device details. The type of device (phone, tablet or computer), its operating system and browser, whether the link was opened inside another app such as WhatsApp, your browser’s language, screen and window size, time zone, the kind of connection your browser reports, and whether you have added the site to your home screen. To work these out we also keep the “user agent” text your browser sends with every request, which names the browser, its version and the device’s system.',
       'How you arrived. The website that sent you to us, if any (its name only, not the page), any campaign tags in the link you opened, and the first page you saw.',
-      'What you do on the site. Which pages you open and when, taps on the main buttons (for example “Host a game”, “Join game”, “Share on WhatsApp”, “Copy link”, sound on or off), the steps of setting up or joining a game, the claims you make and whether they were valid, the kind of message the site showed you, and roughly how long you stayed. We do not record what you type, other than the name described above, and we never record the numbers on your ticket or your dabs for this purpose.',
+      'What you do on the site. Which pages you open and when, taps on the main buttons (for example “Host a game”, “Join game”, “Share on WhatsApp”, “Copy link”, sound on or off), the steps of setting up or joining a game, the claims you make and whether they were valid, the kind of message the site showed you, and roughly how long you stayed. We do not record what you type, other than the name described above and any message you send us with the contact form, and we never record the numbers on your ticket or your dabs for this purpose.',
       'Technical logs. Like every website, our hosting providers also process your IP address, browser type and the time of each request to deliver the pages.',
     ],
   },
@@ -61,6 +66,7 @@ const SECTIONS: LegalSection[] = [
       'To run your game live: deal tickets, show the shared board, call numbers, check claims and show the winners.',
       'To bring you back to your own ticket, or your host controls, when you reopen the link on the same device.',
       'To send one WhatsApp message when the app launches — only to numbers given in “Notify me”.',
+      'To read and answer the messages you send with the contact form, and to act on what you ask — for example a request to erase your data. We do not use your message, name, email or phone number for anything else, and we do not add you to any mailing list.',
       'To keep the service secure, prevent misuse and fix problems — for example to limit how fast one device or one internet connection can send requests.',
       'To understand how the service is used and improve it: how many people visit and from which cities and states, which devices and browsers they use, where they arrive from, how far they get when hosting or joining a game, how many games are played and which ways to win are popular.',
       'These records are kept per device, not per person: we do not know who you are, and we do not combine them with information from anywhere else.',
@@ -77,9 +83,9 @@ const SECTIONS: LegalSection[] = [
       'Anyone who has a game’s link or code can open its invite page and see the host’s name, the game’s name and how many people have joined. Share the link only with people you want in the game.',
     ],
     bullets: [
-      'The site’s operator (the person who runs Letsplaytambola) can see the summary of each game described in “How long we keep it”, the “Notify me” numbers, and — for each device — the IP address, approximate location, browser and device details, how it arrived and what it did on the site. Nobody else can: none of this is ever shown to other players or the host, and it is not part of any page of the site. The operator cannot see your ticket or your dabs.',
+      'The site’s operator (the person who runs Letsplaytambola) can see the summary of each game described in “How long we keep it”, the “Notify me” numbers, the messages sent with the contact form, and — for each device — the IP address, approximate location, browser and device details, how it arrived and what it did on the site. Nobody else can: none of this is ever shown to other players or the host, and it is not part of any page of the site. The operator cannot see your ticket or your dabs.',
       'Vercel hosts the website and its servers, and works out the approximate location from the IP address.',
-      'Supabase stores game data, “Notify me” numbers and the device, location and usage records described above, and delivers the live updates during a game.',
+      'Supabase stores game data, “Notify me” numbers, contact-form messages and the device, location and usage records described above, and delivers the live updates during a game.',
       'These providers work for us under their own data-protection terms and may process data on servers outside India.',
       'Authorities, only when the law requires it.',
     ],
@@ -130,6 +136,7 @@ const SECTIONS: LegalSection[] = [
       'Your IP address, the approximate location, your browser and device details, how you arrived and the record of what you did on the site are kept for up to 90 days after we last saw your device, and then deleted.',
       'All of this is used only to run the service, prevent misuse and understand how it is used, and only the site’s operator can see it.',
       '“Notify me” phone numbers are kept until we have sent the launch message, or until you ask us to remove yours, whichever comes first.',
+      'Messages sent with the contact form — with the name, email or phone number you typed and the details of that request — are kept for up to 90 days after they arrive, and then deleted. We may delete a message sooner once we have dealt with it.',
       'The items in your browser stay on your device until you clear your browser’s site data.',
       'Technical logs are kept by our hosting providers for a short period, as set by them.',
     ],
@@ -143,6 +150,7 @@ const SECTIONS: LegalSection[] = [
       'To remove what is saved on your device, clear this site’s data in your browser settings. After that the site will not recognise your device, so you may not be able to return to a game that is still running.',
       'To remove your number from the “Notify me” list, write to {email} from any email address and tell us the number. We will delete it promptly.',
       'To have the records about your device erased before the 90 days are up, write to {email}. Because we do not know who you are, please tell us the game code and the name you used so we can find your device. We will then delete its IP addresses, location, browser and device details and usage records, and replace your name with “Erased player” in the game summaries we keep.',
+      'To have a message you sent us deleted before the 90 days are up, write to {email} (or use the contact form and choose “Remove my data”), and tell us roughly when you sent it.',
       'To ask about or correct anything else, write to {email}.',
       'You may nominate someone to use these rights for you in case of death or incapacity, as allowed by Indian law.',
       'If you are unhappy with our answer, you can complain to our Grievance Officer (below) and, after that, to the Data Protection Board of India.',
@@ -174,7 +182,7 @@ const SECTIONS: LegalSection[] = [
     id: 'contact',
     title: 'Contact & Grievance Officer',
     paras: [
-      'Questions, requests or complaints about your data: write to {email}.',
+      'Questions, requests or complaints about your data: write to {email}, or use the form on our Contact page (/contact).',
       'Grievance Officer: Letsplaytambola, India — {email}. We acknowledge complaints within 48 hours and aim to resolve them within 30 days.',
     ],
   },

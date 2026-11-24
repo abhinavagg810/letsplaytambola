@@ -168,6 +168,32 @@
   flex: none;
 }
 
+/* A count beside a section (unread messages). */
+.navBadge {
+  margin-left: auto;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--pink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 22px;
+  text-align: center;
+}
+
+.shell[data-collapsed='true'] .navBadge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  font-size: 11px;
+  line-height: 18px;
+}
+
 .navItem[aria-current='page'] .navIcon {
   color: var(--marigold);
 }
@@ -2230,4 +2256,100 @@
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
+}
+
+/* ── Messages (contact form) ───────────────────────────── */
+.msgUnread th,
+.msgUnread td {
+  font-weight: 700;
+}
+
+.msgDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--pink);
+  vertical-align: 1px;
+}
+
+.msgCell {
+  white-space: normal !important;
+  min-width: 260px;
+  max-width: 460px;
+}
+
+.msgSummary {
+  cursor: pointer;
+  list-style: none;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+
+.msgSummary::-webkit-details-marker {
+  display: none;
+}
+
+.msgSummary::after {
+  content: ' Read all ▾';
+  color: var(--teal);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.msgDetails[open] .msgSummary::after {
+  content: ' Close ▴';
+}
+
+.msgDetails[open] .msgPreview {
+  display: none;
+}
+
+.msgFull {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.msgFacts {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.msgFacts div {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.msgFacts dt {
+  min-width: 90px;
+  color: var(--text-muted);
+}
+
+.msgActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.miniDanger {
+  border-color: var(--pink);
+  color: var(--pink-soft);
+}
+
+.miniDanger:hover {
+  background: var(--pink);
+  color: var(--text);
 }

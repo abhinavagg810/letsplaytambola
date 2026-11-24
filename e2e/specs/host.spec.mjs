@@ -6,7 +6,7 @@ const expectToast = (page, text) => until(async () => (await page.getByText(text
 const createBtn = (page) => page.getByRole('button', { name: /Create game & get link|Creating your game/ });
 const pattern = (page, name) => page.getByRole('checkbox', { name: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}`) });
 const amount = (page, name) => page.getByLabel(`Prize amount for ${name} in rupees (optional)`);
-const summary = (page) => page.getByRole('link', { name: /Ways to win/ }).innerText();
+const summary = (page) => page.locator('main').getByRole('link', { name: /Ways to win/ }).innerText();
 
 const cases = [
   {
@@ -170,7 +170,7 @@ const cases = [
       await page.locator('input[name="gameName"]').fill('Teej at Home');
       await page.locator('input[name="price"]').fill('250');
       await page.getByRole('switch', { name: /Deal me a ticket/ }).click();
-      await page.getByRole('link', { name: /Ways to win/ }).click();
+      await page.locator('main').getByRole('link', { name: /Ways to win/ }).click();
       await page.waitForURL('**/host/prizes');
       await page.getByRole('button', { name: 'Lines + House' }).click();
       await page.getByRole('button', { name: /Done · 4 picked/ }).click();
@@ -323,7 +323,7 @@ const cases = [
       await go(page, '/host');
       await hydrated(page);
       await page.locator('input[name="hostName"]').fill('Priya');
-      await page.getByRole('link', { name: /Ways to win/ }).click();
+      await page.locator('main').getByRole('link', { name: /Ways to win/ }).click();
       await page.waitForURL('**/host/prizes');
       for (const name of ['Early Five', 'Top Line', 'Middle Line', 'Bottom Line', 'Four Corners', 'Full House']) await pattern(page, name).click();
       await page.getByRole('button', { name: 'Done · 0 picked' }).click();
@@ -349,7 +349,7 @@ const cases = [
       await go(page, '/host');
       await hydrated(page);
       await page.locator('input[name="hostName"]').fill('Priya');
-      await page.getByRole('link', { name: /Ways to win/ }).click();
+      await page.locator('main').getByRole('link', { name: /Ways to win/ }).click();
       await page.waitForURL('**/host/prizes');
       const rows = page.getByRole('checkbox');
       for (let i = 0; i < 26; i++) if ((await rows.nth(i).getAttribute('aria-checked')) !== 'true') await rows.nth(i).click();
@@ -378,7 +378,7 @@ const cases = [
       await hydrated(page);
       await page.locator('input[name="hostName"]').fill('Priya');
       await page.locator('input[name="price"]').fill('100');
-      await page.getByRole('link', { name: /Ways to win/ }).click();
+      await page.locator('main').getByRole('link', { name: /Ways to win/ }).click();
       await page.waitForURL('**/host/prizes');
       equal(await page.getByLabel(/Prize amount for/).count(), 6, 'one amount field per picked pattern');
       for (const [typed, want] of [['abc', ''], ['₹1,000', '1000'], ['1234567', '123456'], ['999999', '999999'], ['007', '7'], ['0', '0'], ['000', '0'], ['12.50', '12'], ['1,500.75', '1500'], ['-5', '5']]) {
